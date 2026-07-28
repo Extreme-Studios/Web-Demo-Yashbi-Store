@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Operasional — Yashbi Store</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css?v=20260729-operations">
+  <link rel="stylesheet" href="assets/admin.css?v=20260729-1">
+</head>
+<body class="admin-body">
+  <main class="admin-shell">
+    <section class="admin-login" id="loginView">
+      <a class="brand" href="/"><span class="brand-mark">Y</span><span class="brand-copy"><strong>Yashbi</strong><small>Operations</small></span></a>
+      <p class="eyebrow">Private access</p><h1>Panel Operasional</h1>
+      <p>Masuk untuk melihat antrean pesanan dan pengunjung aktif.</p>
+      <form id="loginForm">
+        <label class="field"><span>Email</span><input name="email" type="email" required autocomplete="username" placeholder="owner@yashbi.local"></label>
+        <label class="field"><span>Kata sandi</span><input name="password" type="password" required autocomplete="current-password"></label>
+        <button class="button button-dark button-block" type="submit">Masuk ke panel</button>
+      </form>
+      <p class="admin-error" id="loginError" hidden></p>
+    </section>
+
+    <section class="admin-app" id="appView" hidden>
+      <header class="admin-header">
+        <a class="brand" href="/"><span class="brand-mark">Y</span><span class="brand-copy"><strong>Yashbi</strong><small>Operations</small></span></a>
+        <div class="admin-header-actions"><span id="roleBadge" class="role-badge"></span><button id="refreshButton" class="text-button" type="button">Perbarui</button><button id="logoutButton" class="text-button" type="button">Keluar</button></div>
+      </header>
+      <div class="admin-intro"><div><p class="eyebrow">Live operations</p><h1>Ringkasan toko</h1><p id="syncLabel">Memuat data operasional...</p></div><span class="live-dot">● Sistem terhubung</span></div>
+      <section class="metric-grid" aria-label="Ringkasan operasional">
+        <article><span>Pengunjung online</span><strong id="metricOnline">0</strong></article>
+        <article><span>Baru tanya</span><strong id="metricTanya">0</strong></article>
+        <article><span>Menunggu verifikasi</span><strong id="metricVerify">0</strong></article>
+        <article><span>Dalam pengiriman</span><strong id="metricShipping">0</strong></article>
+      </section>
+      <section class="admin-grid">
+        <article class="admin-card visitors-card"><div class="card-title"><div><p class="eyebrow">Daftar ringkas</p><h2>Pengunjung</h2></div><span id="visitorCount"></span></div><div id="visitorList" class="simple-list"></div></article>
+        <article class="admin-card orders-card"><div class="card-title"><div><p class="eyebrow">Antrean kerja</p><h2>Pesanan masuk</h2></div><span id="orderCount"></span></div><div id="orderList" class="simple-list order-list"></div></article>
+      </section>
+    </section>
+  </main>
+
+  <section class="order-detail" id="detailPanel" hidden><button id="detailClose" class="close-button" type="button" aria-label="Tutup detail">×</button><p class="eyebrow">Detail pesanan</p><h2 id="detailTitle"></h2><div id="detailContent"></div><form id="orderUpdateForm"><label class="field"><span>Status</span><select name="status"><option>Menunggu Verifikasi Pembayaran</option><option>Diproses</option><option>Shipping</option><option>Selesai</option><option>Batal</option></select></label><label class="field"><span>Ekspedisi</span><input name="expedition" placeholder="J&T"></label><label class="field"><span>Nomor resi</span><input name="trackingNumber" placeholder="JP123456789ID"></label><button class="button button-dark button-block" type="submit">Simpan pembaruan</button></form></section>
+  <div class="toast" id="toast" role="status"></div>
+  <script src="assets/config.js"></script><script src="assets/admin.js"></script>
+</body>
+</html>

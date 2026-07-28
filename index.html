@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/styles.css?v=20260729-balanced-category">
+  <link rel="stylesheet" href="assets/styles.css?v=20260729-operations">
 </head>
 <body>
   <div class="announcement">
@@ -318,7 +318,19 @@
     <h2 id="successTitle">Pesananmu sudah tercatat.</h2>
     <p>Tim Yashbi akan memverifikasi pembayaran pada jam operasional berikutnya.</p>
     <div class="order-number"><span>Nomor pesanan</span><strong id="successOrderId"></strong></div>
+    <a class="button button-outline button-block" id="manualOrderButton" href="#" target="_blank" rel="noopener" hidden>Hubungi staff via WhatsApp</a>
     <button class="button button-dark button-block" data-close-modal type="button">Kembali Belanja</button>
+  </section>
+
+  <section class="identity-modal modal-panel compact-modal" id="identityModal" role="dialog" aria-modal="true" aria-labelledby="identityTitle">
+    <p class="eyebrow">Halo, selamat datang</p>
+    <h2 id="identityTitle">Boleh tahu nama panggilanmu?</h2>
+    <p>Nama ini hanya dipakai agar pilihan dan pesananmu tidak tertukar dengan pembeli lain.</p>
+    <form id="identityForm">
+      <label class="field"><span>Nama panggilan</span><input name="visitorName" required maxlength="60" autocomplete="given-name" placeholder="Contoh: Siti"></label>
+      <button class="button button-dark button-block" type="submit">Mulai melihat koleksi</button>
+    </form>
+    <small class="identity-note">Alamat dan WhatsApp baru diminta saat checkout.</small>
   </section>
 
   <section class="image-lightbox" id="imageLightbox" role="dialog" aria-modal="true" aria-label="Foto produk diperbesar">

@@ -42,7 +42,7 @@ PRODUCTS.forEach(product => {
 
 const money = value => new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(value);
 const byId = id => document.getElementById(id);
-const STORE_KEYS = {cart:"yashbi_cart_v1",orders:"yashbi_orders_v1"};
+const STORE_KEYS = {cart:"yashbi_cart_v1",orders:"yashbi_orders_v1",visitor:"yashbi_visitor_v1",queue:"yashbi_sync_queue_v1"};
 const API_URL = String(window.YASHBI_CONFIG?.apiUrl || "").trim();
 
 let cart = JSON.parse(localStorage.getItem(STORE_KEYS.cart) || "[]");
@@ -53,6 +53,41 @@ let selectedProduct = null;
 let selectedColor = null;
 let selectedSize = null;
 let proofData = null;
+let visitor = JSON.parse(localStorage.getItem(STORE_KEYS.visitor) || "null");
+
+function newId(prefix) {
+  const random = globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  return `${prefix}-${random}`;
+}
+
+function readQueue() { return JSON.parse(localStorage.getItem(STORE_KEYS.queue) || "[]"); }
+function writeQueue(queue) { localStorage.setItem(STORE_KEYS.queue, JSON.stringify(queue)); }
+
+async function postApi(payload) {
+  if (!API_URL) throw new Error("Backend belum dikonfigurasi.");
+  const response = await fetch(API_URL, {method:"POST",redirect:"follow",body:JSON.stringify(payload)});
+  if (!response.ok) throw new Error("Server tidak dapat menerima data.");
+  const result = await response.json();
+  if (!result.ok) throw new Error(result.error || "Permintaan ditolak server.");
+  return result;
+}
+
+async function syncQueue() {
+  const queue = readQueue();
+  if (!queue.length || !navigator.onLine || !API_URL) return;
+  const remaining=[];
+  for (const queued of queue) {
+    try { await postApi({...queued.payload, action:"syncOrder"}); }
+    catch (error) { remaining.push(queued); }
+  }
+  writeQueue(remaining);
+}
+
+async function syncVisitor(status="Online / Tanya", orderId="") {
+  if (!visitor) return;
+  try { await postApi({action:"upsertVisitor",sessionId:visitor.sessionId,name:visitor.name,status,orderId}); }
+  catch (error) { console.warn("Status pengunjung belum tersinkron:", error); }
+}
 
 const productGrid = byId("productGrid");
 const backdrop = byId("backdrop");
@@ -242,41 +277,30 @@ function shippingCost(courier) {
 }
 
 async function sendOrderToBackend(order) {
-  if (!API_URL) return null;
   const items = order.items.map(item => {
     const product = PRODUCTS.find(product => product.id === item.productId);
     return {...item,name:product.name,price:product.price};
   });
-  const response = await fetch(API_URL, {
-    method: "POST",
-    redirect: "follow",
-    body: JSON.stringify({
-      action: "createOrder",
-      customer: order.customer,
-      items,
-      subtotal: order.subtotal,
-      shipping: order.shipping,
-      proof: order.proof
-    })
-  });
-  const result = await response.json();
-  if (!result.ok) throw new Error(result.error || "Pesanan gagal dikirim.");
+  const result = await postApi({action:"createOrder",clientOrderId:order.clientOrderId,sessionId:visitor?.sessionId || "",customer:order.customer,items,subtotal:order.subtotal,shipping:order.shipping,proof:order.proof});
   return result.order;
 }
 
 async function createOrder(form) {
   const orders = JSON.parse(localStorage.getItem(STORE_KEYS.orders) || "[]");
   const now = new Date();
-  const localId = `YS-${String(now.getFullYear()).slice(-2)}${String(now.getMonth()+1).padStart(2,"0")}${String(now.getDate()).padStart(2,"0")}-${String(orders.length+1).padStart(3,"0")}`;
+  const localId = `TMP-${String(now.getFullYear()).slice(-2)}${String(now.getMonth()+1).padStart(2,"0")}${String(now.getDate()).padStart(2,"0")}-${String(orders.length+1).padStart(3,"0")}`;
   const data = Object.fromEntries(new FormData(form).entries());
   delete data.proof;
-  const order = {id:localId,createdAt:now.toISOString(),customer:data,items:[...cart],subtotal:cartTotal(),shipping:shippingCost(data.courier),status:"Menunggu Verifikasi Pembayaran",proof:proofData};
+  const order = {id:localId,clientOrderId:newId("YSH"),createdAt:now.toISOString(),customer:data,items:[...cart],subtotal:cartTotal(),shipping:shippingCost(data.courier),status:"Menunggu Verifikasi Pembayaran",proof:proofData,syncState:"Mencoba sinkron"};
   try {
     const remoteOrder = await sendOrderToBackend(order);
-    if (remoteOrder) Object.assign(order, remoteOrder);
+    if (remoteOrder) { Object.assign(order, remoteOrder); order.syncState="Tersinkron"; await syncVisitor(order.status, order.id); }
   } catch (error) {
     order.syncError = error.message;
-    console.warn("Pesanan disimpan lokal karena backend tidak dapat dihubungi:", error);
+    order.status = "Menunggu sinkronisasi";
+    order.syncState = "Antrean perangkat ini";
+    writeQueue([...readQueue(), {payload:{action:"syncOrder",clientOrderId:order.clientOrderId,sessionId:visitor?.sessionId || "",customer:order.customer,items:order.items.map(item=>{const product=PRODUCTS.find(p=>p.id===item.productId);return {...item,name:product.name,price:product.price};}),subtotal:order.subtotal,shipping:order.shipping,proof:order.proof},queuedAt:now.toISOString()}]);
+    console.warn("Pesanan menunggu sinkronisasi:", error);
   }
   orders.unshift(order);
   try { localStorage.setItem(STORE_KEYS.orders, JSON.stringify(orders)); }
@@ -337,7 +361,12 @@ byId("cartClose").addEventListener("click",closeModals);
 byId("cartShopButton").addEventListener("click",()=>{closeModals();byId("koleksi").scrollIntoView({behavior:"smooth"});});
 backdrop.addEventListener("click",closeModals);
 byId("addToCartButton").addEventListener("click",addSelectedToCart);
-byId("checkoutOpen").addEventListener("click",()=>{if(!cart.length)return;renderCheckout();openModal("checkoutModal");});
+byId("checkoutOpen").addEventListener("click",()=>{
+  if(!cart.length)return;
+  if(!visitor) { openModal("identityModal"); toast("Isi nama panggilan dulu agar pesananmu tidak tertukar."); return; }
+  syncVisitor("Checkout — belum bayar");
+  renderCheckout();openModal("checkoutModal");
+});
 byId("productImageZoom").addEventListener("click",()=>{byId("lightboxImage").src=byId("productModalImage").src;byId("imageLightbox").classList.add("open");});
 byId("lightboxClose").addEventListener("click",()=>byId("imageLightbox").classList.remove("open"));
 byId("imageLightbox").addEventListener("click",e=>{if(e.target===byId("imageLightbox"))e.currentTarget.classList.remove("open");});
@@ -369,7 +398,17 @@ byId("checkoutForm").addEventListener("submit",async e=>{
   submitButton.disabled=true;submitButton.textContent="Mencatat pesanan...";
   const order=await createOrder(e.currentTarget);
   submitButton.disabled=false;submitButton.textContent="Buat Pesanan";
-  closeModals();byId("successOrderId").textContent=order.id;openModal("successModal");
+  closeModals();byId("successOrderId").textContent=order.id;
+  byId("successTitle").textContent=order.syncState === "Tersinkron" ? "Pesananmu sudah tercatat." : "Pesananmu sedang diamankan.";
+  document.querySelector("#successModal > p:not(.eyebrow)").textContent=order.syncState === "Tersinkron"
+    ? "Tim Yashbi akan memverifikasi pembayaran pada jam operasional berikutnya."
+    : "Sistem toko sedang gangguan. Pesanan disimpan di perangkat ini dan akan dikirim saat koneksi backend kembali. Untuk proses tercepat, hubungi staff melalui WhatsApp.";
+  const manualButton=byId("manualOrderButton");
+  const waNumber=String(window.YASHBI_CONFIG?.whatsappNumber || "").replace(/\D/g,"");
+  manualButton.hidden=order.syncState === "Tersinkron" || !waNumber;
+  manualButton.href=`https://wa.me/${waNumber}?text=${encodeURIComponent(`Halo Yashbi, saya ${order.customer.name}. Pesanan ${order.id} sedang menunggu sinkronisasi. Mohon bantu proses manual.`)}`;
+  openModal("successModal");
+  if(order.syncState !== "Tersinkron") toast("Pesanan masuk antrean sinkron. Simpan nomor pesanan ini.");
 });
 
 byId("trackForm").addEventListener("submit",async e=>{
@@ -394,6 +433,22 @@ byId("trackForm").addEventListener("submit",async e=>{
 
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){byId("imageLightbox").classList.remove("open");closeModals();}});
 
+byId("identityForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const name=String(new FormData(e.currentTarget).get("visitorName") || "").trim();
+  if(!name) return;
+  visitor={sessionId:newId("VIS"),name,createdAt:new Date().toISOString()};
+  localStorage.setItem(STORE_KEYS.visitor,JSON.stringify(visitor));
+  closeModals();
+  await syncVisitor();
+  toast(`Halo ${name}, koleksi Yashbi siap kamu lihat.`);
+});
+
+window.addEventListener("online",()=>{ syncQueue(); syncVisitor(); toast("Koneksi kembali. Antrean pesanan sedang disinkronkan."); });
+window.addEventListener("focus",()=>{ syncQueue(); syncVisitor(); });
+
 renderProducts();
 renderCart();
 hydrateCatalogImages();
+syncQueue();
+if(visitor) syncVisitor(); else setTimeout(()=>openModal("identityModal"),500);

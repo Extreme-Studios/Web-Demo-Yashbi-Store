@@ -1,14 +1,16 @@
 const CONFIG = {
   spreadsheetId: "1Q4MBvBZMmUTlg-LX2ePXqU47eqp7l0c8GfZfaFSxS1U",
   driveRootFolderId: "1WOnLft-_IUXGHGRdl_sruLFLIZfwXDrm",
-  sheets: { products: "Produk", orders: "Pesanan", orderItems: "Detail Pesanan", settings: "Pengaturan" }
+  sheets: { products: "Produk", orders: "Pesanan", orderItems: "Detail Pesanan", settings: "Pengaturan", visitors: "Pengunjung", admins: "Admin" }
 };
 
 const HEADERS = {
   Produk: ["SKU", "Nama", "Kategori", "Harga", "Harga Coret", "Warna", "Ukuran", "Stok", "Foto Utama", "Foto Kedua", "Deskripsi", "Badge", "Aktif", "Diperbarui"],
-  Pesanan: ["Nomor Pesanan", "Tanggal", "Nama Pembeli", "WhatsApp", "Email", "Alamat", "Kota", "Kode Pos", "Kurir", "Subtotal", "Ongkir", "Total", "Status", "Link Bukti Transfer", "Ekspedisi", "Nomor Resi", "Diperbarui"],
+  Pesanan: ["Nomor Pesanan", "Tanggal", "Nama Pembeli", "WhatsApp", "Email", "Alamat", "Kota", "Kode Pos", "Kurir", "Subtotal", "Ongkir", "Total", "Status", "Link Bukti Transfer", "Ekspedisi", "Nomor Resi", "Diperbarui", "ID Klien"],
   "Detail Pesanan": ["Nomor Pesanan", "SKU", "Nama Produk", "Warna", "Ukuran", "Jumlah", "Harga Satuan", "Total"],
-  Pengaturan: ["Kunci", "Nilai"]
+  Pengaturan: ["Kunci", "Nilai"],
+  Pengunjung: ["ID Sesi", "Nama Panggilan", "Status", "Mulai", "Terakhir Aktif", "Nomor Pesanan"],
+  Admin: ["Email", "Peran", "Password Hash", "Aktif", "Diperbarui"]
 };
 
 function doGet(e) {
@@ -17,6 +19,7 @@ function doGet(e) {
     if (action === "track") return json_(trackOrder_(e.parameter.orderId, e.parameter.phone));
     if (action === "products") return json_({ ok: true, products: getProducts_() });
     if (action === "catalog-images") return json_({ ok: true, images: getCatalogImages_() });
+    if (action === "admin-dashboard") return json_(adminDashboard_(e.parameter.token));
     return json_({ ok: true, service: "Yashbi Store API", time: new Date().toISOString() });
   } catch (error) {
     return json_({ ok: false, error: error.message });
@@ -26,7 +29,9 @@ function doGet(e) {
 function doPost(e) {
   try {
     const payload = JSON.parse((e && e.postData && e.postData.contents) || "{}");
-    if (payload.action === "createOrder") return json_(createOrder_(payload));
+    if (payload.action === "createOrder" || payload.action === "syncOrder") return json_(createOrder_(payload));
+    if (payload.action === "upsertVisitor") return json_(upsertVisitor_(payload));
+    if (payload.action === "adminLogin") return json_(adminLogin_(payload));
     if (payload.action === "updateOrder") return json_(updateOrder_(payload));
     throw new Error("Aksi tidak dikenal.");
   } catch (error) {
@@ -56,6 +61,13 @@ function setupYashbiStore() {
       ["Nama Rekening", "Yashbi Store"]
     ]);
   }
+  const adminSheet = spreadsheet.getSheetByName(CONFIG.sheets.admins);
+  if (adminSheet.getLastRow() < 2) {
+    adminSheet.getRange(2, 1, 2, 5).setValues([
+      ["owner@yashbi.local", "OWNER", "c13f1f7f55150eed727f5f04adea416e95364a8c0a5e3122093fe222337120f2", true, new Date()],
+      ["staff@yashbi.local", "STAFF", "a608f3b7d7f7a5fcb06f096adfc32564e125062e8dae6dc30d893b967cfd01bb", true, new Date()]
+    ]);
+  }
   const root = DriveApp.getFolderById(CONFIG.driveRootFolderId);
   getOrCreateFolder_(root, "Katalog Produk");
   getOrCreateFolder_(root, "Bukti Transfer");
@@ -72,6 +84,12 @@ function createOrder_(payload) {
     const orderSheet = spreadsheet.getSheetByName(CONFIG.sheets.orders);
     const itemSheet = spreadsheet.getSheetByName(CONFIG.sheets.orderItems);
     if (!orderSheet || !itemSheet) throw new Error("Jalankan setupYashbiStore terlebih dahulu.");
+    const clientOrderId = safe_(payload.clientOrderId || "");
+    const existing = clientOrderId && orderSheet.getLastRow() > 1
+      ? orderSheet.getRange(2, 1, orderSheet.getLastRow() - 1, HEADERS.Pesanan.length).getValues()
+          .find(row => String(row[17] || "") === clientOrderId)
+      : null;
+    if (existing) return { ok: true, order: { id: existing[0], status: existing[12], createdAt: new Date(existing[1]).toISOString(), duplicate: true } };
     const orderId = nextOrderId_(orderSheet);
     const now = new Date();
     const proofUrl = saveProof_(payload.proof, orderId);
@@ -83,7 +101,7 @@ function createOrder_(payload) {
     orderSheet.appendRow([
       orderId, now, safe_(customer.name), normalizePhone_(customer.phone), safe_(customer.email),
       safe_(customer.address), safe_(customer.city), safe_(customer.postal), safe_(customer.courier),
-      subtotal, shipping, total, status, proofUrl, "", "", now
+      subtotal, shipping, total, status, proofUrl, "", "", now, clientOrderId
     ]);
     const rows = payload.items.map(item => [
       orderId, safe_(item.productId), safe_(item.name), safe_(item.color), safe_(item.size),
@@ -115,7 +133,70 @@ function trackOrder_(orderId, phone) {
   };
 }
 
+function upsertVisitor_(payload) {
+  const sessionId = safe_(payload.sessionId);
+  const name = safe_(payload.name).slice(0, 60);
+  if (!sessionId || !name) throw new Error("Nama dan ID sesi wajib ada.");
+  const sheet = SpreadsheetApp.openById(CONFIG.spreadsheetId).getSheetByName(CONFIG.sheets.visitors);
+  if (!sheet) throw new Error("Jalankan setupYashbiStore terlebih dahulu.");
+  const now = new Date();
+  const rows = sheet.getLastRow() > 1 ? sheet.getRange(2, 1, sheet.getLastRow() - 1, HEADERS.Pengunjung.length).getValues() : [];
+  const index = rows.findIndex(row => String(row[0]) === sessionId);
+  const status = safe_(payload.status || "Online / Tanya");
+  if (index >= 0) {
+    sheet.getRange(index + 2, 2, 1, 5).setValues([[name, status, rows[index][3] || now, now, safe_(payload.orderId || rows[index][5] || "")]]);
+  } else {
+    sheet.appendRow([sessionId, name, status, now, now, safe_(payload.orderId || "")]);
+  }
+  return { ok: true };
+}
+
+function adminLogin_(payload) {
+  const email = safe_(payload.email).toLowerCase();
+  const password = String(payload.password || "");
+  if (!email || !password) throw new Error("Email dan kata sandi wajib diisi.");
+  const sheet = SpreadsheetApp.openById(CONFIG.spreadsheetId).getSheetByName(CONFIG.sheets.admins);
+  if (!sheet || sheet.getLastRow() < 2) throw new Error("Akun admin belum disiapkan.");
+  const row = sheet.getRange(2, 1, sheet.getLastRow() - 1, HEADERS.Admin.length).getValues()
+    .find(value => String(value[0]).toLowerCase() === email && String(value[3]).toLowerCase() !== "false");
+  if (!row || hash_(password) !== String(row[2])) throw new Error("Email atau kata sandi salah.");
+  const token = Utilities.getUuid() + Utilities.getUuid();
+  CacheService.getScriptCache().put("admin:" + token, JSON.stringify({ email: email, role: String(row[1]).toUpperCase() }), 21600);
+  return { ok: true, token: token, role: String(row[1]).toUpperCase(), name: email.split("@")[0] };
+}
+
+function requireAdmin_(token) {
+  const raw = CacheService.getScriptCache().get("admin:" + String(token || ""));
+  if (!raw) throw new Error("Sesi admin berakhir. Silakan login ulang.");
+  return JSON.parse(raw);
+}
+
+function adminDashboard_(token) {
+  const admin = requireAdmin_(token);
+  const spreadsheet = SpreadsheetApp.openById(CONFIG.spreadsheetId);
+  const orderSheet = spreadsheet.getSheetByName(CONFIG.sheets.orders);
+  const visitorSheet = spreadsheet.getSheetByName(CONFIG.sheets.visitors);
+  const orderRows = orderSheet && orderSheet.getLastRow() > 1 ? orderSheet.getRange(2, 1, orderSheet.getLastRow() - 1, HEADERS.Pesanan.length).getValues() : [];
+  const visitorRows = visitorSheet && visitorSheet.getLastRow() > 1 ? visitorSheet.getRange(2, 1, visitorSheet.getLastRow() - 1, HEADERS.Pengunjung.length).getValues() : [];
+  const now = Date.now();
+  const visitors = visitorRows.slice(-60).reverse().map(row => ({
+    sessionId: row[0], name: row[1], status: row[2], lastSeen: row[4] instanceof Date ? row[4].toISOString() : "", orderId: row[5] || "",
+    online: row[4] instanceof Date && now - row[4].getTime() < 10 * 60 * 1000
+  }));
+  const orders = orderRows.slice(-100).reverse().map(row => ({
+    id: row[0], createdAt: row[1] instanceof Date ? row[1].toISOString() : "", name: row[2], phone: row[3], email: row[4],
+    address: row[5], city: row[6], postal: row[7], courier: row[8], subtotal: number_(row[9]), shipping: number_(row[10]), total: number_(row[11]),
+    status: row[12], proofUrl: row[13], expedition: row[14], trackingNumber: row[15], clientOrderId: row[17] || ""
+  }));
+  const counts = { online: visitors.filter(item => item.online).length, tanya: visitors.filter(item => item.status === "Online / Tanya").length,
+    checkout: orders.filter(item => item.status === "Checkout — belum bayar").length,
+    verify: orders.filter(item => item.status === "Menunggu Verifikasi Pembayaran").length,
+    shipping: orders.filter(item => item.status === "Shipping").length };
+  return { ok: true, admin: admin, visitors: visitors, orders: orders, counts: counts };
+}
+
 function updateOrder_(payload) {
+  const admin = requireAdmin_(payload.token);
   const sheet = SpreadsheetApp.openById(CONFIG.spreadsheetId).getSheetByName(CONFIG.sheets.orders);
   const values = sheet.getDataRange().getValues();
   const index = values.findIndex((row, i) => i > 0 && String(row[0]) === String(payload.orderId));
@@ -124,7 +205,7 @@ function updateOrder_(payload) {
   if (payload.expedition !== undefined) sheet.getRange(index + 1, 15).setValue(safe_(payload.expedition));
   if (payload.trackingNumber !== undefined) sheet.getRange(index + 1, 16).setValue(safe_(payload.trackingNumber));
   sheet.getRange(index + 1, 17).setValue(new Date());
-  return { ok: true };
+  return { ok: true, by: admin.email };
 }
 
 function getProducts_() {
@@ -227,6 +308,11 @@ function safe_(value) {
 function number_(value) {
   const number = Number(value || 0);
   return isFinite(number) ? number : 0;
+}
+
+function hash_(value) {
+  const bytes = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, String(value), Utilities.Charset.UTF_8);
+  return bytes.map(byte => ((byte + 256) % 256).toString(16).padStart(2, "0")).join("");
 }
 
 function json_(data) {
