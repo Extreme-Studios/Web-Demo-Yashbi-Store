@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Yashbi Store — koleksi gaun, sepatu wanita, jas pria, dan sepatu pria pilihan.">
+  <meta name="theme-color" content="#f6f0eb">
+  <title>Yashbi Store — Curated Fashion for Every Moment</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div class="announcement">
+    <span>Gratis konsultasi ukuran</span>
+    <span class="announcement-dot"></span>
+    <span>Koleksi pilihan untuk momen terbaikmu</span>
+    <span class="announcement-dot"></span>
+    <span>Pengiriman seluruh Indonesia</span>
+  </div>
+
+  <header class="site-header" id="top">
+    <a class="brand" href="#top" aria-label="Yashbi Store">
+      <span class="brand-mark">Y</span>
+      <span class="brand-copy">
+        <strong>Yashbi</strong>
+        <small>Store</small>
+      </span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="Navigasi utama">
+      <a href="#koleksi" data-category-link="all">Koleksi</a>
+      <a href="#koleksi" data-category-link="Gaun Wanita">Gaun Wanita</a>
+      <a href="#koleksi" data-category-link="Sepatu Wanita">Sepatu Wanita</a>
+      <a href="#koleksi" data-category-link="Jas Pria">Jas Pria</a>
+      <a href="#koleksi" data-category-link="Sepatu Pria">Sepatu Pria</a>
+    </nav>
+
+    <div class="header-actions">
+      <button class="icon-button" id="searchToggle" type="button" aria-label="Cari produk">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4 4"></path></svg>
+      </button>
+      <button class="icon-button cart-button" id="cartToggle" type="button" aria-label="Buka keranjang">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h2l1.4 8.2a2 2 0 0 0 2 1.7h7.7a2 2 0 0 0 2-1.6L20 9H7"></path><circle cx="10" cy="20" r="1"></circle><circle cx="18" cy="20" r="1"></circle></svg>
+        <span id="cartCount">0</span>
+      </button>
+      <button class="menu-toggle" id="menuToggle" type="button" aria-label="Buka menu"><span></span><span></span></button>
+    </div>
+  </header>
+
+  <div class="search-bar" id="searchBar">
+    <div class="search-inner">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4 4"></path></svg>
+      <input id="globalSearch" type="search" placeholder="Cari gaun, sepatu, jas, warna, atau gaya…" autocomplete="off">
+      <button id="searchClose" type="button" aria-label="Tutup pencarian">×</button>
+    </div>
+  </div>
+
+  <nav class="mobile-nav" id="mobileNav" aria-label="Navigasi mobile">
+    <a href="#koleksi" data-category-link="all">Semua Koleksi</a>
+    <a href="#koleksi" data-category-link="Gaun Wanita">Gaun Wanita</a>
+    <a href="#koleksi" data-category-link="Sepatu Wanita">Sepatu Wanita</a>
+    <a href="#koleksi" data-category-link="Jas Pria">Jas Pria</a>
+    <a href="#koleksi" data-category-link="Sepatu Pria">Sepatu Pria</a>
+    <a href="#tentang">Tentang Yashbi</a>
+  </nav>
+
+  <main>
+    <section class="hero">
+      <img src="assets/images/yashbi-hero.png" alt="Koleksi fashion elegan Yashbi Store" fetchpriority="high">
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <p class="eyebrow">New Season · 2026</p>
+        <h1>Style yang terasa<br><em>seperti dirimu.</em></h1>
+        <p>Temukan gaun, sepatu, dan tailoring pilihan yang dibuat untuk hadir elegan di setiap momen.</p>
+        <div class="hero-actions">
+          <a class="button button-dark" href="#koleksi">Jelajahi Koleksi</a>
+          <button class="text-button" type="button" data-category-link="Gaun Wanita">Lihat Gaun Terbaru <span>→</span></button>
+        </div>
+      </div>
+      <div class="hero-caption">
+        <span>01</span>
+        <p>Modern Grace<br>Collection</p>
+      </div>
+    </section>
+
+    <section class="service-strip" aria-label="Keunggulan toko">
+      <article>
+        <span class="service-icon">◇</span>
+        <div><strong>Koleksi Terkurasi</strong><small>Dipilih untuk gaya modern</small></div>
+      </article>
+      <article>
+        <span class="service-icon">↗</span>
+        <div><strong>Pengiriman Terlacak</strong><small>Resi dan status pesanan jelas</small></div>
+      </article>
+      <article>
+        <span class="service-icon">♡</span>
+        <div><strong>Bantuan Ukuran</strong><small>Pilih fit yang paling nyaman</small></div>
+      </article>
+      <article>
+        <span class="service-icon">✓</span>
+        <div><strong>Pembayaran Aman</strong><small>Verifikasi langsung oleh toko</small></div>
+      </article>
+    </section>
+
+    <section class="category-section section-shell">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Curated for you</p>
+          <h2>Pilih gayamu</h2>
+        </div>
+        <p>Empat kategori utama, dirancang untuk memudahkanmu menemukan tampilan yang tepat.</p>
+      </div>
+      <div class="category-grid">
+        <button class="category-card category-gown" type="button" data-category-link="Gaun Wanita">
+          <span>Gaun Wanita</span><small>8 koleksi</small><i>→</i>
+        </button>
+        <button class="category-card category-wshoes" type="button" data-category-link="Sepatu Wanita">
+          <span>Sepatu Wanita</span><small>7 koleksi</small><i>→</i>
+        </button>
+        <button class="category-card category-suit" type="button" data-category-link="Jas Pria">
+          <span>Jas Pria</span><small>8 koleksi</small><i>→</i>
+        </button>
+        <button class="category-card category-mshoes" type="button" data-category-link="Sepatu Pria">
+          <span>Sepatu Pria</span><small>7 koleksi</small><i>→</i>
+        </button>
+      </div>
+    </section>
+
+    <section class="catalog-section section-shell" id="koleksi">
+      <div class="catalog-heading">
+        <div>
+          <p class="eyebrow">The Yashbi Edit</p>
+          <h2 id="catalogTitle">Semua Koleksi</h2>
+        </div>
+        <div class="catalog-tools">
+          <span id="productResultCount">30 produk</span>
+          <label class="sort-control">
+            <span>Urutkan</span>
+            <select id="sortSelect">
+              <option value="featured">Pilihan Yashbi</option>
+              <option value="newest">Terbaru</option>
+              <option value="price-low">Harga terendah</option>
+              <option value="price-high">Harga tertinggi</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <div class="filter-row" id="filterRow">
+        <button class="active" type="button" data-filter="all">Semua</button>
+        <button type="button" data-filter="Gaun Wanita">Gaun Wanita</button>
+        <button type="button" data-filter="Sepatu Wanita">Sepatu Wanita</button>
+        <button type="button" data-filter="Jas Pria">Jas Pria</button>
+        <button type="button" data-filter="Sepatu Pria">Sepatu Pria</button>
+      </div>
+      <div class="product-grid" id="productGrid"></div>
+      <div class="empty-state" id="emptyState" hidden>
+        <span>◇</span>
+        <h3>Koleksi belum ditemukan</h3>
+        <p>Coba kata pencarian atau kategori lain.</p>
+        <button class="button button-dark" id="resetSearch" type="button">Lihat semua produk</button>
+      </div>
+    </section>
+
+    <section class="story-section" id="tentang">
+      <div class="story-image">
+        <img src="assets/images/yashbi-hero.png" alt="Editorial Yashbi Store" loading="lazy">
+      </div>
+      <div class="story-copy">
+        <p class="eyebrow">About Yashbi</p>
+        <h2>Elegan tidak harus rumit.</h2>
+        <p>Yashbi Store menghadirkan fashion pilihan untuk perempuan dan laki-laki modern—mudah dipadukan, nyaman dipakai, dan pantas hadir di hari penting maupun keseharian.</p>
+        <p>Kami percaya berbelanja online seharusnya terasa personal. Setiap detail produk, ukuran, warna, dan ketersediaan kami sajikan dengan jelas agar kamu dapat memilih dengan percaya diri.</p>
+        <a href="#koleksi" class="text-link">Temukan koleksimu <span>→</span></a>
+      </div>
+    </section>
+
+    <section class="newsletter section-shell">
+      <div>
+        <p class="eyebrow">Yashbi Circle</p>
+        <h2>Jadilah yang pertama tahu.</h2>
+        <p>Dapatkan kabar koleksi baru, inspirasi styling, dan penawaran khusus.</p>
+      </div>
+      <form id="newsletterForm">
+        <input type="email" placeholder="Alamat email kamu" required>
+        <button type="submit">Daftar <span>→</span></button>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-brand">
+      <a class="brand brand-light" href="#top">
+        <span class="brand-mark">Y</span>
+        <span class="brand-copy"><strong>Yashbi</strong><small>Store</small></span>
+      </a>
+      <p>Curated fashion untuk setiap momenmu.</p>
+    </div>
+    <div class="footer-links">
+      <div><strong>Koleksi</strong><a href="#koleksi" data-category-link="Gaun Wanita">Gaun Wanita</a><a href="#koleksi" data-category-link="Sepatu Wanita">Sepatu Wanita</a><a href="#koleksi" data-category-link="Jas Pria">Jas Pria</a><a href="#koleksi" data-category-link="Sepatu Pria">Sepatu Pria</a></div>
+      <div><strong>Bantuan</strong><button type="button" id="trackOrderOpen">Cek Pesanan</button><a href="#tentang">Panduan Ukuran</a><a href="#tentang">Pengiriman</a><a href="#tentang">Kebijakan Penukaran</a></div>
+      <div><strong>Yashbi Store</strong><a href="#tentang">Tentang Kami</a><a href="#tentang">Kontak</a><a href="#tentang">Instagram</a><a href="#tentang">TikTok</a></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yashbi Store. Demo by Extreme Studios AI.</span>
+      <span>Indonesia · IDR</span>
+    </div>
+  </footer>
+
+  <aside class="cart-drawer" id="cartDrawer" aria-hidden="true">
+    <div class="drawer-header">
+      <div><p class="eyebrow">Your selection</p><h2>Keranjang</h2></div>
+      <button class="close-button" id="cartClose" type="button" aria-label="Tutup keranjang">×</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-empty" id="cartEmpty">
+      <span>◇</span><p>Keranjangmu masih kosong.</p><button type="button" id="cartShopButton">Mulai belanja</button>
+    </div>
+    <div class="cart-summary" id="cartSummary" hidden>
+      <div><span>Subtotal</span><strong id="cartSubtotal">Rp0</strong></div>
+      <small>Biaya pengiriman dihitung saat checkout.</small>
+      <button class="button button-dark button-block" id="checkoutOpen" type="button">Lanjut Checkout</button>
+    </div>
+  </aside>
+
+  <div class="modal-backdrop" id="backdrop"></div>
+
+  <section class="product-modal modal-panel" id="productModal" role="dialog" aria-modal="true" aria-labelledby="productModalTitle">
+    <button class="close-button modal-close" data-close-modal type="button" aria-label="Tutup detail">×</button>
+    <div class="product-modal-media">
+      <button class="zoomable-image" id="productImageZoom" type="button" aria-label="Perbesar foto">
+        <img id="productModalImage" src="" alt="">
+        <span>⌕ Perbesar</span>
+      </button>
+      <div class="thumbnail-row" id="thumbnailRow"></div>
+    </div>
+    <div class="product-modal-info">
+      <p class="product-category" id="productModalCategory"></p>
+      <h2 id="productModalTitle"></h2>
+      <div class="modal-price-row"><strong id="productModalPrice"></strong><span id="productModalOriginal"></span></div>
+      <div class="rating-row"><span>★★★★★</span><small id="productModalRating"></small></div>
+      <p class="product-description" id="productModalDescription"></p>
+      <div class="option-group">
+        <div class="option-label"><strong>Warna</strong><span id="selectedColorLabel"></span></div>
+        <div class="color-options" id="colorOptions"></div>
+      </div>
+      <div class="option-group">
+        <div class="option-label"><strong>Ukuran</strong><button type="button" id="sizeGuideButton">Panduan ukuran</button></div>
+        <div class="size-options" id="sizeOptions"></div>
+      </div>
+      <p class="stock-note" id="stockNote"></p>
+      <button class="button button-dark button-block" id="addToCartButton" type="button">Masukkan Keranjang</button>
+      <div class="product-assurances"><span>✓ Produk sesuai foto</span><span>✓ Pemeriksaan kualitas</span><span>✓ Bantuan penukaran ukuran</span></div>
+    </div>
+  </section>
+
+  <section class="checkout-modal modal-panel" id="checkoutModal" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle">
+    <button class="close-button modal-close" data-close-modal type="button" aria-label="Tutup checkout">×</button>
+    <div class="checkout-header"><p class="eyebrow">Secure checkout</p><h2 id="checkoutTitle">Selesaikan Pesanan</h2><p>Isi detail pengiriman dan unggah bukti pembayaran.</p></div>
+    <form id="checkoutForm">
+      <div class="checkout-columns">
+        <div class="checkout-fields">
+          <h3>Informasi penerima</h3>
+          <div class="field-grid">
+            <label class="field full"><span>Nama lengkap</span><input name="name" required autocomplete="name" placeholder="Nama penerima"></label>
+            <label class="field"><span>Nomor WhatsApp</span><input name="phone" required inputmode="tel" placeholder="08xxxxxxxxxx"></label>
+            <label class="field"><span>Email (opsional)</span><input name="email" type="email" autocomplete="email" placeholder="nama@email.com"></label>
+            <label class="field full"><span>Alamat lengkap</span><textarea name="address" required rows="3" placeholder="Nama jalan, nomor rumah, RT/RW"></textarea></label>
+            <label class="field"><span>Kota/Kabupaten</span><input name="city" required placeholder="Surabaya"></label>
+            <label class="field"><span>Kode pos</span><input name="postal" required inputmode="numeric" placeholder="60231"></label>
+            <label class="field full"><span>Kurir</span><select name="courier" required><option value="">Pilih pengiriman</option><option>J&T Regular — Rp18.000</option><option>JNE Regular — Rp20.000</option><option>SiCepat REG — Rp17.000</option><option>Ambil di toko — Gratis</option></select></label>
+          </div>
+          <h3>Pembayaran</h3>
+          <div class="payment-box">
+            <strong>Transfer Bank BCA</strong><span>1234567890 · Yashbi Store</span><small>Gunakan total persis agar verifikasi lebih mudah.</small>
+          </div>
+          <label class="upload-box" id="uploadBox">
+            <input id="proofInput" name="proof" type="file" accept="image/*" required>
+            <span class="upload-icon">⇧</span>
+            <strong id="uploadTitle">Unggah bukti transfer</strong>
+            <small id="uploadHint">JPG, PNG, atau WEBP · maksimal 5 MB</small>
+            <img id="proofPreview" alt="Pratinjau bukti transfer" hidden>
+          </label>
+          <label class="consent"><input type="checkbox" required><span>Saya menyetujui data pesanan digunakan untuk proses transaksi dan menerima pembaruan status melalui WhatsApp.</span></label>
+        </div>
+        <aside class="checkout-order">
+          <h3>Ringkasan</h3>
+          <div id="checkoutItems"></div>
+          <div class="checkout-totals">
+            <div><span>Subtotal</span><span id="checkoutSubtotal"></span></div>
+            <div><span>Pengiriman</span><span id="checkoutShipping">Dipilih nanti</span></div>
+            <div class="grand-total"><strong>Total</strong><strong id="checkoutTotal"></strong></div>
+          </div>
+          <button class="button button-dark button-block" type="submit">Buat Pesanan</button>
+          <small class="checkout-safe">Pesanan diproses setelah pembayaran diverifikasi staff Yashbi Store.</small>
+        </aside>
+      </div>
+    </form>
+  </section>
+
+  <section class="track-modal modal-panel compact-modal" id="trackModal" role="dialog" aria-modal="true" aria-labelledby="trackTitle">
+    <button class="close-button modal-close" data-close-modal type="button">×</button>
+    <p class="eyebrow">Order tracking</p>
+    <h2 id="trackTitle">Cek Pesanan</h2>
+    <p>Masukkan nomor order dan nomor WhatsApp yang digunakan saat checkout.</p>
+    <form id="trackForm">
+      <label class="field"><span>Nomor order</span><input name="orderId" required placeholder="YS-260728-001"></label>
+      <label class="field"><span>Nomor WhatsApp</span><input name="phone" required placeholder="08xxxxxxxxxx"></label>
+      <button class="button button-dark button-block" type="submit">Lihat Status</button>
+    </form>
+    <div class="track-result" id="trackResult" hidden></div>
+  </section>
+
+  <section class="success-modal modal-panel compact-modal" id="successModal" role="dialog" aria-modal="true" aria-labelledby="successTitle">
+    <div class="success-icon">✓</div>
+    <p class="eyebrow">Order received</p>
+    <h2 id="successTitle">Pesananmu sudah tercatat.</h2>
+    <p>Tim Yashbi akan memverifikasi pembayaran pada jam operasional berikutnya.</p>
+    <div class="order-number"><span>Nomor pesanan</span><strong id="successOrderId"></strong></div>
+    <button class="button button-dark button-block" data-close-modal type="button">Kembali Belanja</button>
+  </section>
+
+  <section class="image-lightbox" id="imageLightbox" role="dialog" aria-modal="true" aria-label="Foto produk diperbesar">
+    <button class="close-button" id="lightboxClose" type="button">×</button>
+    <img id="lightboxImage" src="" alt="">
+  </section>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script src="assets/config.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>

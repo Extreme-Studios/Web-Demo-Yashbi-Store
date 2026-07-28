@@ -1,0 +1,4 @@
+.server-out.log
+.server-error.log
+tests/*.png
+__pycache__/
