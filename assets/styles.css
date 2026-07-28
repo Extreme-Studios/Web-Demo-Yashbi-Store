@@ -100,20 +100,21 @@ img { max-width: 100%; display: block; }
 .category-grid { display: grid; grid-template-columns: 1.2fr .9fr .9fr 1.2fr; gap: 12px; min-height: 400px; }
 .category-card {
   border: 0; padding: 26px; position: relative; text-align: left; overflow: hidden; cursor: pointer; color: white;
-  transition: transform .35s ease;
+  color: var(--ink); background: #fff; transition: transform .35s ease, color .35s ease;
 }
 .category-image { display: none; }
 .category-card::before { display: none; }
-.category-card::after { display: none; }
-.category-card:hover { transform: translateY(-5px); }
-.category-card span, .category-card small { position: absolute; left: 25px; bottom: 48px; }
+.category-card::after { content: ""; position: absolute; inset: 0; z-index: 0; opacity: 0; transition: opacity .35s ease; background: linear-gradient(145deg, var(--cat-a), var(--cat-b)); }
+.category-card:hover { transform: translateY(-5px); color: #fff; }
+.category-card:hover::after { opacity: 1; }
+.category-card span, .category-card small { position: absolute; z-index: 1; left: 25px; bottom: 48px; }
 .category-card span { font: 600 26px var(--serif); }
 .category-card small { bottom: 28px; opacity: .82; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; }
-.category-card i { position: absolute; right: 24px; bottom: 30px; font-style: normal; }
-.category-gown { background: linear-gradient(145deg, #d7baa8, #87746e); }
-.category-wshoes { background: linear-gradient(145deg, #c9b3aa, #736a65); }
-.category-suit { background: linear-gradient(145deg, #9ba7aa, #4e5557); }
-.category-mshoes { background: linear-gradient(145deg, #a98f7a, #55473e); }
+.category-card i { position: absolute; z-index: 1; right: 24px; bottom: 30px; font-style: normal; }
+.category-gown { --cat-a:#d7baa8; --cat-b:#87746e; }
+.category-wshoes { --cat-a:#c9b3aa; --cat-b:#736a65; }
+.category-suit { --cat-a:#9ba7aa; --cat-b:#4e5557; }
+.category-mshoes { --cat-a:#a98f7a; --cat-b:#55473e; }
 
 .catalog-section { padding: 60px 0 120px; scroll-margin-top: 90px; }
 .catalog-heading { display: flex; justify-content: space-between; align-items: end; gap: 30px; margin-bottom: 30px; }
