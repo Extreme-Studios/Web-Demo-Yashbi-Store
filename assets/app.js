@@ -91,12 +91,12 @@ async function hydrateCatalogImages() {
   if (!API_URL) return;
   try {
     const url = new URL(API_URL);
-    url.searchParams.set("action", "catalog-images");
+    url.searchParams.set("action", "products");
     const response = await fetch(url);
     const payload = await response.json();
-    if (!payload.ok || !Array.isArray(payload.images)) return;
-    payload.images.forEach(asset => {
-      const product = PRODUCTS.find(item => item.id === asset.id);
+    if (!payload.ok || !Array.isArray(payload.products)) return;
+    payload.products.forEach(asset => {
+      const product = PRODUCTS.find(item => item.id === String(asset.id).toUpperCase());
       if (product) {
         product.image = asset.image;
         product.alt = asset.alt || asset.image;
