@@ -140,8 +140,8 @@ function getProducts_() {
     }));
 }
 
-function importCatalogAssetsFromGitHub() {
-  const baseUrl = "https://raw.githubusercontent.com/Extreme-Studios/Web-Demo-Yashbi-Store/main/assets/images/products/";
+function importCatalogAssetsFromVercel() {
+  const baseUrl = "https://yashbi-store.vercel.app/assets/images/products/";
   const ids = [
     "gw-001", "gw-002", "gw-003", "gw-004", "gw-005", "gw-006", "gw-007", "gw-008",
     "sw-001", "sw-002", "sw-003", "sw-004", "sw-005", "sw-006", "sw-007", "sw-008",
@@ -163,7 +163,8 @@ function importCatalogAssetsFromGitHub() {
     const file = existing.hasNext()
       ? existing.next()
       : catalogFolder.createFile(UrlFetchApp.fetch(baseUrl + filename).getBlob().setName(filename));
-    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    // Folder induk sudah dibagikan. Beberapa akun Google menolak setSharing
+    // per-file dari Apps Script; akses folder tetap diwariskan ke file baru.
     const imageUrl = "https://drive.google.com/thumbnail?id=" + file.getId() + "&sz=w1200";
     const row = rowsBySku[id];
     if (row) {
