@@ -2,3 +2,5 @@
 .server-error.log
 tests/*.png
 __pycache__/
+
+.vercel
