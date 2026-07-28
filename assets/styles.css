@@ -102,17 +102,17 @@ img { max-width: 100%; display: block; }
   border: 0; padding: 26px; position: relative; text-align: left; overflow: hidden; cursor: pointer; color: white;
   background-position: center; background-size: cover; isolation: isolate; transition: transform .35s ease;
 }
-.category-card::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(0deg, rgba(30,25,23,.72), rgba(30,25,23,.05) 70%); }
+.category-card::before { display: none; }
 .category-card::after { content: ""; position: absolute; inset: 0; z-index: -2; background: linear-gradient(145deg, var(--cat-a), var(--cat-b)); }
 .category-card:hover { transform: translateY(-5px); }
 .category-card span, .category-card small { position: absolute; left: 25px; bottom: 48px; }
 .category-card span { font: 600 26px var(--serif); }
 .category-card small { bottom: 28px; opacity: .8; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; }
 .category-card i { position: absolute; right: 24px; bottom: 30px; font-style: normal; }
-.category-gown { --cat-a:#d7baa8; --cat-b:#87746e; background-image: url("../images/products/gw-001.webp"); }
-.category-wshoes { --cat-a:#c9b3aa; --cat-b:#736a65; background-image: url("../images/products/sw-001.webp"); }
-.category-suit { --cat-a:#9ba7aa; --cat-b:#4e5557; background-image: url("../images/products/jp-001.webp"); }
-.category-mshoes { --cat-a:#a98f7a; --cat-b:#55473e; background-image: url("../images/products/sp-001.webp"); }
+.category-gown { --cat-a:#d7baa8; --cat-b:#87746e; background-image: linear-gradient(0deg, rgba(30,25,23,.72), rgba(30,25,23,.05) 70%), url("images/products/gw-001.webp"); }
+.category-wshoes { --cat-a:#c9b3aa; --cat-b:#736a65; background-image: linear-gradient(0deg, rgba(30,25,23,.72), rgba(30,25,23,.05) 70%), url("images/products/sw-001.webp"); }
+.category-suit { --cat-a:#9ba7aa; --cat-b:#4e5557; background-image: linear-gradient(0deg, rgba(30,25,23,.72), rgba(30,25,23,.05) 70%), url("images/products/jp-001.webp"); }
+.category-mshoes { --cat-a:#a98f7a; --cat-b:#55473e; background-image: linear-gradient(0deg, rgba(30,25,23,.72), rgba(30,25,23,.05) 70%), url("images/products/sp-001.webp"); }
 
 .catalog-section { padding: 60px 0 120px; scroll-margin-top: 90px; }
 .catalog-heading { display: flex; justify-content: space-between; align-items: end; gap: 30px; margin-bottom: 30px; }
