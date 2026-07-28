@@ -291,7 +291,7 @@ footer { padding: 70px 6vw 25px; background: var(--ink); color: #e9e1db; }
   .hero-content { width: auto; margin: 0; padding: 0 6vw 50px; }.hero h1 { font-size: 51px; }.hero-content > p:not(.eyebrow) { margin: 18px 0 22px; font-size: 12px; }
   .hero-caption { display: none; }.service-strip { padding: 20px 5vw; }.service-strip article { justify-content: flex-start; }.service-strip article:nth-child(even) { padding-left: 14px; }.service-strip strong { font-size: 9px; }.service-strip small { display: none; }
   .category-section { padding: 80px 0 45px; }.section-heading { align-items: start; flex-direction: column; gap: 16px; }.section-heading > p { font-size: 11px; }
-  .category-grid { min-height: 620px; grid-template-columns: 1fr 1fr; }.category-card { padding: 18px; }.category-card span { left: 16px; bottom: 42px; font-size: 20px; }.category-card small { left: 16px; bottom: 24px; }.category-card i { right: 15px; bottom: 25px; }
+  .category-grid { min-height: 300px; grid-template-columns: 1fr 1fr; }.category-card { padding: 18px; }.category-card span { left: 16px; bottom: 42px; font-size: 20px; }.category-card small { left: 16px; bottom: 24px; }.category-card i { right: 15px; bottom: 25px; }
   .catalog-section { padding-bottom: 80px; }.catalog-heading { align-items: start; flex-direction: column; }.catalog-tools { width: 100%; justify-content: space-between; }.product-grid { grid-template-columns: 1fr 1fr; gap: 28px 10px; }.quick-add { opacity: 1; transform: none; min-height: 34px; font-size: 8px; }
   .product-info h3 { font-size: 15px; }.product-info p { font-size: 9px; }
   .story-section { grid-template-columns: 1fr; }.story-image { min-height: 430px; }.story-copy { padding: 55px 7vw; }
@@ -305,7 +305,7 @@ footer { padding: 70px 6vw 25px; background: var(--ink); color: #e9e1db; }
 @media (max-width: 420px) {
   .brand-copy strong { font-size: 22px; }.icon-button, .menu-toggle { width: 36px; }
   .hero h1 { font-size: 45px; }.hero-actions { gap: 15px; }
-  .category-grid { min-height: 540px; }.category-card:nth-child(2), .category-card:nth-child(3) { grid-column: auto; }
+  .category-grid { min-height: 280px; }.category-card:nth-child(2), .category-card:nth-child(3) { grid-column: auto; }
   .product-grid { grid-template-columns: 1fr 1fr; }
   .footer-links { grid-template-columns: 1fr; }
 }
