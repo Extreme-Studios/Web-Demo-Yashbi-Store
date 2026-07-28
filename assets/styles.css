@@ -99,16 +99,16 @@ img { max-width: 100%; display: block; }
 .section-heading > p { max-width: 430px; margin: 0; color: var(--muted); font-size: 12px; }
 .category-grid { display: grid; grid-template-columns: 1.2fr .9fr .9fr 1.2fr; gap: 12px; min-height: 400px; }
 .category-card {
-  border: 0; padding: 26px; position: relative; text-align: left; overflow: hidden; cursor: pointer; color: white;
-  isolation: isolate; transition: transform .35s ease;
+  border: 0; padding: 24px; position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 5px;
+  text-align: left; overflow: hidden; cursor: pointer; color: white; isolation: isolate; transition: transform .35s ease;
 }
-.category-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; z-index: 0; }
-.category-card::before { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(0deg, rgba(30,25,23,.72), rgba(30,25,23,.05) 70%); }
+.category-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; z-index: 0; filter: brightness(.68); }
+.category-card::before { display: none; }
 .category-card::after { display: none; }
 .category-card:hover { transform: translateY(-5px); }
-.category-card span, .category-card small { position: absolute; z-index: 2; left: 25px; bottom: 48px; }
-.category-card span { font: 600 26px var(--serif); }
-.category-card small { bottom: 28px; opacity: .8; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; }
+.category-card span, .category-card small { position: relative; z-index: 2; left: auto; bottom: auto; }
+.category-card span { font: 600 26px var(--serif); text-shadow: 0 2px 12px rgba(0,0,0,.65); }
+.category-card small { opacity: .92; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; text-shadow: 0 1px 6px rgba(0,0,0,.75); }
 .category-card i { position: absolute; z-index: 2; right: 24px; bottom: 30px; font-style: normal; }
 .category-gown { --cat-a:#d7baa8; --cat-b:#87746e; }
 .category-wshoes { --cat-a:#c9b3aa; --cat-b:#736a65; }
