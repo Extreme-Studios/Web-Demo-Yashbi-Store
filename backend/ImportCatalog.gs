@@ -5,9 +5,9 @@
 function importCatalogAssetsFromGitHub() {
   var ids = [
     "gw-001", "gw-002", "gw-003", "gw-004", "gw-005", "gw-006", "gw-007", "gw-008",
-    "gw-009", "gw-010", "gw-011", "gw-012", "gw-013", "gw-014", "gw-015", "gw-016",
-    "gw-017", "gw-018", "gw-019", "gw-020", "gw-021", "gw-022", "gw-023", "gw-024",
-    "gw-025", "gw-026", "gw-027", "gw-028", "gw-029", "gw-030", "gw-031", "gw-032"
+    "sw-001", "sw-002", "sw-003", "sw-004", "sw-005", "sw-006", "sw-007", "sw-008",
+    "jp-001", "jp-002", "jp-003", "jp-004", "jp-005", "jp-006", "jp-007", "jp-008",
+    "sp-001", "sp-002", "sp-003", "sp-004", "sp-005", "sp-006", "sp-007", "sp-008"
   ];
   var root = DriveApp.getFolderById(CONFIG.driveRootFolderId);
   var folder = getOrCreateFolder_(root, "Katalog Produk");
@@ -33,7 +33,12 @@ function importCatalogAssetsFromGitHub() {
       file = folder.createFile(response.getBlob().setName(filename));
     }
 
-    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    try {
+      file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    } catch (sharingError) {
+      // Kebijakan Drive pemilik dapat melarang perubahan sharing per-file.
+      // Proses katalog tetap dilanjutkan; storefront punya gambar fallback Vercel.
+    }
     var imageUrl = "https://drive.google.com/thumbnail?id=" + file.getId() + "&sz=w1200";
     if (rowBySku[sku]) {
       sheet.getRange(rowBySku[sku], 9, 1, 2).setValues([[imageUrl, imageUrl]]);
