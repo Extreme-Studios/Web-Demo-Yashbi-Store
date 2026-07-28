@@ -93,7 +93,7 @@ img { max-width: 100%; display: block; }
 .service-strip strong { font-size: 10px; letter-spacing: .06em; }
 .service-strip small { color: var(--muted); font-size: 9px; }
 .section-shell { width: min(1260px, 90vw); margin: 0 auto; }
-.category-section { padding: 110px 0 70px; }
+.category-section { padding: 80px 0; }
 .section-heading { display: flex; justify-content: space-between; align-items: end; gap: 40px; margin-bottom: 38px; }
 .section-heading h2, .catalog-heading h2, .story-copy h2, .newsletter h2, .modal-panel h2 { font-size: clamp(40px, 4.3vw, 64px); line-height: .95; }
 .section-heading > p { max-width: 430px; margin: 0; color: var(--muted); font-size: 12px; }
