@@ -218,6 +218,7 @@ function updateOrder_(payload) {
   const index = values.findIndex((row, i) => i > 0 && String(row[0]) === String(payload.orderId));
   if (index < 1) throw new Error("Pesanan tidak ditemukan.");
   if (payload.status) sheet.getRange(index + 1, 13).setValue(safe_(payload.status));
+  if (payload.email !== undefined) sheet.getRange(index + 1, 5).setValue(safe_(payload.email).toLowerCase());
   if (payload.expedition !== undefined) sheet.getRange(index + 1, 15).setValue(safe_(payload.expedition));
   if (payload.trackingNumber !== undefined) sheet.getRange(index + 1, 16).setValue(safe_(payload.trackingNumber));
   sheet.getRange(index + 1, 17).setValue(new Date());
