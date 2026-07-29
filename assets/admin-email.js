@@ -18,6 +18,27 @@
     if(!button) return;
     button.hidden = false;
     const email = String(selectedOrder.email || "").trim();
+    const configureDirectEmail = target => {
+      button.removeAttribute("aria-disabled");
+      button.textContent = "Kirim invoice via Email";
+      button.href = "#kirim-invoice-email";
+      button.onclick = async event => {
+        event.preventDefault();
+        if(!window.confirm(`Kirim invoice ${selectedOrder.id} langsung ke ${target}?`)) return;
+        button.setAttribute("aria-disabled", "true");
+        button.textContent = "Mengirim email...";
+        try{
+          const result = await api({action:"sendInvoiceEmail",token:session.token,orderId:selectedOrder.id});
+          button.textContent = "Invoice email terkirim";
+          toast(`Invoice dikirim ke ${result.sentTo||target}.`);
+        }catch(error){
+          button.textContent = "Kirim invoice via Email";
+          toast(error.message||"Email gagal dikirim.");
+        }finally{
+          button.removeAttribute("aria-disabled");
+        }
+      };
+    };
     if(!email){
       button.href = "#email-pembeli";
       button.textContent = "Isi email pembeli";
@@ -36,16 +57,11 @@
         field.scrollIntoView({behavior:"smooth",block:"center"});
         field.focus();
         selectedOrder.email = entered;
-        button.onclick = null;
-        button.textContent = "Kirim invoice via Email";
-        button.href = `mailto:${encodeURIComponent(entered)}?subject=${encodeURIComponent(`Invoice Yashbi Store ${selectedOrder.id}`)}&body=${encodeURIComponent(invoiceMessage(selectedOrder))}`;
+        configureDirectEmail(entered);
         toast("Email siap dipakai. Tekan Simpan pembaruan agar tersimpan di pesanan.");
       };
       return;
     }
-    button.onclick = null;
-    button.removeAttribute("aria-disabled");
-    button.textContent = "Kirim invoice via Email";
-    button.href = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(`Invoice Yashbi Store ${selectedOrder.id}`)}&body=${encodeURIComponent(invoiceMessage(selectedOrder))}`;
+    configureDirectEmail(email);
   };
 })();

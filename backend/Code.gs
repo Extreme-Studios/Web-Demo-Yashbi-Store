@@ -33,6 +33,7 @@ function doPost(e) {
     if (payload.action === "upsertVisitor") return json_(upsertVisitor_(payload));
     if (payload.action === "adminLogin") return json_(adminLogin_(payload));
     if (payload.action === "updateOrder") return json_(updateOrder_(payload));
+    if (payload.action === "sendInvoiceEmail") return json_(sendInvoiceEmail_(payload));
     throw new Error("Aksi tidak dikenal.");
   } catch (error) {
     return json_({ ok: false, error: error.message });
@@ -225,6 +226,26 @@ function updateOrder_(payload) {
   return { ok: true, by: admin.email };
 }
 
+function sendInvoiceEmail_(payload) {
+  requireAdmin_(payload.token);
+  const spreadsheet = SpreadsheetApp.openById(CONFIG.spreadsheetId);
+  const orderSheet = spreadsheet.getSheetByName(CONFIG.sheets.orders);
+  const itemSheet = spreadsheet.getSheetByName(CONFIG.sheets.orderItems);
+  const rows = orderSheet.getDataRange().getValues();
+  const order = rows.find((row, index) => index > 0 && String(row[0]) === String(payload.orderId));
+  if (!order) throw new Error("Pesanan tidak ditemukan.");
+  const email = safe_(order[4]).trim();
+  if (!email) throw new Error("Email pembeli belum diisi.");
+  const items = itemSheet && itemSheet.getLastRow() > 1
+    ? itemSheet.getRange(2, 1, itemSheet.getLastRow() - 1, HEADERS["Detail Pesanan"].length).getValues().filter(row => String(row[0]) === String(order[0]))
+    : [];
+  const itemText = items.map(row => `• ${safe_(row[2])}\n  Warna/ukuran: ${safe_(row[3])} / ${safe_(row[4])}\n  Jumlah: ${number_(row[5])}\n  Harga: ${rupiah_(row[6])}\n  Total barang: ${rupiah_(row[7])}`).join("\n\n") || "• Rincian produk tercatat pada pesanan";
+  const shipping = /shipping/i.test(String(order[12])) ? `\nEkspedisi: ${safe_(order[14] || order[8] || "-")}\nResi: ${safe_(order[15] || "-")}` : "";
+  const body = `Halo Kak ${safe_(order[2])},\n\nTerima kasih sudah berbelanja di Yashbi Store. Berikut detail pesanan Kakak:\n\nInvoice: ${safe_(order[0])}\n${itemText}\n\nSubtotal: ${rupiah_(order[9])}\nOngkir: ${rupiah_(order[10])}\nTotal: ${rupiah_(order[11])}\nStatus: ${safe_(order[12])}${shipping}\n\nTerima kasih.`;
+  GmailApp.sendEmail(email, `Invoice Yashbi Store ${safe_(order[0])}`, body, { name: "Yashbi Store" });
+  return { ok: true, sentTo: email };
+}
+
 function getProducts_() {
   const sheet = SpreadsheetApp.openById(CONFIG.spreadsheetId).getSheetByName(CONFIG.sheets.products);
   if (!sheet || sheet.getLastRow() < 2) return [];
@@ -370,6 +391,10 @@ function safe_(value) {
 function number_(value) {
   const number = Number(value || 0);
   return isFinite(number) ? number : 0;
+}
+
+function rupiah_(value) {
+  return "Rp " + number_(value).toLocaleString("id-ID");
 }
 
 function hash_(value) {
