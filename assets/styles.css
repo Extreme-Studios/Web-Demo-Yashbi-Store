@@ -230,8 +230,11 @@ footer { padding: 70px 6vw 25px; background: var(--ink); color: #e9e1db; }
 .size-option { min-width: 42px; height: 37px; border: 1px solid var(--line); background: white; cursor: pointer; font-size: 9px; }
 .size-option.active { border-color: var(--ink); background: var(--ink); color: white; }
 .stock-note { color: #728166; font-size: 9px; }
-.product-action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+.product-action-row { display: grid; grid-template-columns: 54px 1fr; gap: 10px; margin-top: 16px; }
 .product-action-row .button { width: 100%; padding-inline: 12px; }
+.product-cart-action { min-height: 49px; border: 1px solid var(--ink); background: transparent; color: var(--ink); display: grid; place-items: center; cursor: pointer; transition: .25s ease; }
+.product-cart-action:hover { background: var(--ink); color: white; transform: translateY(-2px); }
+.product-cart-action svg { width: 20px; fill: none; stroke: currentColor; stroke-width: 1.5; }
 .product-assurances { margin-top: 18px; display: grid; gap: 3px; color: var(--muted); font-size: 8px; }
 .checkout-modal { width: min(1120px, 95vw); padding: 40px; }
 .checkout-header { margin-bottom: 26px; }
