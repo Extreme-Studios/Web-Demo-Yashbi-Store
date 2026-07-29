@@ -36,9 +36,16 @@ const PRODUCTS = [
 
 PRODUCTS.forEach(product => {
   const filename = product.id.toLowerCase();
+  const secondaryPhoto = product.alt;
   product.image = `assets/images/products/${filename}.webp`;
-  product.alt = product.image;
+  product.colorImages = {};
+  product.colors.forEach((color, index) => {
+    product.colorImages[color] = index === 0 ? product.image : (secondaryPhoto || product.image);
+  });
 });
+// Varian unggulan dibuat sebagai aset katalog sendiri agar pembeli benar-benar
+// melihat gaun yang sama dalam warna berbeda, bukan sekadar kotak warna berubah.
+PRODUCTS.find(product => product.id === "GW-001").colorImages["Champagne"] = "assets/images/products/gw-001-champagne.png";
 
 const money = value => new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(value);
 const byId = id => document.getElementById(id);
@@ -133,8 +140,7 @@ async function hydrateCatalogImages() {
     payload.products.forEach(asset => {
       const product = PRODUCTS.find(item => item.id === String(asset.id).toUpperCase());
       if (product) {
-        product.image = asset.image;
-        product.alt = asset.alt || asset.image;
+        product.remoteImage = asset.image;
       }
     });
     renderProducts();
@@ -157,7 +163,7 @@ function openProduct(id) {
   if (!selectedProduct) return;
   selectedColor = selectedProduct.colors[0];
   selectedSize = null;
-  byId("productModalImage").src = selectedProduct.image;
+  byId("productModalImage").src = imageForColor(selectedProduct, selectedColor);
   byId("productModalImage").alt = selectedProduct.name;
   byId("productModalCategory").textContent = selectedProduct.category;
   byId("productModalTitle").textContent = selectedProduct.name;
@@ -166,11 +172,24 @@ function openProduct(id) {
   byId("productModalRating").textContent = `${selectedProduct.rating} · ${selectedProduct.reviews} ulasan`;
   byId("productModalDescription").textContent = selectedProduct.desc;
   byId("stockNote").textContent = `Tersedia · ${selectedProduct.stock} item dalam stok online`;
-  byId("thumbnailRow").innerHTML = [selectedProduct.image, selectedProduct.alt].map((img,i)=>`<button type="button" class="${i===0?"active":""}" data-thumb="${img}"><img src="${img}" alt="${selectedProduct.name} tampilan ${i+1}"></button>`).join("");
+  byId("thumbnailRow").innerHTML = selectedProduct.colors.map((color,i)=>{
+    const img=imageForColor(selectedProduct,color);
+    return `<button type="button" class="${i===0?"active":""}" data-thumb="${img}" data-image-color="${color}"><img src="${img}" alt="${selectedProduct.name} warna ${color}"></button>`;
+  }).join("");
   byId("colorOptions").innerHTML = selectedProduct.colors.map((c,i)=>`<button type="button" class="color-option ${i===0?"active":""}" data-color="${c}" title="${c}"><i style="background:${selectedProduct.colorHex[i]}"></i></button>`).join("");
   byId("selectedColorLabel").textContent = selectedColor;
   byId("sizeOptions").innerHTML = selectedProduct.sizes.map(s=>`<button type="button" class="size-option" data-size="${s}">${s}</button>`).join("");
   openModal("productModal");
+}
+
+function imageForColor(product, color) {
+  return product?.colorImages?.[color] || product?.image || "";
+}
+
+function updateProductColorImage() {
+  if (!selectedProduct || !selectedColor) return;
+  byId("productModalImage").src = imageForColor(selectedProduct, selectedColor);
+  document.querySelectorAll("[data-thumb]").forEach(button => button.classList.toggle("active", button.dataset.imageColor === selectedColor));
 }
 
 function openModal(id) {
@@ -327,13 +346,21 @@ document.addEventListener("click", e => {
   if (filter) setCategory(filter);
   const thumb = e.target.closest("[data-thumb]");
   if (thumb) {
-    byId("productModalImage").src=thumb.dataset.thumb;
-    document.querySelectorAll("[data-thumb]").forEach(t=>t.classList.toggle("active",t===thumb));
+    if (thumb.dataset.imageColor) {
+      selectedColor=thumb.dataset.imageColor;
+      byId("selectedColorLabel").textContent=selectedColor;
+      document.querySelectorAll("[data-color]").forEach(c=>c.classList.toggle("active",c.dataset.color===selectedColor));
+      updateProductColorImage();
+    } else {
+      byId("productModalImage").src=thumb.dataset.thumb;
+      document.querySelectorAll("[data-thumb]").forEach(t=>t.classList.toggle("active",t===thumb));
+    }
   }
   const color = e.target.closest("[data-color]");
   if (color) {
     selectedColor=color.dataset.color; byId("selectedColorLabel").textContent=selectedColor;
     document.querySelectorAll("[data-color]").forEach(c=>c.classList.toggle("active",c===color));
+    updateProductColorImage();
   }
   const size = e.target.closest("[data-size]");
   if (size) {
