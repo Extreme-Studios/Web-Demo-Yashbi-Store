@@ -77,6 +77,24 @@ function setupYashbiStore() {
   return "Setup Yashbi Store selesai.";
 }
 
+function setDemoAdminCredentials() {
+  const sheet = SpreadsheetApp.openById(CONFIG.spreadsheetId).getSheetByName(CONFIG.sheets.admins);
+  if (!sheet) throw new Error("Sheet Admin belum tersedia.");
+  const passwordHash = hash_("admin");
+  const desired = [
+    ["owner@yashbi.local", "OWNER", passwordHash, true, new Date()],
+    ["staff@yashbi.local", "STAFF", passwordHash, true, new Date()],
+    ["admin@yashbi.local", "STAFF", passwordHash, true, new Date()]
+  ];
+  const current = sheet.getLastRow() > 1 ? sheet.getRange(2, 1, sheet.getLastRow() - 1, HEADERS.Admin.length).getValues() : [];
+  desired.forEach(account => {
+    const index = current.findIndex(row => String(row[0]).toLowerCase() === account[0]);
+    if (index >= 0) sheet.getRange(index + 2, 1, 1, HEADERS.Admin.length).setValues([account]);
+    else sheet.appendRow(account);
+  });
+  return "Akun demo owner dan staff diperbarui.";
+}
+
 function createOrder_(payload) {
   if (!payload.customer || !payload.items || !payload.items.length) throw new Error("Data pesanan tidak lengkap.");
   const lock = LockService.getScriptLock();
