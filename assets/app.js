@@ -43,9 +43,32 @@ PRODUCTS.forEach(product => {
     product.colorImages[color] = index === 0 ? product.image : (secondaryPhoto || product.image);
   });
 });
-// Varian unggulan dibuat sebagai aset katalog sendiri agar pembeli benar-benar
-// melihat gaun yang sama dalam warna berbeda, bukan sekadar kotak warna berubah.
-PRODUCTS.find(product => product.id === "GW-001").colorImages["Champagne"] = "assets/images/products/gw-001-champagne.png";
+// Setiap pilihan warna kedua memiliki foto katalog tersendiri. Tidak ada lagi
+// fallback ke foto produk lain/eksternal saat pembeli mengganti warna.
+const COLOR_VARIANT_ASSETS = {
+  "GW-001": {"Champagne":"gw-001-champagne.png"}, "GW-002": {"Ivory":"gw-002-ivory.png"},
+  "GW-003": {"Navy":"gw-003-navy.png"}, "GW-004": {"Rose":"gw-004-rose.png"},
+  "GW-005": {"Black":"gw-005-black.png"}, "GW-006": {"Mocha":"gw-006-mocha.png"},
+  "GW-007": {"Dusty Pink":"gw-007-dusty-pink.png"}, "GW-008": {"Burgundy":"gw-008-burgundy.png"},
+  "SW-001": {"Nude":"sw-001-nude.png"}, "SW-002": {"Black":"sw-002-black.png"},
+  "SW-003": {"Cream":"sw-003-cream.png"}, "SW-004": {"Black":"sw-004-black.png"},
+  "SW-005": {"Champagne":"sw-005-champagne.png"}, "SW-006": {"Sage":"sw-006-sage.png"},
+  "SW-007": {"Caramel":"sw-007-caramel.png"},
+  "JP-001": {"Charcoal":"jp-001-charcoal.png"}, "JP-002": {"Black":"jp-002-black.png"},
+  "JP-003": {"Slate":"jp-003-slate.png"}, "JP-005": {"Ivory":"jp-005-ivory.png"},
+  "JP-006": {"Brown":"jp-006-brown.png"}, "JP-007": {"Cream":"jp-007-cream.png"},
+  "JP-008": {"Navy":"jp-008-navy.png"},
+  "SP-001": {"Dark Brown":"sp-001-dark-brown.png"}, "SP-003": {"Black":"sp-003-black.png"},
+  "SP-004": {"Black":"sp-004-black.png"}, "SP-005": {"Sand":"sp-005-sand.png"},
+  "SP-006": {"White":"sp-006-white.png"}, "SP-007": {"Tan":"sp-007-tan.png"}
+};
+Object.entries(COLOR_VARIANT_ASSETS).forEach(([id, variants]) => {
+  const product = PRODUCTS.find(item => item.id === id);
+  if (!product) return;
+  Object.entries(variants).forEach(([color, filename]) => {
+    product.colorImages[color] = `assets/images/products/${filename}`;
+  });
+});
 
 const money = value => new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(value);
 const byId = id => document.getElementById(id);

@@ -261,6 +261,31 @@ function importCatalogAssetsFromVercel() {
   return imported;
 }
 
+// Menyalin foto tiap varian warna dari deployment produksi ke folder katalog Drive.
+// File varian tidak ditulis sebagai produk baru di Sheet karena SKU produknya tetap sama.
+function syncColorVariantAssetsFromVercel() {
+  const baseUrl = "https://yashbi-store.vercel.app/assets/images/products/";
+  const filenames = [
+    "gw-001-champagne.png", "gw-002-ivory.png", "gw-003-navy.png", "gw-004-rose.png",
+    "gw-005-black.png", "gw-006-mocha.png", "gw-007-dusty-pink.png", "gw-008-burgundy.png",
+    "sw-001-nude.png", "sw-002-black.png", "sw-003-cream.png", "sw-004-black.png",
+    "sw-005-champagne.png", "sw-006-sage.png", "sw-007-caramel.png",
+    "jp-001-charcoal.png", "jp-002-black.png", "jp-003-slate.png", "jp-005-ivory.png",
+    "jp-006-brown.png", "jp-007-cream.png", "jp-008-navy.png",
+    "sp-001-dark-brown.png", "sp-003-black.png", "sp-004-black.png", "sp-005-sand.png",
+    "sp-006-white.png", "sp-007-tan.png"
+  ];
+  const root = DriveApp.getFolderById(CONFIG.driveRootFolderId);
+  const catalogFolder = getOrCreateFolder_(root, "Katalog Produk");
+  return filenames.map(filename => {
+    const existing = catalogFolder.getFilesByName(filename);
+    const file = existing.hasNext()
+      ? existing.next()
+      : catalogFolder.createFile(UrlFetchApp.fetch(baseUrl + filename).getBlob().setName(filename));
+    return { filename: filename, image: "https://drive.google.com/thumbnail?id=" + file.getId() + "&sz=w1200" };
+  });
+}
+
 function getCatalogImages_() {
   const sheet = SpreadsheetApp.openById(CONFIG.spreadsheetId).getSheetByName(CONFIG.sheets.products);
   if (!sheet || sheet.getLastRow() < 2) return [];
