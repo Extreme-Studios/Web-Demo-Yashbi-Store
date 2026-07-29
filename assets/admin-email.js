@@ -19,11 +19,17 @@
     button.hidden = false;
     const email = String(selectedOrder.email || "").trim();
     if(!email){
-      button.removeAttribute("href");
-      button.textContent = "Isi email pembeli lalu simpan pembaruan";
-      button.setAttribute("aria-disabled", "true");
+      button.href = "#email-pembeli";
+      button.textContent = "Isi email pembeli";
+      button.removeAttribute("aria-disabled");
+      button.onclick = event => {
+        event.preventDefault();
+        field.focus();
+        toast("Isi email pembeli, lalu tekan Simpan pembaruan.");
+      };
       return;
     }
+    button.onclick = null;
     button.removeAttribute("aria-disabled");
     button.textContent = "Kirim invoice via Email";
     button.href = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(`Invoice Yashbi Store ${selectedOrder.id}`)}&body=${encodeURIComponent(invoiceMessage(selectedOrder))}`;
