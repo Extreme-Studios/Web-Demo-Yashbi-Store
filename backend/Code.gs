@@ -41,6 +41,7 @@ function doPost(e) {
     if (payload.action === "createBiteshipShipment") return json_(createBiteshipShipment_(payload));
     if (payload.action === "biteshipSandboxStatus") return json_(biteshipSandboxStatus_(payload));
     if (payload.action === "biteshipWebhook") return json_(receiveBiteshipWebhook_(payload, e));
+    if (payload.action === "clearDemoOrderData") return json_(clearDemoOrderDataForOwner_(payload));
     throw new Error("Aksi tidak dikenal.");
   } catch (error) {
     return json_({ ok: false, error: error.message });
@@ -114,6 +115,12 @@ function clearDemoOrderData() {
     cleared[name] = rowCount;
   });
   return { ok: true, cleared: cleared, message: "Data operasional demo dibersihkan. Katalog dan arsip Drive tidak dihapus." };
+}
+
+function clearDemoOrderDataForOwner_(payload) {
+  const admin = requireAdmin_(payload.token);
+  if (admin.role !== "OWNER") throw new Error("Hanya owner yang boleh membersihkan data demo.");
+  return clearDemoOrderData();
 }
 
 function createOrder_(payload) {
