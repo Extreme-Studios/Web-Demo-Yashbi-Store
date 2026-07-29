@@ -24,8 +24,22 @@
       button.removeAttribute("aria-disabled");
       button.onclick = event => {
         event.preventDefault();
+        const value = window.prompt("Masukkan email pembeli untuk menerima invoice:", field.value || "");
+        if(value === null) return;
+        const entered = String(value).trim();
+        if(!/^\S+@\S+\.\S+$/.test(entered)){
+          toast("Format email belum benar.");
+          field.focus();
+          return;
+        }
+        field.value = entered;
+        field.scrollIntoView({behavior:"smooth",block:"center"});
         field.focus();
-        toast("Isi email pembeli, lalu tekan Simpan pembaruan.");
+        selectedOrder.email = entered;
+        button.onclick = null;
+        button.textContent = "Kirim invoice via Email";
+        button.href = `mailto:${encodeURIComponent(entered)}?subject=${encodeURIComponent(`Invoice Yashbi Store ${selectedOrder.id}`)}&body=${encodeURIComponent(invoiceMessage(selectedOrder))}`;
+        toast("Email siap dipakai. Tekan Simpan pembaruan agar tersimpan di pesanan.");
       };
       return;
     }
