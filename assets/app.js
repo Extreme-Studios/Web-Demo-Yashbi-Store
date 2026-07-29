@@ -309,6 +309,14 @@ function openCart() {
 }
 
 function renderCheckout() {
+  const checkoutForm = byId("checkoutForm");
+  checkoutForm.reset();
+  proofData = null;
+  byId("proofPreview").removeAttribute("src");
+  byId("proofPreview").hidden = true;
+  byId("uploadTitle").textContent = "Unggah bukti transfer";
+  byId("uploadHint").textContent = "JPG, PNG, atau WEBP · maksimal 5 MB";
+  byId("checkoutShipping").textContent = "Dipilih nanti";
   byId("checkoutItems").innerHTML = cart.map(item=>{
     const p=PRODUCTS.find(x=>x.id===item.productId);
     return `<div class="checkout-line"><img src="${p.image}" alt=""><div><strong>${p.name}</strong><small>${item.color} · ${item.size} · ${item.qty}×</small></div><span>${money(p.price*item.qty)}</span></div>`;
