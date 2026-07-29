@@ -101,6 +101,21 @@ function setDemoAdminCredentials() {
   return "Akun demo owner dan staff diperbarui.";
 }
 
+// Maintenance helper for resetting only operational demo rows. It intentionally
+// preserves products, store settings, admins, Drive proofs, and invoice archives.
+function clearDemoOrderData() {
+  const spreadsheet = SpreadsheetApp.openById(CONFIG.spreadsheetId);
+  const cleared = {};
+  [CONFIG.sheets.orders, CONFIG.sheets.orderItems, CONFIG.sheets.visitors].forEach(name => {
+    const sheet = spreadsheet.getSheetByName(name);
+    if (!sheet || sheet.getLastRow() < 2) { cleared[name] = 0; return; }
+    const rowCount = sheet.getLastRow() - 1;
+    sheet.getRange(2, 1, rowCount, sheet.getMaxColumns()).clearContent();
+    cleared[name] = rowCount;
+  });
+  return { ok: true, cleared: cleared, message: "Data operasional demo dibersihkan. Katalog dan arsip Drive tidak dihapus." };
+}
+
 function createOrder_(payload) {
   if (!payload.customer || !payload.items || !payload.items.length) throw new Error("Data pesanan tidak lengkap.");
   const lock = LockService.getScriptLock();
