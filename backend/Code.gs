@@ -6,7 +6,7 @@ const CONFIG = {
 
 const HEADERS = {
   Produk: ["SKU", "Nama", "Kategori", "Harga", "Harga Coret", "Warna", "Ukuran", "Stok", "Foto Utama", "Foto Kedua", "Deskripsi", "Badge", "Aktif", "Diperbarui"],
-  Pesanan: ["Nomor Pesanan", "Tanggal", "Nama Pembeli", "WhatsApp", "Email", "Alamat", "Kota", "Kode Pos", "Kurir", "Subtotal", "Ongkir", "Total", "Status", "Link Bukti Transfer", "Ekspedisi", "Nomor Resi", "Diperbarui", "ID Klien", "Sumber Pesanan", "Metode Pembayaran", "Link Invoice PDF"],
+  Pesanan: ["Nomor Pesanan", "Tanggal", "Nama Pembeli", "WhatsApp", "Email", "Alamat", "Kota", "Kode Pos", "Kurir", "Subtotal", "Ongkir", "Total", "Status", "Link Bukti Transfer", "Ekspedisi", "Nomor Resi", "Diperbarui", "ID Klien", "Sumber Pesanan", "Metode Pembayaran", "Link Invoice PDF", "Biteship Order ID", "Biteship Tracking ID", "Biteship Courier", "Biteship Service", "Biteship Shipping Status", "Biteship Last Event Key", "Biteship Updated"],
   "Detail Pesanan": ["Nomor Pesanan", "SKU", "Nama Produk", "Warna", "Ukuran", "Jumlah", "Harga Satuan", "Total"],
   Pengaturan: ["Kunci", "Nilai"],
   Pengunjung: ["ID Sesi", "Nama Panggilan", "Status", "Mulai", "Terakhir Aktif", "Nomor Pesanan"],
@@ -28,6 +28,9 @@ function doGet(e) {
 
 function doPost(e) {
   try {
+    if (e && e.parameter && e.parameter.webhook === "biteship") {
+      return json_(receiveBiteshipWebhook_(JSON.parse((e.postData && e.postData.contents) || "{}"), e));
+    }
     const payload = JSON.parse((e && e.postData && e.postData.contents) || "{}");
     if (payload.action === "createOrder" || payload.action === "syncOrder") return json_(createOrder_(payload));
     if (payload.action === "upsertVisitor") return json_(upsertVisitor_(payload));
@@ -35,6 +38,9 @@ function doPost(e) {
     if (payload.action === "updateOrder") return json_(updateOrder_(payload));
     if (payload.action === "sendInvoiceEmail") return json_(sendInvoiceLinkEmail_(payload));
     if (payload.action === "generateInvoice") return json_(generateInvoice_(payload));
+    if (payload.action === "createBiteshipShipment") return json_(createBiteshipShipment_(payload));
+    if (payload.action === "biteshipSandboxStatus") return json_(biteshipSandboxStatus_(payload));
+    if (payload.action === "biteshipWebhook") return json_(receiveBiteshipWebhook_(payload, e));
     throw new Error("Aksi tidak dikenal.");
   } catch (error) {
     return json_({ ok: false, error: error.message });
@@ -157,7 +163,7 @@ function trackOrder_(orderId, phone) {
     ok: true,
     order: {
       id: row[0], createdAt: new Date(row[1]).toISOString(), status: row[12],
-      expedition: row[14] || "", trackingNumber: row[15] || ""
+      expedition: row[14] || "", trackingNumber: row[15] || "", biteshipStatus: row[25] || "", biteshipCourier: row[23] || "", biteshipService: row[24] || ""
     }
   };
 }
@@ -230,7 +236,8 @@ function adminDashboard_(token) {
   const orders = orderRows.slice(-100).reverse().map(row => ({
     id: row[0], createdAt: row[1] instanceof Date ? row[1].toISOString() : "", name: row[2], phone: row[3], email: row[4],
     address: row[5], city: row[6], postal: row[7], courier: row[8], subtotal: number_(row[9]), shipping: number_(row[10]), total: number_(row[11]),
-    status: row[12], proofUrl: row[13], expedition: row[14], trackingNumber: row[15], clientOrderId: row[17] || "", source: row[18] || "Website", paymentMethod: row[19] || "Transfer manual", invoiceUrl: row[20] || "", items: itemsByOrder[String(row[0])] || []
+    status: row[12], proofUrl: row[13], expedition: row[14], trackingNumber: row[15], clientOrderId: row[17] || "", source: row[18] || "Website", paymentMethod: row[19] || "Transfer manual", invoiceUrl: row[20] || "",
+    biteshipOrderId: row[21] || "", biteshipTrackingId: row[22] || "", biteshipCourier: row[23] || "", biteshipService: row[24] || "", biteshipStatus: row[25] || "", biteshipUpdatedAt: row[27] instanceof Date ? row[27].toISOString() : "", items: itemsByOrder[String(row[0])] || []
   }));
   const counts = { online: visitors.filter(item => item.online).length, tanya: visitors.filter(item => item.status === "Online / Tanya").length,
     checkout: orders.filter(item => item.status === "Checkout — belum bayar").length,
@@ -262,6 +269,182 @@ function updateOrder_(payload) {
     sheet.getRange(index + 1, 21).setValue(invoice.viewUrl);
   }
   return { ok: true, by: admin.email };
+}
+
+// Biteship is deliberately sandbox-only in this store. The API key is kept in
+// Apps Script Properties, never in the Sheet, static files, or Vercel build.
+const BITESHIP_API_BASE = "https://api.biteship.com";
+const BITESHIP_COLUMNS = {
+  orderId: 22, trackingId: 23, courier: 24, service: 25, status: 26, eventKey: 27, updatedAt: 28
+};
+
+function biteshipSandboxStatus_(payload) {
+  requireAdmin_(payload.token);
+  const props = PropertiesService.getScriptProperties();
+  const key = String(props.getProperty("BITESHIP_API_KEY") || "").trim();
+  const environment = String(props.getProperty("BITESHIP_ENV") || "").trim().toLowerCase();
+  return {
+    ok: true,
+    environment: environment || "belum diatur",
+    keyConfigured: Boolean(key),
+    sandboxKey: key.indexOf("biteship_test.") === 0,
+    ready: environment === "sandbox" && key.indexOf("biteship_test.") === 0
+  };
+}
+
+function readBiteshipSandboxConfig_() {
+  const props = PropertiesService.getScriptProperties();
+  const environment = String(props.getProperty("BITESHIP_ENV") || "").trim().toLowerCase();
+  const apiKey = String(props.getProperty("BITESHIP_API_KEY") || "").trim();
+  if (environment !== "sandbox") throw new Error("Biteship ditolak: BITESHIP_ENV harus bernilai sandbox.");
+  if (!apiKey || apiKey.indexOf("biteship_test.") !== 0) {
+    throw new Error("Biteship sandbox belum siap. Isi BITESHIP_API_KEY dengan test key berawalan biteship_test. di Script Properties.");
+  }
+  return {
+    apiKey: apiKey,
+    origin: {
+      name: String(props.getProperty("BITESHIP_SANDBOX_ORIGIN_NAME") || "Yashbi Sandbox Store").trim(),
+      phone: String(props.getProperty("BITESHIP_SANDBOX_ORIGIN_PHONE") || "081234567890").trim(),
+      email: String(props.getProperty("BITESHIP_SANDBOX_ORIGIN_EMAIL") || "sandbox@yashbi.test").trim(),
+      organization: String(props.getProperty("BITESHIP_SANDBOX_ORGANIZATION") || "Yashbi Store Sandbox").trim(),
+      address: String(props.getProperty("BITESHIP_SANDBOX_ORIGIN_ADDRESS") || "Jl. Jenderal Sudirman No. 1, Jakarta Selatan").trim(),
+      postalCode: number_(props.getProperty("BITESHIP_SANDBOX_ORIGIN_POSTAL") || 12190)
+    }
+  };
+}
+
+function createBiteshipShipment_(payload) {
+  const admin = requireAdmin_(payload.token);
+  const lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    const config = readBiteshipSandboxConfig_();
+    const spreadsheet = SpreadsheetApp.openById(CONFIG.spreadsheetId);
+    const orderSheet = spreadsheet.getSheetByName(CONFIG.sheets.orders);
+    const itemSheet = spreadsheet.getSheetByName(CONFIG.sheets.orderItems);
+    ensureOrderPaymentHeaders_(orderSheet);
+    const rows = orderSheet.getDataRange().getValues();
+    const index = rows.findIndex((row, rowIndex) => rowIndex > 0 && String(row[0]) === String(payload.orderId));
+    if (index < 1) throw new Error("Pesanan tidak ditemukan.");
+    const order = rows[index];
+    if (String(order[21] || "").trim()) {
+      return { ok: true, duplicate: true, message: "Shipment sandbox sudah pernah dibuat untuk pesanan ini.", shipment: biteshipOrderFromRow_(order) };
+    }
+    if (!safe_(order[2]) || !safe_(order[3]) || !safe_(order[5]) || !number_(order[7])) {
+      throw new Error("Data tujuan belum lengkap. Nama, WhatsApp, alamat, dan kode pos pembeli wajib ada.");
+    }
+    const itemRows = itemSheet && itemSheet.getLastRow() > 1
+      ? itemSheet.getRange(2, 1, itemSheet.getLastRow() - 1, HEADERS["Detail Pesanan"].length).getValues().filter(row => String(row[0]) === String(order[0]))
+      : [];
+    if (!itemRows.length) throw new Error("Rincian produk pesanan tidak ditemukan.");
+    const courierCompany = String(payload.courierCompany || "jne").trim().toLowerCase();
+    const courierType = String(payload.courierType || "reg").trim().toLowerCase();
+    const requestBody = {
+      shipper_contact_name: config.origin.name,
+      shipper_contact_phone: config.origin.phone,
+      shipper_contact_email: config.origin.email,
+      shipper_organization: config.origin.organization,
+      origin_contact_name: config.origin.name,
+      origin_contact_phone: config.origin.phone,
+      origin_contact_email: config.origin.email,
+      origin_address: config.origin.address,
+      origin_note: "SANDBOX ONLY — tidak ada pickup sungguhan.",
+      origin_postal_code: config.origin.postalCode,
+      destination_contact_name: safe_(order[2]),
+      destination_contact_phone: normalizePhone_(order[3]),
+      destination_contact_email: safe_(order[4]),
+      destination_address: safe_(order[5]) + (safe_(order[6]) ? ", " + safe_(order[6]) : ""),
+      destination_postal_code: number_(order[7]),
+      courier_company: courierCompany,
+      courier_type: courierType,
+      delivery_type: "now",
+      order_note: "Yashbi Store sandbox test. Tidak ada pengiriman atau pickup nyata.",
+      reference_id: String(order[0]) + "-sandbox",
+      metadata: { yashbi_order_id: String(order[0]), environment: "sandbox" },
+      items: itemRows.map(item => ({
+        name: safe_(item[2]), description: "Warna " + safe_(item[3]) + ", ukuran " + safe_(item[4]), category: "fashion", sku: safe_(item[1]),
+        value: number_(item[6]), quantity: number_(item[5]), weight: Math.max(1, 250 * Math.max(1, number_(item[5]))), height: 10, length: 30, width: 20
+      }))
+    };
+    const response = UrlFetchApp.fetch(BITESHIP_API_BASE + "/v1/orders", {
+      method: "post",
+      contentType: "application/json",
+      headers: { Authorization: "Bearer " + config.apiKey },
+      payload: JSON.stringify(requestBody),
+      muteHttpExceptions: true
+    });
+    const httpStatus = response.getResponseCode();
+    let body;
+    try { body = JSON.parse(response.getContentText()); } catch (parseError) { throw new Error("Respons Biteship bukan JSON (HTTP " + httpStatus + ")."); }
+    if (httpStatus < 200 || httpStatus >= 300 || body.success !== true) {
+      throw new Error("Biteship Sandbox menolak shipment: " + safe_(body.error || body.message || "HTTP " + httpStatus));
+    }
+    const courier = body.courier || {};
+    if (!body.id || !courier.waybill_id) throw new Error("Biteship tidak mengembalikan order ID atau waybill_id. Data tidak disimpan agar tidak ada resi palsu.");
+    saveBiteshipShipment_(orderSheet, itemSheet, index + 1, order, body, "api:" + body.id, admin.email);
+    return { ok: true, duplicate: false, shipment: {
+      biteshipOrderId: body.id, trackingId: courier.tracking_id || "", waybill: courier.waybill_id,
+      courier: courier.company || courierCompany, service: courier.type || courierType, status: body.status || "confirmed"
+    }};
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function biteshipOrderFromRow_(row) {
+  return { biteshipOrderId: row[21] || "", trackingId: row[22] || "", courier: row[23] || "", service: row[24] || "", status: row[25] || "", waybill: row[15] || "" };
+}
+
+function saveBiteshipShipment_(orderSheet, itemSheet, sheetRow, order, response, eventKey, actor) {
+  const courier = response.courier || {};
+  const shipmentStatus = String(response.status || "confirmed").toLowerCase();
+  const company = safe_(courier.company || "");
+  const service = safe_(courier.type || "");
+  const waybill = safe_(courier.waybill_id || "");
+  const storefrontStatus = biteshipStorefrontStatus_(shipmentStatus, order[12]);
+  const expedition = [company.toUpperCase(), service.toUpperCase()].filter(Boolean).join(" ");
+  orderSheet.getRange(sheetRow, 13).setValue(storefrontStatus);
+  orderSheet.getRange(sheetRow, 15).setValue(expedition);
+  orderSheet.getRange(sheetRow, 16).setValue(waybill);
+  orderSheet.getRange(sheetRow, 17).setValue(new Date());
+  orderSheet.getRange(sheetRow, BITESHIP_COLUMNS.orderId).setValue(safe_(response.id));
+  orderSheet.getRange(sheetRow, BITESHIP_COLUMNS.trackingId).setValue(safe_(courier.tracking_id || ""));
+  orderSheet.getRange(sheetRow, BITESHIP_COLUMNS.courier).setValue(company);
+  orderSheet.getRange(sheetRow, BITESHIP_COLUMNS.service).setValue(service);
+  orderSheet.getRange(sheetRow, BITESHIP_COLUMNS.status).setValue(shipmentStatus);
+  orderSheet.getRange(sheetRow, BITESHIP_COLUMNS.eventKey).setValue(safe_(eventKey));
+  orderSheet.getRange(sheetRow, BITESHIP_COLUMNS.updatedAt).setValue(new Date());
+  const invoice = createInvoicePdf_(orderSheet, itemSheet, order[0]);
+  orderSheet.getRange(sheetRow, 21).setValue(invoice.viewUrl);
+}
+
+function biteshipStorefrontStatus_(status, current) {
+  if (status === "delivered") return "Selesai";
+  if (status === "cancelled") return "Batal";
+  return "Shipping";
+}
+
+function receiveBiteshipWebhook_(payload, e) {
+  const expectedToken = String(PropertiesService.getScriptProperties().getProperty("BITESHIP_WEBHOOK_TOKEN") || "");
+  const providedToken = String((e && e.parameter && e.parameter.token) || payload.webhookToken || "");
+  if (!expectedToken || providedToken !== expectedToken) throw new Error("Webhook Biteship ditolak.");
+  const orderId = safe_(payload.order_id);
+  if (!orderId || !safe_(payload.event)) throw new Error("Webhook Biteship tidak memiliki order_id atau event.");
+  const spreadsheet = SpreadsheetApp.openById(CONFIG.spreadsheetId);
+  const orderSheet = spreadsheet.getSheetByName(CONFIG.sheets.orders);
+  const itemSheet = spreadsheet.getSheetByName(CONFIG.sheets.orderItems);
+  ensureOrderPaymentHeaders_(orderSheet);
+  const rows = orderSheet.getDataRange().getValues();
+  const index = rows.findIndex((row, rowIndex) => rowIndex > 0 && String(row[21]) === orderId);
+  if (index < 1) throw new Error("Webhook tidak cocok dengan shipment Yashbi.");
+  const eventKey = [payload.event, orderId, payload.status || "", payload.courier_waybill_id || "", payload.courier_tracking_id || ""].join(":");
+  if (String(rows[index][26] || "") === eventKey) return { ok: true, duplicate: true };
+  const response = {
+    id: orderId, status: safe_(payload.status || rows[index][25] || "confirmed"),
+    courier: { tracking_id: payload.courier_tracking_id || rows[index][22] || "", waybill_id: payload.courier_waybill_id || rows[index][15] || "", company: payload.courier_company || rows[index][23] || "", type: payload.courier_type || rows[index][24] || "" }
+  };
+  saveBiteshipShipment_(orderSheet, itemSheet, index + 1, rows[index], response, eventKey, "biteship-webhook");
+  return { ok: true, duplicate: false, orderId: rows[index][0], status: response.status };
 }
 
 function sendInvoiceEmail_(payload) {
@@ -375,7 +558,11 @@ function createInvoicePdf_(orderSheet, itemSheet, orderId) {
   buyerCell.appendParagraph(safe_(order[5]) + "\n" + safe_(order[6]) + " " + safe_(order[7]) + "\nWhatsApp  " + safe_(order[3])).setFontSize(9).setForegroundColor(ink);
   deliveryCell.appendParagraph("PENGIRIMAN & PEMBAYARAN").setFontSize(8).setBold(true).setForegroundColor(muted);
   deliveryCell.appendParagraph(safe_(order[8] || "Belum dipilih")).setFontSize(11).setBold(true).setForegroundColor(ink);
-  deliveryCell.appendParagraph("Resi: " + safe_(order[15] || "Akan diinformasikan setelah pesanan dikirim") + "\nMetode: " + safe_(order[19] || "Transfer manual") + "\n" + (/shipping/i.test(String(order[12])) ? "Pesanan telah dikirim." : "Pesanan sedang diproses oleh tim Yashbi.")).setFontSize(9).setForegroundColor(ink);
+  const courierInfo = [safe_(order[23] || order[14] || ""), safe_(order[24] || "")].filter(Boolean).join(" · ");
+  const shippingInfo = order[15]
+    ? "Kurir: " + safe_(courierInfo || order[14] || "-") + "\nNo. Resi: " + safe_(order[15]) + "\nStatus Pengiriman: " + safe_(order[25] || order[12])
+    : "Pengiriman sedang diproses";
+  deliveryCell.appendParagraph(shippingInfo + "\nMetode: " + safe_(order[19] || "Transfer manual")).setFontSize(9).setForegroundColor(ink);
   body.appendParagraph("");
   body.appendParagraph("RINCIAN PESANAN").setFontSize(10).setBold(true).setForegroundColor(brand);
   const table = body.appendTable();
@@ -568,15 +755,10 @@ function paymentMethod_(value) {
 }
 
 function ensureOrderPaymentHeaders_(sheet) {
-  if (sheet.getRange(1, 19).getValue() !== "Sumber Pesanan") {
-    sheet.getRange(1, 19).setValue("Sumber Pesanan");
-  }
-  if (sheet.getRange(1, 20).getValue() !== "Metode Pembayaran") {
-    sheet.getRange(1, 20).setValue("Metode Pembayaran");
-  }
-  if (sheet.getRange(1, 21).getValue() !== "Link Invoice PDF") {
-    sheet.getRange(1, 21).setValue("Link Invoice PDF");
-  }
+  HEADERS.Pesanan.forEach((header, index) => {
+    const cell = sheet.getRange(1, index + 1);
+    if (cell.getValue() !== header) cell.setValue(header);
+  });
 }
 
 function safe_(value) {
