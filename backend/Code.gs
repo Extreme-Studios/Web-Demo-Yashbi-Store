@@ -177,17 +177,22 @@ function adminDashboard_(token) {
   const spreadsheet = SpreadsheetApp.openById(CONFIG.spreadsheetId);
   const orderSheet = spreadsheet.getSheetByName(CONFIG.sheets.orders);
   const itemSheet = spreadsheet.getSheetByName(CONFIG.sheets.orderItems);
+  const productSheet = spreadsheet.getSheetByName(CONFIG.sheets.products);
   const visitorSheet = spreadsheet.getSheetByName(CONFIG.sheets.visitors);
   if (orderSheet) ensureOrderPaymentHeaders_(orderSheet);
   const orderRows = orderSheet && orderSheet.getLastRow() > 1 ? orderSheet.getRange(2, 1, orderSheet.getLastRow() - 1, HEADERS.Pesanan.length).getValues() : [];
   const itemRows = itemSheet && itemSheet.getLastRow() > 1 ? itemSheet.getRange(2, 1, itemSheet.getLastRow() - 1, HEADERS["Detail Pesanan"].length).getValues() : [];
+  const productRows = productSheet && productSheet.getLastRow() > 1 ? productSheet.getRange(2, 1, productSheet.getLastRow() - 1, HEADERS.Produk.length).getValues() : [];
   const visitorRows = visitorSheet && visitorSheet.getLastRow() > 1 ? visitorSheet.getRange(2, 1, visitorSheet.getLastRow() - 1, HEADERS.Pengunjung.length).getValues() : [];
+  const productsBySku = {};
+  productRows.forEach(row => { productsBySku[String(row[0] || "")] = { original: number_(row[4]) }; });
   const itemsByOrder = {};
   itemRows.forEach(row => {
     const orderId = String(row[0] || "");
     if (!orderId) return;
     if (!itemsByOrder[orderId]) itemsByOrder[orderId] = [];
-    itemsByOrder[orderId].push({ productId: row[1], name: row[2], color: row[3], size: row[4], qty: number_(row[5]), price: number_(row[6]), total: number_(row[7]) });
+    const product = productsBySku[String(row[1] || "")] || {};
+    itemsByOrder[orderId].push({ productId: row[1], name: row[2], color: row[3], size: row[4], qty: number_(row[5]), price: number_(row[6]), total: number_(row[7]), original: product.original || 0 });
   });
   const now = Date.now();
   const visitors = visitorRows.slice(-60).reverse().map(row => ({

@@ -12,8 +12,15 @@ const esc=value=>String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&
 const money=value=>new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(Number(value||0));
 function statusClass(status){return /shipping/i.test(status)?"shipping":/verifikasi/i.test(status)?"verify":"";}
 const waPhone=value=>String(value||"").replace(/\D/g,"").replace(/^0/,"62");
+function invoiceItemText(item){
+  const total=Number(item.total || item.price*item.qty || 0);
+  const original=Number(item.original||0);
+  const discount=original>Number(item.price||0) ? (original-Number(item.price||0))*Number(item.qty||1) : 0;
+  const priceLine=discount?`Harga: ${money(original)} → ${money(item.price)}\n  Diskon: ${money(discount)}`:`Harga: ${money(item.price)}`;
+  return `• ${item.name}\n  Warna/ukuran: ${item.color} / ${item.size}\n  Jumlah: ${item.qty}\n  ${priceLine}\n  Total barang: ${money(total)}`;
+}
 function invoiceMessage(order){
-  const items=(order.items||[]).map(item=>`• ${item.name} (${item.color} / ${item.size}) ×${item.qty} — ${money(item.total || item.price*item.qty)}`).join("\n") || "• Rincian produk tercatat pada pesanan";
+  const items=(order.items||[]).map(invoiceItemText).join("\n\n") || "• Rincian produk tercatat pada pesanan";
   const shipping=/shipping/i.test(order.status) ? `\nEkspedisi: ${order.expedition||"-"}\nResi: ${order.trackingNumber||"-"}` : "";
   return `Halo Kak ${order.name},\n\nTerima kasih sudah berbelanja di Yashbi Store. Berikut detail pesanan Kakak:\n\nInvoice: ${order.id}\n${items}\n\nSubtotal: ${money(order.subtotal)}\nOngkir: ${money(order.shipping)}\nTotal: ${money(order.total)}\nStatus: ${order.status}${shipping}\n\nTerima kasih.`;
 }
