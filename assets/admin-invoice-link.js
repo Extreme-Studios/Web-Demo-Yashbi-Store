@@ -12,20 +12,29 @@ invoiceMessage = function(order) {
 const originalRenderInvoiceButton = renderInvoiceButton;
 renderInvoiceButton = function(order) {
   originalRenderInvoiceButton(order);
-  const button = A("sendInvoiceWhatsApp");
+  let button = A("sendInvoiceWhatsApp");
   if (!button) return;
-  if (invoiceReadyToSend(order)) {
-    button.classList.remove("is-disabled");
-    button.removeAttribute("aria-disabled");
-    button.onclick = null;
-    return;
+
+  // An anchor with its href removed can still look and feel clickable. Replace it
+  // with a real button so notification is impossible before shipment is saved.
+  if (button.tagName !== "BUTTON") {
+    const replacement = document.createElement("button");
+    replacement.type = "button";
+    replacement.id = button.id;
+    replacement.className = button.className;
+    replacement.hidden = button.hidden;
+    button.replaceWith(replacement);
+    button = replacement;
   }
-  button.removeAttribute("href");
-  button.removeAttribute("target");
-  button.classList.add("is-disabled");
-  button.setAttribute("aria-disabled", "true");
-  button.textContent = "WhatsApp aktif setelah resi diisi";
-  button.onclick = event => { event.preventDefault(); toast("Isi ekspedisi dan nomor resi, lalu simpan status Shipping terlebih dahulu."); };
+
+  const ready = Boolean(invoiceReadyToSend(order));
+  button.disabled = !ready;
+  button.classList.toggle("is-disabled", !ready);
+  button.setAttribute("aria-disabled", String(!ready));
+  button.textContent = ready ? "Kirim invoice & resi via WhatsApp" : "WhatsApp aktif setelah status Shipping dan resi tersimpan";
+  button.onclick = ready
+    ? () => window.open(`https://wa.me/${waPhone(order.phone)}?text=${encodeURIComponent(invoiceMessage(order))}`, "_blank", "noopener")
+    : () => toast("Isi ekspedisi dan nomor resi, pilih status Shipping, lalu Simpan pembaruan terlebih dahulu.");
 };
 
 const originalOpenOrderForInvoiceLock = openOrder;
