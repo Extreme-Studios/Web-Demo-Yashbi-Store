@@ -84,6 +84,7 @@ let selectedColor = null;
 let selectedSize = null;
 let proofData = null;
 let visitor = JSON.parse(localStorage.getItem(STORE_KEYS.visitor) || "null");
+let pendingCheckout = false;
 const orderSource = (() => {
   const value = new URLSearchParams(location.search).get("source") || new URLSearchParams(location.search).get("src") || "";
   const source = value.trim().toLowerCase();
@@ -242,7 +243,21 @@ function persistCart() {
   renderCart();
 }
 
-function addSelectedToCart() {
+function openCheckoutFlow() {
+  if (!cart.length) return;
+  if (!visitor) {
+    pendingCheckout = true;
+    openModal("identityModal");
+    toast("Isi nama panggilan dulu agar pesananmu tidak tertukar.");
+    return;
+  }
+  pendingCheckout = false;
+  syncVisitor("Checkout — belum bayar");
+  renderCheckout();
+  openModal("checkoutModal");
+}
+
+function addSelectedToCart(openCheckout = false) {
   if (!selectedSize) return toast("Pilih ukuran terlebih dahulu.");
   const key = `${selectedProduct.id}-${selectedColor}-${selectedSize}`;
   const existing = cart.find(i=>i.key===key);
@@ -250,6 +265,10 @@ function addSelectedToCart() {
   else cart.push({key,productId:selectedProduct.id,color:selectedColor,size:selectedSize,qty:1});
   persistCart();
   closeModals();
+  if (openCheckout) {
+    openCheckoutFlow();
+    return;
+  }
   toast(`${selectedProduct.name} masuk keranjang.`);
 }
 
@@ -418,13 +437,9 @@ byId("cartToggle").addEventListener("click",openCart);
 byId("cartClose").addEventListener("click",closeModals);
 byId("cartShopButton").addEventListener("click",()=>{closeModals();byId("koleksi").scrollIntoView({behavior:"smooth"});});
 backdrop.addEventListener("click",closeModals);
-byId("addToCartButton").addEventListener("click",addSelectedToCart);
-byId("checkoutOpen").addEventListener("click",()=>{
-  if(!cart.length)return;
-  if(!visitor) { openModal("identityModal"); toast("Isi nama panggilan dulu agar pesananmu tidak tertukar."); return; }
-  syncVisitor("Checkout — belum bayar");
-  renderCheckout();openModal("checkoutModal");
-});
+byId("addToCartButton").addEventListener("click",()=>addSelectedToCart());
+byId("buyNowButton").addEventListener("click",()=>addSelectedToCart(true));
+byId("checkoutOpen").addEventListener("click",openCheckoutFlow);
 byId("productImageZoom").addEventListener("click",()=>{byId("lightboxImage").src=byId("productModalImage").src;byId("imageLightbox").classList.add("open");});
 byId("lightboxClose").addEventListener("click",()=>byId("imageLightbox").classList.remove("open"));
 byId("imageLightbox").addEventListener("click",e=>{if(e.target===byId("imageLightbox"))e.currentTarget.classList.remove("open");});
@@ -499,6 +514,10 @@ byId("identityForm").addEventListener("submit",async e=>{
   localStorage.setItem(STORE_KEYS.visitor,JSON.stringify(visitor));
   closeModals();
   await syncVisitor();
+  if (pendingCheckout) {
+    openCheckoutFlow();
+    return;
+  }
   toast(`Halo ${name}, koleksi Yashbi siap kamu lihat.`);
 });
 
