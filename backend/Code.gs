@@ -176,10 +176,19 @@ function adminDashboard_(token) {
   const admin = requireAdmin_(token);
   const spreadsheet = SpreadsheetApp.openById(CONFIG.spreadsheetId);
   const orderSheet = spreadsheet.getSheetByName(CONFIG.sheets.orders);
+  const itemSheet = spreadsheet.getSheetByName(CONFIG.sheets.orderItems);
   const visitorSheet = spreadsheet.getSheetByName(CONFIG.sheets.visitors);
   if (orderSheet) ensureOrderPaymentHeaders_(orderSheet);
   const orderRows = orderSheet && orderSheet.getLastRow() > 1 ? orderSheet.getRange(2, 1, orderSheet.getLastRow() - 1, HEADERS.Pesanan.length).getValues() : [];
+  const itemRows = itemSheet && itemSheet.getLastRow() > 1 ? itemSheet.getRange(2, 1, itemSheet.getLastRow() - 1, HEADERS["Detail Pesanan"].length).getValues() : [];
   const visitorRows = visitorSheet && visitorSheet.getLastRow() > 1 ? visitorSheet.getRange(2, 1, visitorSheet.getLastRow() - 1, HEADERS.Pengunjung.length).getValues() : [];
+  const itemsByOrder = {};
+  itemRows.forEach(row => {
+    const orderId = String(row[0] || "");
+    if (!orderId) return;
+    if (!itemsByOrder[orderId]) itemsByOrder[orderId] = [];
+    itemsByOrder[orderId].push({ productId: row[1], name: row[2], color: row[3], size: row[4], qty: number_(row[5]), price: number_(row[6]), total: number_(row[7]) });
+  });
   const now = Date.now();
   const visitors = visitorRows.slice(-60).reverse().map(row => ({
     sessionId: row[0], name: row[1], status: row[2], lastSeen: row[4] instanceof Date ? row[4].toISOString() : "", orderId: row[5] || "",
@@ -188,7 +197,7 @@ function adminDashboard_(token) {
   const orders = orderRows.slice(-100).reverse().map(row => ({
     id: row[0], createdAt: row[1] instanceof Date ? row[1].toISOString() : "", name: row[2], phone: row[3], email: row[4],
     address: row[5], city: row[6], postal: row[7], courier: row[8], subtotal: number_(row[9]), shipping: number_(row[10]), total: number_(row[11]),
-    status: row[12], proofUrl: row[13], expedition: row[14], trackingNumber: row[15], clientOrderId: row[17] || "", source: row[18] || "Website", paymentMethod: row[19] || "Transfer manual"
+    status: row[12], proofUrl: row[13], expedition: row[14], trackingNumber: row[15], clientOrderId: row[17] || "", source: row[18] || "Website", paymentMethod: row[19] || "Transfer manual", items: itemsByOrder[String(row[0])] || []
   }));
   const counts = { online: visitors.filter(item => item.online).length, tanya: visitors.filter(item => item.status === "Online / Tanya").length,
     checkout: orders.filter(item => item.status === "Checkout — belum bayar").length,

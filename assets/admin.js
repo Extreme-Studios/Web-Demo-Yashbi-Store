@@ -11,6 +11,22 @@ async function getDashboard(){const url=new URL(API);url.searchParams.set("actio
 const esc=value=>String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[char]));
 const money=value=>new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(Number(value||0));
 function statusClass(status){return /shipping/i.test(status)?"shipping":/verifikasi/i.test(status)?"verify":"";}
+const waPhone=value=>String(value||"").replace(/\D/g,"").replace(/^0/,"62");
+function invoiceMessage(order){
+  const items=(order.items||[]).map(item=>`• ${item.name} (${item.color} / ${item.size}) ×${item.qty} — ${money(item.total || item.price*item.qty)}`).join("\n") || "• Rincian produk tercatat pada pesanan";
+  const shipping=/shipping/i.test(order.status) ? `\nEkspedisi: ${order.expedition||"-"}\nResi: ${order.trackingNumber||"-"}` : "";
+  return `Halo Kak ${order.name},\n\nTerima kasih sudah berbelanja di Yashbi Store. Berikut detail pesanan Kakak:\n\nInvoice: ${order.id}\n${items}\n\nSubtotal: ${money(order.subtotal)}\nOngkir: ${money(order.shipping)}\nTotal: ${money(order.total)}\nStatus: ${order.status}${shipping}\n\nTerima kasih.`;
+}
+function renderInvoiceButton(order){
+  const form=A("orderUpdateForm");
+  let button=A("sendInvoiceWhatsApp");
+  if(!button){button=document.createElement("a");button.id="sendInvoiceWhatsApp";button.className="button button-outline button-block invoice-whatsapp";button.target="_blank";button.rel="noopener";form.before(button);}
+  const phone=waPhone(order.phone);
+  button.hidden=!phone;
+  if(!phone)return;
+  button.href=`https://wa.me/${phone}?text=${encodeURIComponent(invoiceMessage(order))}`;
+  button.textContent=/shipping/i.test(order.status)?"Kirim invoice & resi via WhatsApp":"Kirim invoice via WhatsApp";
+}
 function render(){
   A("roleBadge").textContent=session.role==="OWNER"?"Owner":"Staff";
   A("metricOnline").textContent=dashboard.counts.online;A("metricTanya").textContent=dashboard.counts.tanya;A("metricVerify").textContent=dashboard.counts.verify;A("metricShipping").textContent=dashboard.counts.shipping;
@@ -23,6 +39,8 @@ function render(){
 function openOrder(id){selectedOrder=dashboard.orders.find(item=>item.id===id);if(!selectedOrder)return;A("detailTitle").textContent=selectedOrder.name;A("detailContent").innerHTML=`<div class="detail-block"><strong>${esc(selectedOrder.status)}</strong>${esc(selectedOrder.id)} · ${money(selectedOrder.total)}</div><div class="detail-block"><strong>Kontak</strong>${esc(selectedOrder.phone)}${selectedOrder.email?` · ${esc(selectedOrder.email)}`:""}</div><div class="detail-block"><strong>Pengiriman</strong>${esc(selectedOrder.address)}, ${esc(selectedOrder.city)} ${esc(selectedOrder.postal)}<br>${esc(selectedOrder.courier)}</div><div class="detail-block"><strong>Bukti pembayaran</strong>${selectedOrder.proofUrl?`<a class="detail-link" target="_blank" rel="noopener" href="${esc(selectedOrder.proofUrl)}">Buka bukti transfer</a>`:"Belum ada"}</div>`;const form=A("orderUpdateForm");form.status.value=selectedOrder.status;form.expedition.value=selectedOrder.expedition||"";form.trackingNumber.value=selectedOrder.trackingNumber||"";A("detailPanel").hidden=false;}
 const baseOpenOrder=openOrder;
 openOrder=function(id){baseOpenOrder(id);if(!selectedOrder)return;const detail=A("detailContent");detail.insertAdjacentHTML("afterbegin",`<div class="detail-block"><strong>Sumber pesanan</strong>${esc(selectedOrder.source||"Website")}</div><div class="detail-block"><strong>Metode pembayaran</strong>${esc(selectedOrder.paymentMethod||"Transfer manual")}</div>`);};
+const invoiceOpenOrder=openOrder;
+openOrder=function(id){invoiceOpenOrder(id);if(!selectedOrder)return;const detail=A("detailContent");const items=(selectedOrder.items||[]).map(item=>`${esc(item.name)} · ${esc(item.color)} / ${esc(item.size)} · ${esc(item.qty)}×`).join("<br>");detail.insertAdjacentHTML("afterbegin",`<div class="detail-block"><strong>Rincian produk</strong>${items||"Belum ada rincian produk"}</div>`);renderInvoiceButton(selectedOrder);};
 const baseRender=render;
 render=function(){baseRender();A("orderList").querySelectorAll("[data-order]").forEach(row=>{const item=dashboard.orders.find(order=>order.id===row.dataset.order);if(item){const meta=row.querySelector("small");meta.textContent=`${item.id} · ${item.source||"Website"} · ${item.paymentMethod||"Transfer manual"} · ${money(item.total)}`;}});};
 async function refresh(){try{dashboard=await getDashboard();render();}catch(error){if(/Sesi admin/i.test(error.message)){logout();return;}toast(error.message);}}
