@@ -232,8 +232,14 @@ function sendInvoiceEmail_(payload) {
   const orderSheet = spreadsheet.getSheetByName(CONFIG.sheets.orders);
   const itemSheet = spreadsheet.getSheetByName(CONFIG.sheets.orderItems);
   const rows = orderSheet.getDataRange().getValues();
-  const order = rows.find((row, index) => index > 0 && String(row[0]) === String(payload.orderId));
-  if (!order) throw new Error("Pesanan tidak ditemukan.");
+  const orderIndex = rows.findIndex((row, index) => index > 0 && String(row[0]) === String(payload.orderId));
+  if (orderIndex < 1) throw new Error("Pesanan tidak ditemukan.");
+  const order = rows[orderIndex];
+  const requestedEmail = safe_(payload.email).trim().toLowerCase();
+  if (requestedEmail) {
+    orderSheet.getRange(orderIndex + 1, 5).setValue(requestedEmail);
+    order[4] = requestedEmail;
+  }
   const email = safe_(order[4]).trim();
   if (!email) throw new Error("Email pembeli belum diisi.");
   const items = itemSheet && itemSheet.getLastRow() > 1
@@ -244,6 +250,10 @@ function sendInvoiceEmail_(payload) {
   const body = `Halo Kak ${safe_(order[2])},\n\nTerima kasih sudah berbelanja di Yashbi Store. Berikut detail pesanan Kakak:\n\nInvoice: ${safe_(order[0])}\n${itemText}\n\nSubtotal: ${rupiah_(order[9])}\nOngkir: ${rupiah_(order[10])}\nTotal: ${rupiah_(order[11])}\nStatus: ${safe_(order[12])}${shipping}\n\nTerima kasih.`;
   GmailApp.sendEmail(email, `Invoice Yashbi Store ${safe_(order[0])}`, body, { name: "Yashbi Store" });
   return { ok: true, sentTo: email };
+}
+
+function authorizeInvoiceEmail() {
+  return GmailApp.getRemainingDailyQuota();
 }
 
 function getProducts_() {

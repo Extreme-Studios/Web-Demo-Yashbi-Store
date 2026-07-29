@@ -24,13 +24,20 @@
       button.href = "#kirim-invoice-email";
       button.onclick = async event => {
         event.preventDefault();
-        if(!window.confirm(`Kirim invoice ${selectedOrder.id} langsung ke ${target}?`)) return;
+        const currentEmail = String(field.value || target || "").trim();
+        if(!/^\S+@\S+\.\S+$/.test(currentEmail)){
+          toast("Isi email pembeli yang valid terlebih dahulu.");
+          field.focus();
+          return;
+        }
+        if(!window.confirm(`Kirim invoice ${selectedOrder.id} langsung ke ${currentEmail}?`)) return;
         button.setAttribute("aria-disabled", "true");
         button.textContent = "Mengirim email...";
         try{
-          const result = await api({action:"sendInvoiceEmail",token:session.token,orderId:selectedOrder.id});
+          const result = await api({action:"sendInvoiceEmail",token:session.token,orderId:selectedOrder.id,email:currentEmail});
+          selectedOrder.email = currentEmail;
           button.textContent = "Invoice email terkirim";
-          toast(`Invoice dikirim ke ${result.sentTo||target}.`);
+          toast(`Invoice dikirim ke ${result.sentTo||currentEmail}.`);
         }catch(error){
           button.textContent = "Kirim invoice via Email";
           toast(error.message||"Email gagal dikirim.");
