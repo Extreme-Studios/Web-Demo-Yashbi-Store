@@ -21,7 +21,7 @@ function invoiceItemText(item){
 }
 function invoiceMessage(order){
   const items=(order.items||[]).map(invoiceItemText).join("\n\n") || "• Rincian produk tercatat pada pesanan";
-  const shipping=/shipping/i.test(order.status) ? `\nEkspedisi: ${order.expedition||"-"}\nResi: ${order.trackingNumber||"-"}` : "";
+  const shipping=/shipping/i.test(order.status) ? `\nEkspedisi: ${order.expedition||order.courier||"-"}\nResi: ${order.trackingNumber||"-"}` : "";
   return `Halo Kak ${order.name},\n\nTerima kasih sudah berbelanja di Yashbi Store. Berikut detail pesanan Kakak:\n\nInvoice: ${order.id}\n${items}\n\nSubtotal: ${money(order.subtotal)}\nOngkir: ${money(order.shipping)}\nTotal: ${money(order.total)}\nStatus: ${order.status}${shipping}\n\nTerima kasih.`;
 }
 function renderInvoiceButton(order){
@@ -56,6 +56,8 @@ const baseOpenOrder=openOrder;
 openOrder=function(id){baseOpenOrder(id);if(!selectedOrder)return;const detail=A("detailContent");detail.insertAdjacentHTML("afterbegin",`<div class="detail-block"><strong>Sumber pesanan</strong>${esc(selectedOrder.source||"Website")}</div><div class="detail-block"><strong>Metode pembayaran</strong>${esc(selectedOrder.paymentMethod||"Transfer manual")}</div>`);};
 const invoiceOpenOrder=openOrder;
 openOrder=function(id){invoiceOpenOrder(id);if(!selectedOrder)return;const detail=A("detailContent");const items=(selectedOrder.items||[]).map(item=>`${esc(item.name)} · ${esc(item.color)} / ${esc(item.size)} · ${esc(item.qty)}×`).join("<br>");detail.insertAdjacentHTML("afterbegin",`<div class="detail-block"><strong>Rincian produk</strong>${items||"Belum ada rincian produk"}</div>`);renderInvoiceButton(selectedOrder);renderInvoiceEmailButton(selectedOrder);};
+const courierOpenOrder=openOrder;
+openOrder=function(id){courierOpenOrder(id);if(!selectedOrder)return;A("orderUpdateForm").expedition.value=selectedOrder.expedition||selectedOrder.courier||"";};
 const baseRender=render;
 render=function(){baseRender();A("orderList").querySelectorAll("[data-order]").forEach(row=>{const item=dashboard.orders.find(order=>order.id===row.dataset.order);if(item){const meta=row.querySelector("small");meta.textContent=`${item.id} · ${item.source||"Website"} · ${item.paymentMethod||"Transfer manual"} · ${money(item.total)}`;}});};
 async function refresh(){try{dashboard=await getDashboard();render();}catch(error){if(/Sesi admin/i.test(error.message)){logout();return;}toast(error.message);}}
