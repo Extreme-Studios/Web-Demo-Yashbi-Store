@@ -245,11 +245,22 @@ function updateOrder_(payload) {
   const values = sheet.getDataRange().getValues();
   const index = values.findIndex((row, i) => i > 0 && String(row[0]) === String(payload.orderId));
   if (index < 1) throw new Error("Pesanan tidak ditemukan.");
-  if (payload.status) sheet.getRange(index + 1, 13).setValue(safe_(payload.status));
+  const nextStatus = safe_(payload.status || values[index][12]);
+  const nextExpedition = safe_(payload.expedition !== undefined ? payload.expedition : values[index][14]);
+  const nextTracking = safe_(payload.trackingNumber !== undefined ? payload.trackingNumber : values[index][15]);
+  if (/^(shipping|selesai)$/i.test(nextStatus) && (!nextExpedition || !nextTracking)) {
+    throw new Error("Status Shipping/Selesai wajib memiliki ekspedisi dan nomor resi.");
+  }
+  if (payload.status) sheet.getRange(index + 1, 13).setValue(nextStatus);
   if (payload.email !== undefined) sheet.getRange(index + 1, 5).setValue(safe_(payload.email).toLowerCase());
   if (payload.expedition !== undefined) sheet.getRange(index + 1, 15).setValue(safe_(payload.expedition));
   if (payload.trackingNumber !== undefined) sheet.getRange(index + 1, 16).setValue(safe_(payload.trackingNumber));
   sheet.getRange(index + 1, 17).setValue(new Date());
+  if (/^(shipping|selesai)$/i.test(nextStatus)) {
+    const itemSheet = SpreadsheetApp.openById(CONFIG.spreadsheetId).getSheetByName(CONFIG.sheets.orderItems);
+    const invoice = createInvoicePdf_(sheet, itemSheet, payload.orderId);
+    sheet.getRange(index + 1, 21).setValue(invoice.viewUrl);
+  }
   return { ok: true, by: admin.email };
 }
 
@@ -296,8 +307,11 @@ function sendInvoiceLinkEmail_(payload) {
   }
   const email = safe_(order[4]);
   if (!email) throw new Error("Email pembeli belum diisi.");
-  const invoice = String(order[20] || "") ? { viewUrl: String(order[20]), downloadUrl: driveDownloadUrl_(String(order[20])) } : createInvoicePdf_(orderSheet, itemSheet, order[0]);
-  if (!order[20]) orderSheet.getRange(orderIndex + 1, 21).setValue(invoice.viewUrl);
+  if (!/^(shipping|selesai)$/i.test(String(order[12])) || !safe_(order[14]) || !safe_(order[15])) {
+    throw new Error("Invoice WA/email aktif setelah status Shipping/Selesai, ekspedisi, dan nomor resi lengkap.");
+  }
+  const invoice = createInvoicePdf_(orderSheet, itemSheet, order[0]);
+  orderSheet.getRange(orderIndex + 1, 21).setValue(invoice.viewUrl);
   sendInvoiceNotice_(email, order[0], invoice.downloadUrl, order[12]);
   return { ok: true, sentTo: email, invoiceUrl: invoice.downloadUrl };
 }
