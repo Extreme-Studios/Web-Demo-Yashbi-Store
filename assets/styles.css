@@ -307,7 +307,6 @@ footer { padding: 70px 6vw 25px; background: var(--ink); color: #e9e1db; }
   .footer-brand { align-items: start; flex-direction: column; gap: 20px; }.footer-brand p { font-size: 17px; }
   .footer-links { grid-template-columns: 1fr 1fr; gap: 40px 20px; }.footer-bottom { flex-direction: column; gap: 8px; }
   .product-modal { display: block; width: 94vw; }.product-modal-info { padding: 30px 24px 35px; }.zoomable-image { aspect-ratio: 1; }.product-modal-info h2 { font-size: 40px; }
-  .product-action-row { grid-template-columns: 1fr; }
   .checkout-modal { padding: 28px 18px; }.checkout-columns { grid-template-columns: 1fr; gap: 25px; }.checkout-order { position: static; }.field-grid { grid-template-columns: 1fr; }.field.full { grid-column: auto; }.checkout-header h2 { font-size: 40px; }
   .compact-modal { padding: 38px 24px; }.compact-modal h2 { font-size: 39px; }
 }
