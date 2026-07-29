@@ -234,7 +234,8 @@ footer { padding: 70px 6vw 25px; background: var(--ink); color: #e9e1db; }
 .checkout-modal { width: min(1120px, 95vw); padding: 40px; }
 .checkout-header { margin-bottom: 26px; }
 .checkout-header h2 { font-size: 48px; }
-.checkout-header > p:last-child { margin: 8px 0 0; color: var(--muted); font-size: 11px; }
+.checkout-header > p:not(.eyebrow) { margin: 8px 0 0; color: var(--muted); font-size: 11px; }
+.checkout-header .checkout-source { display: inline-block; margin-top: 12px; padding: 6px 9px; border-radius: 99px; background: #eee6df; color: #5f514a; font-size: 9px; letter-spacing: .04em; }
 .checkout-columns { display: grid; grid-template-columns: 1.25fr .75fr; gap: 45px; }
 .checkout-fields h3, .checkout-order h3 { margin: 24px 0 14px; font: 600 20px var(--serif); }
 .checkout-fields h3:first-child, .checkout-order h3:first-child { margin-top: 0; }

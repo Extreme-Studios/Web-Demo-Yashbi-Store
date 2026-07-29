@@ -84,6 +84,13 @@ let selectedColor = null;
 let selectedSize = null;
 let proofData = null;
 let visitor = JSON.parse(localStorage.getItem(STORE_KEYS.visitor) || "null");
+const orderSource = (() => {
+  const value = new URLSearchParams(location.search).get("source") || new URLSearchParams(location.search).get("src") || "";
+  const source = value.trim().toLowerCase();
+  if (source === "wa" || source === "whatsapp") return "WhatsApp";
+  if (source === "chat" || source === "chatbot") return "Chatbot";
+  return "Website";
+})();
 
 function newId(prefix) {
   const random = globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -289,6 +296,7 @@ function renderCheckout() {
   }).join("");
   byId("checkoutSubtotal").textContent = money(cartTotal());
   byId("checkoutTotal").textContent = money(cartTotal());
+  byId("checkoutSource").textContent = `Sumber pesanan: ${orderSource}`;
 }
 
 function readAndCompressImage(file) {
@@ -323,7 +331,7 @@ async function sendOrderToBackend(order) {
     const product = PRODUCTS.find(product => product.id === item.productId);
     return {...item,name:product.name,price:product.price};
   });
-  const result = await postApi({action:"createOrder",clientOrderId:order.clientOrderId,sessionId:visitor?.sessionId || "",customer:order.customer,items,subtotal:order.subtotal,shipping:order.shipping,proof:order.proof});
+  const result = await postApi({action:"createOrder",clientOrderId:order.clientOrderId,sessionId:visitor?.sessionId || "",customer:order.customer,items,subtotal:order.subtotal,shipping:order.shipping,proof:order.proof,source:order.source});
   return result.order;
 }
 
@@ -333,7 +341,7 @@ async function createOrder(form) {
   const localId = `TMP-${String(now.getFullYear()).slice(-2)}${String(now.getMonth()+1).padStart(2,"0")}${String(now.getDate()).padStart(2,"0")}-${String(orders.length+1).padStart(3,"0")}`;
   const data = Object.fromEntries(new FormData(form).entries());
   delete data.proof;
-  const order = {id:localId,clientOrderId:newId("YSH"),createdAt:now.toISOString(),customer:data,items:[...cart],subtotal:cartTotal(),shipping:shippingCost(data.courier),status:"Menunggu Verifikasi Pembayaran",proof:proofData,syncState:"Mencoba sinkron"};
+  const order = {id:localId,clientOrderId:newId("YSH"),createdAt:now.toISOString(),customer:data,items:[...cart],subtotal:cartTotal(),shipping:shippingCost(data.courier),status:"Menunggu Verifikasi Pembayaran",proof:proofData,source:orderSource,syncState:"Mencoba sinkron"};
   try {
     const remoteOrder = await sendOrderToBackend(order);
     if (remoteOrder) { Object.assign(order, remoteOrder); order.syncState="Tersinkron"; await syncVisitor(order.status, order.id); }
@@ -341,7 +349,7 @@ async function createOrder(form) {
     order.syncError = error.message;
     order.status = "Menunggu sinkronisasi";
     order.syncState = "Antrean perangkat ini";
-    writeQueue([...readQueue(), {payload:{action:"syncOrder",clientOrderId:order.clientOrderId,sessionId:visitor?.sessionId || "",customer:order.customer,items:order.items.map(item=>{const product=PRODUCTS.find(p=>p.id===item.productId);return {...item,name:product.name,price:product.price};}),subtotal:order.subtotal,shipping:order.shipping,proof:order.proof},queuedAt:now.toISOString()}]);
+    writeQueue([...readQueue(), {payload:{action:"syncOrder",clientOrderId:order.clientOrderId,sessionId:visitor?.sessionId || "",customer:order.customer,items:order.items.map(item=>{const product=PRODUCTS.find(p=>p.id===item.productId);return {...item,name:product.name,price:product.price};}),subtotal:order.subtotal,shipping:order.shipping,proof:order.proof,source:order.source},queuedAt:now.toISOString()}]);
     console.warn("Pesanan menunggu sinkronisasi:", error);
   }
   orders.unshift(order);
@@ -502,3 +510,7 @@ renderCart();
 hydrateCatalogImages();
 syncQueue();
 if(visitor) syncVisitor(); else setTimeout(()=>openModal("identityModal"),500);
+const linkedProduct = new URLSearchParams(location.search).get("product");
+if (linkedProduct && PRODUCTS.some(product => product.id === linkedProduct.toUpperCase())) {
+  setTimeout(() => openProduct(linkedProduct.toUpperCase()), 250);
+}
