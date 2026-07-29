@@ -345,6 +345,7 @@ function createInvoicePdf_(orderSheet, itemSheet, orderId) {
   body.clear();
   const brand = "#1f2730", ink = "#20262d", muted = "#737980", cream = "#f4f0eb", rose = "#c89fa0";
   const header = body.appendTable();
+  header.setBorderWidth(0);
   const brandHeaderRow = header.appendTableRow();
   const brandCell = brandHeaderRow.appendTableCell();
   const invoiceCell = brandHeaderRow.appendTableCell();
@@ -356,6 +357,7 @@ function createInvoicePdf_(orderSheet, itemSheet, orderId) {
   invoiceCell.appendParagraph(Utilities.formatDate(new Date(order[1]), Session.getScriptTimeZone(), "dd MMM yyyy - HH:mm") + " WIB").setAlignment(DocumentApp.HorizontalAlignment.RIGHT).setFontSize(8).setForegroundColor("#ffffff");
   body.appendParagraph("");
   const statusTable = body.appendTable();
+  statusTable.setBorderWidth(0);
   const statusRow = statusTable.appendTableRow();
   const statusLabel = statusRow.appendTableCell();
   const statusValue = statusRow.appendTableCell();
@@ -364,6 +366,7 @@ function createInvoicePdf_(orderSheet, itemSheet, orderId) {
   statusValue.appendParagraph(safe_(order[12]).toUpperCase()).setAlignment(DocumentApp.HorizontalAlignment.RIGHT).setFontSize(9).setBold(true).setForegroundColor(brand);
   body.appendParagraph("");
   const info = body.appendTable();
+  info.setBorderWidth(0);
   const infoRow = info.appendTableRow();
   const buyerCell = infoRow.appendTableCell();
   const deliveryCell = infoRow.appendTableCell();
@@ -372,10 +375,11 @@ function createInvoicePdf_(orderSheet, itemSheet, orderId) {
   buyerCell.appendParagraph(safe_(order[5]) + "\n" + safe_(order[6]) + " " + safe_(order[7]) + "\nWhatsApp  " + safe_(order[3])).setFontSize(9).setForegroundColor(ink);
   deliveryCell.appendParagraph("PENGIRIMAN & PEMBAYARAN").setFontSize(8).setBold(true).setForegroundColor(muted);
   deliveryCell.appendParagraph(safe_(order[8] || "Belum dipilih")).setFontSize(11).setBold(true).setForegroundColor(ink);
-  deliveryCell.appendParagraph("Metode  " + safe_(order[19] || "Transfer manual") + "\nBukti pembayaran telah diterima dan menunggu verifikasi staff.").setFontSize(9).setForegroundColor(ink);
+  deliveryCell.appendParagraph("Resi: " + safe_(order[15] || "Akan diinformasikan setelah pesanan dikirim") + "\nMetode: " + safe_(order[19] || "Transfer manual") + "\n" + (/shipping/i.test(String(order[12])) ? "Pesanan telah dikirim." : "Pesanan sedang diproses oleh tim Yashbi.")).setFontSize(9).setForegroundColor(ink);
   body.appendParagraph("");
   body.appendParagraph("RINCIAN PESANAN").setFontSize(10).setBold(true).setForegroundColor(brand);
   const table = body.appendTable();
+  table.setBorderWidth(0);
   const headerRow = table.appendTableRow();
   ["Produk", "Varian", "Qty", "Harga", "Total"].forEach(value => headerRow.appendTableCell(value));
   headerRow.editAsText().setBold(true).setForegroundColor("#ffffff");
@@ -387,6 +391,7 @@ function createInvoicePdf_(orderSheet, itemSheet, orderId) {
   });
   body.appendParagraph("");
   const totals = body.appendTable();
+  totals.setBorderWidth(0);
   [["SUBTOTAL", rupiah_(order[9])], ["ONGKIR", rupiah_(order[10])], ["TOTAL PEMBAYARAN", rupiah_(order[11])]].forEach((value, index) => {
     const row = totals.appendTableRow();
     const label = row.appendTableCell(value[0]);
@@ -401,8 +406,8 @@ function createInvoicePdf_(orderSheet, itemSheet, orderId) {
     amount.getChild(0).asParagraph().setAlignment(DocumentApp.HorizontalAlignment.RIGHT);
   });
   body.appendParagraph("");
-  body.appendParagraph("SIMPAN DOKUMEN INI").setFontSize(8).setBold(true).setForegroundColor(rose);
-  body.appendParagraph("Invoice ini merupakan bukti pesanan Yashbi Store. Simpan PDF ini untuk kebutuhan verifikasi, pengiriman, atau layanan purnajual.").setFontSize(9).setForegroundColor(muted);
+  body.appendParagraph("CATATAN PESANAN").setFontSize(8).setBold(true).setForegroundColor(rose);
+  body.appendParagraph("Terima kasih telah berbelanja di Yashbi Store. Simpan invoice ini sebagai bukti pembelian untuk kebutuhan verifikasi, pengiriman, atau layanan purnajual.").setFontSize(9).setForegroundColor(muted);
   document.saveAndClose();
   const sourceFile = DriveApp.getFileById(document.getId());
   sourceFile.moveTo(sourceFolder);
