@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/styles.css?v=20260729-compact-actions-v1">
+  <link rel="stylesheet" href="assets/styles.css?v=20260729-payment-methods-v1">
 </head>
 <body>
   <div class="announcement">
@@ -277,8 +277,19 @@
             <label class="field full"><span>Kurir</span><select name="courier" required><option value="">Pilih pengiriman</option><option>J&T Regular — Rp18.000</option><option>JNE Regular — Rp20.000</option><option>SiCepat REG — Rp17.000</option><option>Ambil di toko — Gratis</option></select></label>
           </div>
           <h3>Pembayaran</h3>
-          <div class="payment-box">
+          <div class="payment-methods" role="radiogroup" aria-label="Metode pembayaran">
+            <label class="payment-option"><input type="radio" name="paymentMethod" value="QRIS" checked required><span><strong>QRIS</strong><small>Scan untuk pembayaran instan</small></span></label>
+            <label class="payment-option"><input type="radio" name="paymentMethod" value="Transfer BCA" required><span><strong>Transfer BCA</strong><small>Transfer manual ke rekening BCA</small></span></label>
+          </div>
+          <div class="payment-box" id="qrisPayment">
+            <img src="assets/images/qris-extreme-studios.jpeg" alt="QRIS Extreme Studios">
+            <div><strong>QRIS Extreme Studios</strong><span>Scan QRIS ini menggunakan aplikasi pembayaran pilihanmu.</span><small>Pastikan nominal sesuai total pesanan sebelum unggah bukti pembayaran.</small></div>
+          </div>
+          <div class="payment-box" id="bcaPayment" hidden>
             <strong>Transfer Bank BCA</strong><span>1234567890 · Yashbi Store</span><small>Gunakan total persis agar verifikasi lebih mudah.</small>
+          </div>
+          <div class="payment-box payment-bca-actual" id="bcaPaymentActual" hidden>
+            <strong>Transfer Bank BCA</strong><span>0183769453 · a/n Adi Nugroho</span><small>Gunakan total persis agar verifikasi lebih mudah.</small>
           </div>
           <label class="upload-box" id="uploadBox">
             <input id="proofInput" name="proof" type="file" accept="image/*" required>
@@ -346,6 +357,6 @@
   <div class="toast" id="toast" role="status"></div>
 
   <script src="assets/config.js?v=20260729-operations"></script>
-  <script src="assets/app.js?v=20260729-checkout-reset-v1"></script>
+  <script src="assets/app.js?v=20260729-payment-methods-v1"></script>
 </body>
 </html>

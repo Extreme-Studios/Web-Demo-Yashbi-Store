@@ -317,6 +317,7 @@ function renderCheckout() {
   byId("uploadTitle").textContent = "Unggah bukti transfer";
   byId("uploadHint").textContent = "JPG, PNG, atau WEBP · maksimal 5 MB";
   byId("checkoutShipping").textContent = "Dipilih nanti";
+  syncPaymentMethod();
   byId("checkoutItems").innerHTML = cart.map(item=>{
     const p=PRODUCTS.find(x=>x.id===item.productId);
     return `<div class="checkout-line"><img src="${p.image}" alt=""><div><strong>${p.name}</strong><small>${item.color} · ${item.size} · ${item.qty}×</small></div><span>${money(p.price*item.qty)}</span></div>`;
@@ -324,6 +325,12 @@ function renderCheckout() {
   byId("checkoutSubtotal").textContent = money(cartTotal());
   byId("checkoutTotal").textContent = money(cartTotal());
   byId("checkoutSource").textContent = `Sumber pesanan: ${orderSource}`;
+}
+
+function syncPaymentMethod() {
+  const method = document.querySelector('input[name="paymentMethod"]:checked')?.value || "QRIS";
+  byId("qrisPayment").hidden = method !== "QRIS";
+  byId("bcaPaymentActual").hidden = method !== "Transfer BCA";
 }
 
 function readAndCompressImage(file) {
@@ -358,7 +365,7 @@ async function sendOrderToBackend(order) {
     const product = PRODUCTS.find(product => product.id === item.productId);
     return {...item,name:product.name,price:product.price};
   });
-  const result = await postApi({action:"createOrder",clientOrderId:order.clientOrderId,sessionId:visitor?.sessionId || "",customer:order.customer,items,subtotal:order.subtotal,shipping:order.shipping,proof:order.proof,source:order.source});
+  const result = await postApi({action:"createOrder",clientOrderId:order.clientOrderId,sessionId:visitor?.sessionId || "",customer:order.customer,items,subtotal:order.subtotal,shipping:order.shipping,proof:order.proof,source:order.source,paymentMethod:order.customer.paymentMethod || "QRIS"});
   return result.order;
 }
 
@@ -376,7 +383,7 @@ async function createOrder(form) {
     order.syncError = error.message;
     order.status = "Menunggu sinkronisasi";
     order.syncState = "Antrean perangkat ini";
-    writeQueue([...readQueue(), {payload:{action:"syncOrder",clientOrderId:order.clientOrderId,sessionId:visitor?.sessionId || "",customer:order.customer,items:order.items.map(item=>{const product=PRODUCTS.find(p=>p.id===item.productId);return {...item,name:product.name,price:product.price};}),subtotal:order.subtotal,shipping:order.shipping,proof:order.proof,source:order.source},queuedAt:now.toISOString()}]);
+    writeQueue([...readQueue(), {payload:{action:"syncOrder",clientOrderId:order.clientOrderId,sessionId:visitor?.sessionId || "",customer:order.customer,items:order.items.map(item=>{const product=PRODUCTS.find(p=>p.id===item.productId);return {...item,name:product.name,price:product.price};}),subtotal:order.subtotal,shipping:order.shipping,proof:order.proof,source:order.source,paymentMethod:order.customer.paymentMethod || "QRIS"},queuedAt:now.toISOString()}]);
     console.warn("Pesanan menunggu sinkronisasi:", error);
   }
   orders.unshift(order);
@@ -465,6 +472,7 @@ byId("proofInput").addEventListener("change",async e=>{
 });
 
 byId("checkoutForm").addEventListener("change",e=>{
+  if(e.target.name==="paymentMethod") syncPaymentMethod();
   if(e.target.name==="courier") {
     const match=e.target.value.match(/Rp([\d.]+)/); const shipping=match?Number(match[1].replace(".","")):0;
     byId("checkoutShipping").textContent=shipping?money(shipping):e.target.value.includes("Gratis")?"Gratis":"Dipilih nanti";

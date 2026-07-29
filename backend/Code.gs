@@ -6,7 +6,7 @@ const CONFIG = {
 
 const HEADERS = {
   Produk: ["SKU", "Nama", "Kategori", "Harga", "Harga Coret", "Warna", "Ukuran", "Stok", "Foto Utama", "Foto Kedua", "Deskripsi", "Badge", "Aktif", "Diperbarui"],
-  Pesanan: ["Nomor Pesanan", "Tanggal", "Nama Pembeli", "WhatsApp", "Email", "Alamat", "Kota", "Kode Pos", "Kurir", "Subtotal", "Ongkir", "Total", "Status", "Link Bukti Transfer", "Ekspedisi", "Nomor Resi", "Diperbarui", "ID Klien", "Sumber Pesanan"],
+  Pesanan: ["Nomor Pesanan", "Tanggal", "Nama Pembeli", "WhatsApp", "Email", "Alamat", "Kota", "Kode Pos", "Kurir", "Subtotal", "Ongkir", "Total", "Status", "Link Bukti Transfer", "Ekspedisi", "Nomor Resi", "Diperbarui", "ID Klien", "Sumber Pesanan", "Metode Pembayaran"],
   "Detail Pesanan": ["Nomor Pesanan", "SKU", "Nama Produk", "Warna", "Ukuran", "Jumlah", "Harga Satuan", "Total"],
   Pengaturan: ["Kunci", "Nilai"],
   Pengunjung: ["ID Sesi", "Nama Panggilan", "Status", "Mulai", "Terakhir Aktif", "Nomor Pesanan"],
@@ -84,7 +84,7 @@ function createOrder_(payload) {
     const orderSheet = spreadsheet.getSheetByName(CONFIG.sheets.orders);
     const itemSheet = spreadsheet.getSheetByName(CONFIG.sheets.orderItems);
     if (!orderSheet || !itemSheet) throw new Error("Jalankan setupYashbiStore terlebih dahulu.");
-    ensureOrderSourceHeader_(orderSheet);
+    ensureOrderPaymentHeaders_(orderSheet);
     const clientOrderId = safe_(payload.clientOrderId || "");
     const existing = clientOrderId && orderSheet.getLastRow() > 1
       ? orderSheet.getRange(2, 1, orderSheet.getLastRow() - 1, HEADERS.Pesanan.length).getValues()
@@ -102,7 +102,7 @@ function createOrder_(payload) {
     orderSheet.appendRow([
       orderId, now, safe_(customer.name), normalizePhone_(customer.phone), safe_(customer.email),
       safe_(customer.address), safe_(customer.city), safe_(customer.postal), safe_(customer.courier),
-      subtotal, shipping, total, status, proofUrl, "", "", now, clientOrderId, orderSource_(payload.source)
+      subtotal, shipping, total, status, proofUrl, "", "", now, clientOrderId, orderSource_(payload.source), paymentMethod_(payload.paymentMethod || customer.paymentMethod)
     ]);
     const rows = payload.items.map(item => [
       orderId, safe_(item.productId), safe_(item.name), safe_(item.color), safe_(item.size),
@@ -177,7 +177,7 @@ function adminDashboard_(token) {
   const spreadsheet = SpreadsheetApp.openById(CONFIG.spreadsheetId);
   const orderSheet = spreadsheet.getSheetByName(CONFIG.sheets.orders);
   const visitorSheet = spreadsheet.getSheetByName(CONFIG.sheets.visitors);
-  if (orderSheet) ensureOrderSourceHeader_(orderSheet);
+  if (orderSheet) ensureOrderPaymentHeaders_(orderSheet);
   const orderRows = orderSheet && orderSheet.getLastRow() > 1 ? orderSheet.getRange(2, 1, orderSheet.getLastRow() - 1, HEADERS.Pesanan.length).getValues() : [];
   const visitorRows = visitorSheet && visitorSheet.getLastRow() > 1 ? visitorSheet.getRange(2, 1, visitorSheet.getLastRow() - 1, HEADERS.Pengunjung.length).getValues() : [];
   const now = Date.now();
@@ -188,7 +188,7 @@ function adminDashboard_(token) {
   const orders = orderRows.slice(-100).reverse().map(row => ({
     id: row[0], createdAt: row[1] instanceof Date ? row[1].toISOString() : "", name: row[2], phone: row[3], email: row[4],
     address: row[5], city: row[6], postal: row[7], courier: row[8], subtotal: number_(row[9]), shipping: number_(row[10]), total: number_(row[11]),
-    status: row[12], proofUrl: row[13], expedition: row[14], trackingNumber: row[15], clientOrderId: row[17] || "", source: row[18] || "Website"
+    status: row[12], proofUrl: row[13], expedition: row[14], trackingNumber: row[15], clientOrderId: row[17] || "", source: row[18] || "Website", paymentMethod: row[19] || "Transfer manual"
   }));
   const counts = { online: visitors.filter(item => item.online).length, tanya: visitors.filter(item => item.status === "Online / Tanya").length,
     checkout: orders.filter(item => item.status === "Checkout — belum bayar").length,
@@ -334,9 +334,16 @@ function orderSource_(value) {
   return "Website";
 }
 
-function ensureOrderSourceHeader_(sheet) {
+function paymentMethod_(value) {
+  return String(value || "").trim().toLowerCase() === "transfer bca" ? "Transfer BCA" : "QRIS";
+}
+
+function ensureOrderPaymentHeaders_(sheet) {
   if (sheet.getRange(1, 19).getValue() !== "Sumber Pesanan") {
     sheet.getRange(1, 19).setValue("Sumber Pesanan");
+  }
+  if (sheet.getRange(1, 20).getValue() !== "Metode Pembayaran") {
+    sheet.getRange(1, 20).setValue("Metode Pembayaran");
   }
 }
 
