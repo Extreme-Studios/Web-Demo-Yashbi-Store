@@ -6,7 +6,7 @@ const CONFIG = {
 
 const HEADERS = {
   Produk: ["SKU", "Nama", "Kategori", "Harga", "Harga Coret", "Warna", "Ukuran", "Stok", "Foto Utama", "Foto Kedua", "Deskripsi", "Badge", "Aktif", "Diperbarui"],
-  Pesanan: ["Nomor Pesanan", "Tanggal", "Nama Pembeli", "WhatsApp", "Email", "Alamat", "Kota", "Kode Pos", "Kurir", "Subtotal", "Ongkir", "Total", "Status", "Link Bukti Transfer", "Ekspedisi", "Nomor Resi", "Diperbarui", "ID Klien", "Sumber Pesanan", "Metode Pembayaran"],
+  Pesanan: ["Nomor Pesanan", "Tanggal", "Nama Pembeli", "WhatsApp", "Email", "Alamat", "Kota", "Kode Pos", "Kurir", "Subtotal", "Ongkir", "Total", "Status", "Link Bukti Transfer", "Ekspedisi", "Nomor Resi", "Diperbarui", "ID Klien", "Sumber Pesanan", "Metode Pembayaran", "Link Invoice PDF"],
   "Detail Pesanan": ["Nomor Pesanan", "SKU", "Nama Produk", "Warna", "Ukuran", "Jumlah", "Harga Satuan", "Total"],
   Pengaturan: ["Kunci", "Nilai"],
   Pengunjung: ["ID Sesi", "Nama Panggilan", "Status", "Mulai", "Terakhir Aktif", "Nomor Pesanan"],
@@ -33,7 +33,8 @@ function doPost(e) {
     if (payload.action === "upsertVisitor") return json_(upsertVisitor_(payload));
     if (payload.action === "adminLogin") return json_(adminLogin_(payload));
     if (payload.action === "updateOrder") return json_(updateOrder_(payload));
-    if (payload.action === "sendInvoiceEmail") return json_(sendInvoiceEmail_(payload));
+    if (payload.action === "sendInvoiceEmail") return json_(sendInvoiceLinkEmail_(payload));
+    if (payload.action === "generateInvoice") return json_(generateInvoice_(payload));
     throw new Error("Aksi tidak dikenal.");
   } catch (error) {
     return json_({ ok: false, error: error.message });
@@ -110,7 +111,15 @@ function createOrder_(payload) {
       number_(item.qty), number_(item.price), number_(item.qty) * number_(item.price)
     ]);
     itemSheet.getRange(itemSheet.getLastRow() + 1, 1, rows.length, HEADERS["Detail Pesanan"].length).setValues(rows);
-    return { ok: true, order: { id: orderId, status: status, createdAt: now.toISOString() } };
+    let invoice = null;
+    try {
+      invoice = createInvoicePdf_(orderSheet, itemSheet, orderId);
+      orderSheet.getRange(orderSheet.getLastRow(), 21).setValue(invoice.viewUrl);
+      if (safe_(customer.email)) sendInvoiceNotice_(customer.email, orderId, invoice.downloadUrl, status);
+    } catch (invoiceError) {
+      console.warn("Invoice belum dapat dibuat untuk " + orderId + ": " + invoiceError.message);
+    }
+    return { ok: true, order: { id: orderId, status: status, createdAt: now.toISOString(), invoiceUrl: invoice ? invoice.downloadUrl : "", invoiceViewUrl: invoice ? invoice.viewUrl : "" } };
   } finally {
     lock.releaseLock();
   }
@@ -203,7 +212,7 @@ function adminDashboard_(token) {
   const orders = orderRows.slice(-100).reverse().map(row => ({
     id: row[0], createdAt: row[1] instanceof Date ? row[1].toISOString() : "", name: row[2], phone: row[3], email: row[4],
     address: row[5], city: row[6], postal: row[7], courier: row[8], subtotal: number_(row[9]), shipping: number_(row[10]), total: number_(row[11]),
-    status: row[12], proofUrl: row[13], expedition: row[14], trackingNumber: row[15], clientOrderId: row[17] || "", source: row[18] || "Website", paymentMethod: row[19] || "Transfer manual", items: itemsByOrder[String(row[0])] || []
+    status: row[12], proofUrl: row[13], expedition: row[14], trackingNumber: row[15], clientOrderId: row[17] || "", source: row[18] || "Website", paymentMethod: row[19] || "Transfer manual", invoiceUrl: row[20] || "", items: itemsByOrder[String(row[0])] || []
   }));
   const counts = { online: visitors.filter(item => item.online).length, tanya: visitors.filter(item => item.status === "Online / Tanya").length,
     checkout: orders.filter(item => item.status === "Checkout — belum bayar").length,
@@ -252,8 +261,105 @@ function sendInvoiceEmail_(payload) {
   return { ok: true, sentTo: email };
 }
 
+function sendInvoiceLinkEmail_(payload) {
+  requireAdmin_(payload.token);
+  const spreadsheet = SpreadsheetApp.openById(CONFIG.spreadsheetId);
+  const orderSheet = spreadsheet.getSheetByName(CONFIG.sheets.orders);
+  const itemSheet = spreadsheet.getSheetByName(CONFIG.sheets.orderItems);
+  ensureOrderPaymentHeaders_(orderSheet);
+  const rows = orderSheet.getDataRange().getValues();
+  const orderIndex = rows.findIndex((row, index) => index > 0 && String(row[0]) === String(payload.orderId));
+  if (orderIndex < 1) throw new Error("Pesanan tidak ditemukan.");
+  const order = rows[orderIndex];
+  const requestedEmail = safe_(payload.email).toLowerCase();
+  if (requestedEmail) {
+    orderSheet.getRange(orderIndex + 1, 5).setValue(requestedEmail);
+    order[4] = requestedEmail;
+  }
+  const email = safe_(order[4]);
+  if (!email) throw new Error("Email pembeli belum diisi.");
+  const invoice = String(order[20] || "") ? { viewUrl: String(order[20]), downloadUrl: driveDownloadUrl_(String(order[20])) } : createInvoicePdf_(orderSheet, itemSheet, order[0]);
+  if (!order[20]) orderSheet.getRange(orderIndex + 1, 21).setValue(invoice.viewUrl);
+  sendInvoiceNotice_(email, order[0], invoice.downloadUrl, order[12]);
+  return { ok: true, sentTo: email, invoiceUrl: invoice.downloadUrl };
+}
+
+function generateInvoice_(payload) {
+  requireAdmin_(payload.token);
+  const spreadsheet = SpreadsheetApp.openById(CONFIG.spreadsheetId);
+  const orderSheet = spreadsheet.getSheetByName(CONFIG.sheets.orders);
+  const itemSheet = spreadsheet.getSheetByName(CONFIG.sheets.orderItems);
+  ensureOrderPaymentHeaders_(orderSheet);
+  const rows = orderSheet.getDataRange().getValues();
+  const orderIndex = rows.findIndex((row, index) => index > 0 && String(row[0]) === String(payload.orderId));
+  if (orderIndex < 1) throw new Error("Pesanan tidak ditemukan.");
+  const invoice = createInvoicePdf_(orderSheet, itemSheet, payload.orderId);
+  orderSheet.getRange(orderIndex + 1, 21).setValue(invoice.viewUrl);
+  return { ok: true, invoiceUrl: invoice.downloadUrl, invoiceViewUrl: invoice.viewUrl };
+}
+
+function createInvoicePdf_(orderSheet, itemSheet, orderId) {
+  const rows = orderSheet.getDataRange().getValues();
+  const order = rows.find((row, index) => index > 0 && String(row[0]) === String(orderId));
+  if (!order) throw new Error("Pesanan tidak ditemukan.");
+  const items = itemSheet && itemSheet.getLastRow() > 1
+    ? itemSheet.getRange(2, 1, itemSheet.getLastRow() - 1, HEADERS["Detail Pesanan"].length).getValues().filter(row => String(row[0]) === String(orderId))
+    : [];
+  const root = DriveApp.getFolderById(CONFIG.driveRootFolderId);
+  const invoiceFolder = getOrCreateFolder_(root, "Invoice");
+  const sourceFolder = getOrCreateFolder_(invoiceFolder, "Arsip Sumber");
+  const document = DocumentApp.create("Invoice " + orderId);
+  const body = document.getBody();
+  body.clear();
+  body.appendParagraph("YASHBI STORE").setHeading(DocumentApp.ParagraphHeading.TITLE).setForegroundColor("#22352f");
+  body.appendParagraph("CURATED FASHION FOR EVERY MOMENT").setForegroundColor("#8a6d5d");
+  body.appendHorizontalRule();
+  body.appendParagraph("INVOICE PESANAN").setHeading(DocumentApp.ParagraphHeading.HEADING1);
+  body.appendParagraph("Nomor invoice: " + orderId + "\nTanggal: " + Utilities.formatDate(new Date(order[1]), Session.getScriptTimeZone(), "dd MMMM yyyy, HH:mm") + " WIB\nStatus: " + safe_(order[12]));
+  body.appendParagraph("DITAGIHKAN KEPADA").setHeading(DocumentApp.ParagraphHeading.HEADING2);
+  body.appendParagraph(safe_(order[2]) + "\n" + safe_(order[5]) + "\n" + safe_(order[6]) + " " + safe_(order[7]) + "\nWhatsApp: " + safe_(order[3]));
+  body.appendParagraph("RINCIAN PESANAN").setHeading(DocumentApp.ParagraphHeading.HEADING2);
+  const table = body.appendTable();
+  const headerRow = table.appendTableRow();
+  ["Produk", "Varian", "Qty", "Harga", "Total"].forEach(value => headerRow.appendTableCell(value));
+  headerRow.editAsText().setBold(true).setForegroundColor("#22352f");
+  items.forEach(item => {
+    const itemRow = table.appendTableRow();
+    [safe_(item[2]), safe_(item[3]) + " / " + safe_(item[4]), String(number_(item[5])), rupiah_(item[6]), rupiah_(item[7])].forEach(value => itemRow.appendTableCell(value));
+  });
+  body.appendParagraph("\nSubtotal: " + rupiah_(order[9]) + "\nOngkir: " + rupiah_(order[10]) + "\nTOTAL: " + rupiah_(order[11])).setBold(true);
+  body.appendParagraph("Metode pembayaran: " + safe_(order[19] || "Transfer manual") + "\nKurir: " + safe_(order[8]) + "\nStatus pembayaran: bukti pembayaran diterima, menunggu verifikasi staff.");
+  body.appendHorizontalRule();
+  body.appendParagraph("Simpan invoice ini sebagai bukti pesanan. Terima kasih telah berbelanja di Yashbi Store.").setForegroundColor("#6f625b");
+  document.saveAndClose();
+  const sourceFile = DriveApp.getFileById(document.getId());
+  sourceFile.moveTo(sourceFolder);
+  const pdf = invoiceFolder.createFile(sourceFile.getAs(MimeType.PDF).setName("Invoice-" + orderId + ".pdf"));
+  try { pdf.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW); } catch (sharingError) { console.warn("Akses invoice mengikuti folder: " + sharingError.message); }
+  return { viewUrl: pdf.getUrl(), downloadUrl: "https://drive.google.com/uc?export=download&id=" + pdf.getId() };
+}
+
+function driveDownloadUrl_(viewUrl) {
+  const id = String(viewUrl || "").match(/[-\w]{25,}/);
+  return id ? "https://drive.google.com/uc?export=download&id=" + id[0] : viewUrl;
+}
+
+function sendInvoiceNotice_(email, orderId, downloadUrl, status) {
+  GmailApp.sendEmail(email, "Invoice Yashbi Store " + orderId, "Halo Kak,\n\nInvoice profesional pesanan " + orderId + " sudah dibuat. Status saat ini: " + safe_(status) + ".\n\nSilakan unduh dan simpan invoice sebagai bukti pembelian:\n" + downloadUrl + "\n\nTerima kasih telah berbelanja di Yashbi Store.", { name: "Yashbi Store" });
+}
+
+function authorizeInvoicePdf() {
+  const root = DriveApp.getFolderById(CONFIG.driveRootFolderId);
+  const sourceFolder = getOrCreateFolder_(getOrCreateFolder_(root, "Invoice"), "Arsip Sumber");
+  const document = DocumentApp.create("Yashbi Invoice Permission Check");
+  document.getBody().appendParagraph("Dokumen ini dibuat sekali untuk mengaktifkan izin pembuatan invoice PDF.");
+  document.saveAndClose();
+  DriveApp.getFileById(document.getId()).moveTo(sourceFolder);
+  return "Izin PDF invoice aktif.";
+}
+
 function authorizeInvoiceEmail() {
-  return GmailApp.getRemainingDailyQuota();
+  return MailApp.getRemainingDailyQuota();
 }
 
 function getProducts_() {
@@ -390,6 +496,9 @@ function ensureOrderPaymentHeaders_(sheet) {
   }
   if (sheet.getRange(1, 20).getValue() !== "Metode Pembayaran") {
     sheet.getRange(1, 20).setValue("Metode Pembayaran");
+  }
+  if (sheet.getRange(1, 21).getValue() !== "Link Invoice PDF") {
+    sheet.getRange(1, 21).setValue("Link Invoice PDF");
   }
 }
 

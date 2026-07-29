@@ -286,6 +286,7 @@ footer { padding: 70px 6vw 25px; background: var(--ink); color: #e9e1db; }
 .success-modal { text-align: center; }
 .success-icon { width: 55px; height: 55px; margin: 0 auto 15px; display: grid; place-items: center; border-radius: 50%; background: #dbe3d5; color: #526246; font-size: 22px; }
 .order-number { margin: 18px 0; padding: 13px; background: var(--cream); }.order-number span, .order-number strong { display: block; }.order-number span { color: var(--muted); font-size: 8px; }.order-number strong { font: 600 22px var(--serif); }
+.invoice-download-note { display: block; margin: 12px 0 4px; color: #6f625b; font-size: 9px; line-height: 1.5; }
 .image-lightbox { position: fixed; z-index: 110; inset: 0; padding: 4vh 4vw; display: grid; place-items: center; background: rgba(17,15,14,.94); opacity: 0; visibility: hidden; transition: .25s ease; }
 .image-lightbox.open { opacity: 1; visibility: visible; }
 .image-lightbox img { max-width: 90vw; max-height: 90vh; object-fit: contain; }

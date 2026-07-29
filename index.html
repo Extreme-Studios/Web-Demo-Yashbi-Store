@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/styles.css?v=20260729-payment-methods-v1">
+  <link rel="stylesheet" href="assets/styles.css?v=20260729-invoice-pdf-v1">
 </head>
 <body>
   <div class="announcement">
@@ -330,12 +330,15 @@
 
   <section class="success-modal modal-panel compact-modal" id="successModal" role="dialog" aria-modal="true" aria-labelledby="successTitle">
     <div class="success-icon">✓</div>
-    <p class="eyebrow">Order received</p>
-    <h2 id="successTitle">Pesananmu sudah tercatat.</h2>
-    <p>Tim Yashbi akan memverifikasi pembayaran pada jam operasional berikutnya.</p>
+    <p class="eyebrow">Purchase record</p>
+    <h2 id="successTitle">Invoice pesanan siap.</h2>
+    <p id="successMessage">Simpan invoice ini sebagai bukti pembelian. Pembayaran akan diverifikasi oleh tim Yashbi.</p>
     <div class="order-number"><span>Nomor pesanan</span><strong id="successOrderId"></strong></div>
+    <a class="button button-dark button-block" id="downloadInvoiceButton" href="#" target="_blank" rel="noopener" download hidden>Download PDF Invoice</a>
+    <a class="button button-outline button-block" id="viewInvoiceButton" href="#" target="_blank" rel="noopener" hidden>Lihat Invoice</a>
+    <small class="invoice-download-note" id="invoiceDownloadNote">Jangan tutup layar ini sebelum invoice tersimpan di perangkatmu.</small>
     <a class="button button-outline button-block" id="manualOrderButton" href="#" target="_blank" rel="noopener" hidden>Hubungi staff via WhatsApp</a>
-    <button class="button button-dark button-block" data-close-modal type="button">Kembali Belanja</button>
+    <button class="button button-outline button-block" id="closeInvoiceButton" type="button">Saya sudah menyimpan invoice</button>
   </section>
 
   <section class="identity-modal modal-panel compact-modal" id="identityModal" role="dialog" aria-modal="true" aria-labelledby="identityTitle">
@@ -357,6 +360,6 @@
   <div class="toast" id="toast" role="status"></div>
 
   <script src="assets/config.js?v=20260729-operations"></script>
-  <script src="assets/app.js?v=20260729-payment-methods-v1"></script>
+  <script src="assets/app.js?v=20260729-invoice-pdf-v1"></script>
 </body>
 </html>

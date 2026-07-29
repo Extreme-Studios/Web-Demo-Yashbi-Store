@@ -85,6 +85,7 @@ let selectedSize = null;
 let proofData = null;
 let visitor = JSON.parse(localStorage.getItem(STORE_KEYS.visitor) || "null");
 let pendingCheckout = false;
+let invoiceLockActive = false;
 const orderSource = (() => {
   const value = new URLSearchParams(location.search).get("source") || new URLSearchParams(location.search).get("src") || "";
   const source = value.trim().toLowerCase();
@@ -237,6 +238,19 @@ function closeModals() {
   backdrop.classList.remove("open");
   document.body.classList.remove("modal-open");
 }
+
+function closeInvoiceSafely() {
+  if (!invoiceLockActive) return closeModals();
+  if (!window.confirm("Invoice ini adalah bukti pembelian. Kamu yakin sudah mengunduh atau menyimpannya?")) return;
+  invoiceLockActive = false;
+  closeModals();
+}
+
+window.addEventListener("beforeunload", event => {
+  if (!invoiceLockActive) return;
+  event.preventDefault();
+  event.returnValue = "";
+});
 
 function persistCart() {
   localStorage.setItem(STORE_KEYS.cart, JSON.stringify(cart));
@@ -438,7 +452,10 @@ document.addEventListener("click", e => {
   }
   const remove = e.target.closest("[data-remove]");
   if(remove) { cart=cart.filter(i=>i.key!==remove.dataset.remove); persistCart(); }
-  if(e.target.closest("[data-close-modal]")) closeModals();
+  if(e.target.closest("[data-close-modal]")) {
+    if (byId("successModal").classList.contains("open")) closeInvoiceSafely();
+    else closeModals();
+  }
 });
 
 byId("filterRow").addEventListener("click",()=>{});
@@ -451,7 +468,10 @@ byId("menuToggle").addEventListener("click",()=>byId("mobileNav").classList.togg
 byId("cartToggle").addEventListener("click",openCart);
 byId("cartClose").addEventListener("click",closeModals);
 byId("cartShopButton").addEventListener("click",()=>{closeModals();byId("koleksi").scrollIntoView({behavior:"smooth"});});
-backdrop.addEventListener("click",closeModals);
+backdrop.addEventListener("click",()=>{
+  if (byId("successModal").classList.contains("open")) closeInvoiceSafely();
+  else closeModals();
+});
 byId("addToCartButton").addEventListener("click",()=>addSelectedToCart());
 byId("buyNowButton").addEventListener("click",()=>addSelectedToCart(true));
 byId("checkoutOpen").addEventListener("click",openCheckoutFlow);
@@ -488,10 +508,19 @@ byId("checkoutForm").addEventListener("submit",async e=>{
   const order=await createOrder(e.currentTarget);
   submitButton.disabled=false;submitButton.textContent="Buat Pesanan";
   closeModals();byId("successOrderId").textContent=order.id;
-  byId("successTitle").textContent=order.syncState === "Tersinkron" ? "Pesananmu sudah tercatat." : "Pesananmu sedang diamankan.";
-  document.querySelector("#successModal > p:not(.eyebrow)").textContent=order.syncState === "Tersinkron"
-    ? "Tim Yashbi akan memverifikasi pembayaran pada jam operasional berikutnya."
-    : "Sistem toko sedang gangguan. Pesanan disimpan di perangkat ini dan akan dikirim saat koneksi backend kembali. Untuk proses tercepat, hubungi staff melalui WhatsApp.";
+  const invoiceUrl = String(order.invoiceUrl || "");
+  const invoiceViewUrl = String(order.invoiceViewUrl || invoiceUrl);
+  invoiceLockActive = order.syncState === "Tersinkron" && Boolean(invoiceUrl);
+  byId("successTitle").textContent=invoiceLockActive ? "Invoice pesanan siap." : (order.syncState === "Tersinkron" ? "Pesananmu sudah tercatat." : "Pesananmu sedang diamankan.");
+  byId("successMessage").textContent=invoiceLockActive
+    ? "Simpan invoice PDF ini sebagai bukti pembelian. Pembayaran akan diverifikasi oleh tim Yashbi."
+    : (order.syncState === "Tersinkron" ? "Invoice sedang diproses. Tim Yashbi akan memverifikasi pembayaran pada jam operasional berikutnya." : "Sistem toko sedang gangguan. Pesanan disimpan di perangkat ini dan akan dikirim saat koneksi backend kembali. Untuk proses tercepat, hubungi staff melalui WhatsApp.");
+  const downloadInvoiceButton=byId("downloadInvoiceButton");
+  const viewInvoiceButton=byId("viewInvoiceButton");
+  const invoiceNote=byId("invoiceDownloadNote");
+  downloadInvoiceButton.hidden=!invoiceUrl; downloadInvoiceButton.href=invoiceUrl || "#";
+  viewInvoiceButton.hidden=!invoiceViewUrl; viewInvoiceButton.href=invoiceViewUrl || "#";
+  invoiceNote.hidden=!invoiceLockActive;
   const manualButton=byId("manualOrderButton");
   const waNumber=String(window.YASHBI_CONFIG?.whatsappNumber || "").replace(/\D/g,"");
   manualButton.hidden=order.syncState === "Tersinkron" || !waNumber;
@@ -499,6 +528,8 @@ byId("checkoutForm").addEventListener("submit",async e=>{
   openModal("successModal");
   if(order.syncState !== "Tersinkron") toast("Pesanan masuk antrean sinkron. Simpan nomor pesanan ini.");
 });
+
+byId("closeInvoiceButton").addEventListener("click",closeInvoiceSafely);
 
 byId("trackForm").addEventListener("submit",async e=>{
   e.preventDefault(); const data=Object.fromEntries(new FormData(e.currentTarget).entries());
