@@ -27,6 +27,14 @@ function renderInvoiceButton(order){
   button.href=`https://wa.me/${phone}?text=${encodeURIComponent(invoiceMessage(order))}`;
   button.textContent=/shipping/i.test(order.status)?"Kirim invoice & resi via WhatsApp":"Kirim invoice via WhatsApp";
 }
+function renderInvoiceEmailButton(order){
+  let button=A("sendInvoiceEmail");
+  if(!button){button=document.createElement("a");button.id="sendInvoiceEmail";button.className="button button-outline button-block invoice-whatsapp";button.textContent="Kirim invoice via Email";A("sendInvoiceWhatsApp").after(button);}
+  const email=String(order.email||"").trim();
+  button.hidden=!email;
+  if(!email)return;
+  button.href=`mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(`Invoice Yashbi Store ${order.id}`)}&body=${encodeURIComponent(invoiceMessage(order))}`;
+}
 function render(){
   A("roleBadge").textContent=session.role==="OWNER"?"Owner":"Staff";
   A("metricOnline").textContent=dashboard.counts.online;A("metricTanya").textContent=dashboard.counts.tanya;A("metricVerify").textContent=dashboard.counts.verify;A("metricShipping").textContent=dashboard.counts.shipping;
@@ -40,7 +48,7 @@ function openOrder(id){selectedOrder=dashboard.orders.find(item=>item.id===id);i
 const baseOpenOrder=openOrder;
 openOrder=function(id){baseOpenOrder(id);if(!selectedOrder)return;const detail=A("detailContent");detail.insertAdjacentHTML("afterbegin",`<div class="detail-block"><strong>Sumber pesanan</strong>${esc(selectedOrder.source||"Website")}</div><div class="detail-block"><strong>Metode pembayaran</strong>${esc(selectedOrder.paymentMethod||"Transfer manual")}</div>`);};
 const invoiceOpenOrder=openOrder;
-openOrder=function(id){invoiceOpenOrder(id);if(!selectedOrder)return;const detail=A("detailContent");const items=(selectedOrder.items||[]).map(item=>`${esc(item.name)} · ${esc(item.color)} / ${esc(item.size)} · ${esc(item.qty)}×`).join("<br>");detail.insertAdjacentHTML("afterbegin",`<div class="detail-block"><strong>Rincian produk</strong>${items||"Belum ada rincian produk"}</div>`);renderInvoiceButton(selectedOrder);};
+openOrder=function(id){invoiceOpenOrder(id);if(!selectedOrder)return;const detail=A("detailContent");const items=(selectedOrder.items||[]).map(item=>`${esc(item.name)} · ${esc(item.color)} / ${esc(item.size)} · ${esc(item.qty)}×`).join("<br>");detail.insertAdjacentHTML("afterbegin",`<div class="detail-block"><strong>Rincian produk</strong>${items||"Belum ada rincian produk"}</div>`);renderInvoiceButton(selectedOrder);renderInvoiceEmailButton(selectedOrder);};
 const baseRender=render;
 render=function(){baseRender();A("orderList").querySelectorAll("[data-order]").forEach(row=>{const item=dashboard.orders.find(order=>order.id===row.dataset.order);if(item){const meta=row.querySelector("small");meta.textContent=`${item.id} · ${item.source||"Website"} · ${item.paymentMethod||"Transfer manual"} · ${money(item.total)}`;}});};
 async function refresh(){try{dashboard=await getDashboard();render();}catch(error){if(/Sesi admin/i.test(error.message)){logout();return;}toast(error.message);}}
