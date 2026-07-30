@@ -596,7 +596,12 @@ function createInvoicePdf_(orderSheet, itemSheet, orderId) {
   items.forEach((item, index) => {
     const itemRow = table.appendTableRow();
     [safe_(item[2]), safe_(item[3]) + " / " + safe_(item[4]), String(number_(item[5])), rupiah_(item[6]), rupiah_(item[7])].forEach(value => itemRow.appendTableCell(value));
-    if (index % 2 === 0) for (let i = 0; i < itemRow.getNumCells(); i++) itemRow.getCell(i).setBackgroundColor("#faf8f5");
+    for (let i = 0; i < itemRow.getNumCells(); i++) {
+      itemRow.getCell(i).setBackgroundColor(index % 2 === 0 ? "#faf8f5" : "#ffffff");
+    }
+    // Google Docs occasionally inherits the white header color into subsequent
+    // rows when converted to PDF. Force a dark ink color on every product row.
+    itemRow.editAsText().setForegroundColor("#25313c").setFontSize(9);
   });
   body.appendParagraph("");
   const totals = body.appendTable();
