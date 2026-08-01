@@ -38,6 +38,7 @@ function doPost(e) {
     if (payload.action === "updateOrder") return json_(updateOrder_(payload));
     if (payload.action === "sendInvoiceEmail") return json_(sendInvoiceLinkEmail_(payload));
     if (payload.action === "generateInvoice") return json_(generateInvoice_(payload));
+    if (payload.action === "readyForBiteshipPickup") return json_(readyForBiteshipPickup_(payload));
     if (payload.action === "createBiteshipShipment") return json_(createBiteshipShipment_(payload));
     if (payload.action === "biteshipSandboxStatus") return json_(biteshipSandboxStatus_(payload));
     if (payload.action === "biteshipWebhook") return json_(receiveBiteshipWebhook_(payload, e));
@@ -264,7 +265,7 @@ function adminDashboard_(token) {
   const counts = { online: visitors.filter(item => item.online).length, tanya: visitors.filter(item => item.status === "Online / Tanya").length,
     checkout: orders.filter(item => item.status === "Checkout — belum bayar").length,
     verify: orders.filter(item => item.status === "Menunggu Verifikasi Pembayaran").length,
-    shipping: orders.filter(item => item.status === "Shipping").length };
+    shipping: orders.filter(item => /^(Menunggu Penjemputan|Shipping)$/i.test(item.status)).length };
   return { ok: true, admin: admin, visitors: visitors, orders: orders, counts: counts };
 }
 
@@ -285,12 +286,39 @@ function updateOrder_(payload) {
   if (payload.expedition !== undefined) sheet.getRange(index + 1, 15).setValue(safe_(payload.expedition));
   if (payload.trackingNumber !== undefined) sheet.getRange(index + 1, 16).setValue(safe_(payload.trackingNumber));
   sheet.getRange(index + 1, 17).setValue(new Date());
-  if (/^(shipping|selesai)$/i.test(nextStatus)) {
+  if (/^(menunggu penjemputan|shipping|selesai)$/i.test(nextStatus)) {
     const itemSheet = SpreadsheetApp.openById(CONFIG.spreadsheetId).getSheetByName(CONFIG.sheets.orderItems);
     const invoice = createInvoicePdf_(sheet, itemSheet, payload.orderId);
     sheet.getRange(index + 1, 21).setValue(invoice.viewUrl);
   }
   return { ok: true, by: admin.email };
+}
+
+// Staff only marks a packed order as ready. The backend then creates exactly one
+// Sandbox pickup request and rolls the status back when Biteship rejects it.
+function readyForBiteshipPickup_(payload) {
+  requireAdmin_(payload.token);
+  const sheet = SpreadsheetApp.openById(CONFIG.spreadsheetId).getSheetByName(CONFIG.sheets.orders);
+  ensureOrderPaymentHeaders_(sheet);
+  const rows = sheet.getDataRange().getValues();
+  const index = rows.findIndex((row, i) => i > 0 && String(row[0]) === String(payload.orderId));
+  if (index < 1) throw new Error("Pesanan tidak ditemukan.");
+  const order = rows[index];
+  if (String(order[21] || "").trim()) {
+    return { ok: true, duplicate: true, message: "Pesanan ini sudah memiliki shipment Biteship.", shipment: biteshipOrderFromRow_(order) };
+  }
+  if (!/^diproses$/i.test(String(order[12] || ""))) {
+    throw new Error("Pesanan harus berstatus Diproses sebelum dinyatakan Ready untuk pickup.");
+  }
+  sheet.getRange(index + 1, 13).setValue("Ready — Meminta Pickup");
+  sheet.getRange(index + 1, 17).setValue(new Date());
+  try {
+    return createBiteshipShipment_(payload);
+  } catch (error) {
+    sheet.getRange(index + 1, 13).setValue("Diproses");
+    sheet.getRange(index + 1, 17).setValue(new Date());
+    throw error;
+  }
 }
 
 // Biteship is deliberately sandbox-only in this store. The API key is kept in
@@ -351,6 +379,9 @@ function createBiteshipShipment_(payload) {
     const order = rows[index];
     if (String(order[21] || "").trim()) {
       return { ok: true, duplicate: true, message: "Shipment sandbox sudah pernah dibuat untuk pesanan ini.", shipment: biteshipOrderFromRow_(order) };
+    }
+    if (!/^ready — meminta pickup$/i.test(String(order[12] || ""))) {
+      throw new Error("Shipment hanya dapat dibuat lewat aksi Ready setelah pesanan selesai dipacking.");
     }
     if (!safe_(order[2]) || !safe_(order[3]) || !safe_(order[5]) || !number_(order[7])) {
       throw new Error("Data tujuan belum lengkap. Nama, WhatsApp, alamat, dan kode pos pembeli wajib ada.");
@@ -443,7 +474,9 @@ function saveBiteshipShipment_(orderSheet, itemSheet, sheetRow, order, response,
 function biteshipStorefrontStatus_(status, current) {
   if (status === "delivered") return "Selesai";
   if (status === "cancelled") return "Batal";
-  return "Shipping";
+  if (["confirmed", "allocated", "pending", "picking_up"].indexOf(status) >= 0) return "Menunggu Penjemputan";
+  if (["picked_up", "in_transit", "out_for_delivery"].indexOf(status) >= 0) return "Shipping";
+  return /^menunggu penjemputan$/i.test(String(current || "")) ? current : "Menunggu Penjemputan";
 }
 
 function receiveBiteshipWebhook_(payload, e) {
@@ -489,7 +522,7 @@ function sendInvoiceEmail_(payload) {
     ? itemSheet.getRange(2, 1, itemSheet.getLastRow() - 1, HEADERS["Detail Pesanan"].length).getValues().filter(row => String(row[0]) === String(order[0]))
     : [];
   const itemText = items.map(row => `• ${safe_(row[2])}\n  Warna/ukuran: ${safe_(row[3])} / ${safe_(row[4])}\n  Jumlah: ${number_(row[5])}\n  Harga: ${rupiah_(row[6])}\n  Total barang: ${rupiah_(row[7])}`).join("\n\n") || "• Rincian produk tercatat pada pesanan";
-  const shipping = /shipping/i.test(String(order[12])) ? `\nEkspedisi: ${safe_(order[14] || order[8] || "-")}\nResi: ${safe_(order[15] || "-")}` : "";
+  const shipping = /^(menunggu penjemputan|shipping|selesai)$/i.test(String(order[12])) ? `\nEkspedisi: ${safe_(order[14] || order[8] || "-")}\nResi: ${safe_(order[15] || "-")}` : "";
   const body = `Halo Kak ${safe_(order[2])},\n\nTerima kasih sudah berbelanja di Yashbi Store. Berikut detail pesanan Kakak:\n\nInvoice: ${safe_(order[0])}\n${itemText}\n\nSubtotal: ${rupiah_(order[9])}\nOngkir: ${rupiah_(order[10])}\nTotal: ${rupiah_(order[11])}\nStatus: ${safe_(order[12])}${shipping}\n\nTerima kasih.`;
   GmailApp.sendEmail(email, `Invoice Yashbi Store ${safe_(order[0])}`, body, { name: "Yashbi Store" });
   return { ok: true, sentTo: email };
@@ -512,8 +545,8 @@ function sendInvoiceLinkEmail_(payload) {
   }
   const email = safe_(order[4]);
   if (!email) throw new Error("Email pembeli belum diisi.");
-  if (!/^(shipping|selesai)$/i.test(String(order[12])) || !safe_(order[14]) || !safe_(order[15])) {
-    throw new Error("Invoice WA/email aktif setelah status Shipping/Selesai, ekspedisi, dan nomor resi lengkap.");
+  if (!/^(menunggu penjemputan|shipping|selesai)$/i.test(String(order[12])) || !safe_(order[14]) || !safe_(order[15])) {
+    throw new Error("Invoice WA/email aktif setelah pickup dibuat, ekspedisi, dan nomor resi tersimpan.");
   }
   const invoice = createInvoicePdf_(orderSheet, itemSheet, order[0]);
   orderSheet.getRange(orderIndex + 1, 21).setValue(invoice.viewUrl);

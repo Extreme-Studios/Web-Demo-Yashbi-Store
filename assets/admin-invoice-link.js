@@ -1,8 +1,8 @@
 /* Invoice notification is only released after the parcel has a real tracking number. */
-const invoiceReadyToSend = order => /^(shipping|selesai)$/i.test(String(order.status || "")) && String(order.expedition || order.courier || "").trim() && String(order.trackingNumber || "").trim();
+const invoiceReadyToSend = order => /^(menunggu penjemputan|shipping|selesai)$/i.test(String(order.status || "")) && String(order.expedition || order.courier || "").trim() && String(order.trackingNumber || "").trim();
 
 invoiceMessage = function(order) {
-  const shipping = /shipping/i.test(order.status)
+  const shipping = /^(menunggu penjemputan|shipping|selesai)$/i.test(order.status)
     ? `\nEkspedisi: ${order.expedition || order.courier || "-"}\nResi: ${order.trackingNumber || "-"}`
     : "";
   const invoiceLink = String(order.invoiceUrl || "");
@@ -31,10 +31,10 @@ renderInvoiceButton = function(order) {
   button.disabled = !ready;
   button.classList.toggle("is-disabled", !ready);
   button.setAttribute("aria-disabled", String(!ready));
-  button.textContent = ready ? "Kirim invoice & resi via WhatsApp" : "WhatsApp aktif setelah status Shipping dan resi tersimpan";
+  button.textContent = ready ? "Kirim invoice & resi via WhatsApp" : "WhatsApp aktif setelah pickup dan resi tersimpan";
   button.onclick = ready
     ? () => window.open(`https://wa.me/${waPhone(order.phone)}?text=${encodeURIComponent(invoiceMessage(order))}`, "_blank", "noopener")
-    : () => toast("Isi ekspedisi dan nomor resi, pilih status Shipping, lalu Simpan pembaruan terlebih dahulu.");
+    : () => toast("Nyatakan pesanan Ready agar sistem membuat pickup dan resi terlebih dahulu.");
 };
 
 const originalOpenOrderForInvoiceLock = openOrder;
@@ -47,8 +47,8 @@ openOrder = function(id) {
     emailButton.removeAttribute("href");
     emailButton.classList.add("is-disabled");
     emailButton.setAttribute("aria-disabled", "true");
-    emailButton.textContent = "Email aktif setelah resi diisi";
-    emailButton.onclick = event => { event.preventDefault(); toast("Email invoice aktif setelah status Shipping dan nomor resi tersimpan."); };
+    emailButton.textContent = "Email aktif setelah resi tersedia";
+    emailButton.onclick = event => { event.preventDefault(); toast("Email invoice aktif setelah pickup dibuat dan nomor resi tersimpan."); };
   }
   form.addEventListener("submit", event => {
     const status = String(form.status.value || "");
