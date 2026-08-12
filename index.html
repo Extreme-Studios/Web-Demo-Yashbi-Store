@@ -359,7 +359,17 @@
 
   <div class="toast" id="toast" role="status"></div>
 
+  <aside class="yashbi-chat" id="yashbiChat" aria-label="Sahabat Yashbi">
+    <section class="yashbi-chat-panel" data-chat-panel hidden>
+      <header><div><strong>✦ Sahabat Yashbi</strong><small>Teman belanja fashionmu</small></div><button type="button" data-chat-close aria-label="Tutup chat">×</button></header>
+      <div class="yashbi-chat-messages" data-chat-messages><div class="yashbi-chat-message assistant">Halo, Kak! Aku Sahabat Yashbi. Lagi cari gaun, sepatu, jas, atau butuh bantuan pilih ukuran dan warna? Ceritakan saja santai ya.</div></div>
+      <form><div class="yashbi-chat-input"><input maxlength="800" aria-label="Pesan untuk Sahabat Yashbi" placeholder="Contoh: cari sepatu pria size 42..." autocomplete="off"><button type="submit" data-chat-send aria-label="Kirim pesan">↑</button></div><div class="yashbi-chat-footer"><span data-chat-remaining></span><a href="#koleksi">Lihat koleksi</a></div></form>
+    </section>
+    <button class="yashbi-chat-toggle" type="button" data-chat-toggle aria-expanded="false" aria-label="Buka Sahabat Yashbi"><b>◌</b><span>Sahabat Yashbi</span></button>
+  </aside>
+
   <script src="assets/config.js?v=20260729-operations"></script>
   <script src="assets/app.js?v=20260729-invoice-pdf-v1"></script>
+  <script src="assets/chat-widget.js?v=20260812-sahabat-yashbi-v1"></script>
 </body>
 </html>
