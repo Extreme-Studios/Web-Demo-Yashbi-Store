@@ -1,0 +1,3111 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-11-13T08:00:27Z",
+  "sourcePhotoCount": 60,
+  "baseSkuCount": 32,
+  "colourVariantCount": 28,
+  "complete": true,
+  "originalsPreserved": true,
+  "geometryReconstructed": false,
+  "pipeline": "semantic segmentation -> alpha matting -> speck cleanup -> exact nonzero-alpha crop",
+  "models": {
+    "isnet-general-use": {
+      "url": "https://github.com/danielgatis/rembg/releases/download/v0.0.0/isnet-general-use.onnx",
+      "md5": "fc16ebd8b0c10d971d3513d564d01e29",
+      "verifiedMd5": "fc16ebd8b0c10d971d3513d564d01e29"
+    },
+    "u2net": {
+      "url": "https://github.com/danielgatis/rembg/releases/download/v0.0.0/u2net.onnx",
+      "md5": "60024c5c889badc19c04ad937298a77b",
+      "verifiedMd5": "60024c5c889badc19c04ad937298a77b"
+    },
+    "u2net_cloth_seg": {
+      "url": "https://github.com/danielgatis/rembg/releases/download/v0.0.0/u2net_cloth_seg.onnx",
+      "md5": "2434d1f3cb744e0e49386c906e5a08bb",
+      "verifiedMd5": "2434d1f3cb744e0e49386c906e5a08bb"
+    }
+  },
+  "versions": {
+    "rembg": "2.0.87",
+    "onnxruntime": "1.31.1",
+    "Pillow": "13.0.0",
+    "numpy": "2.5.4",
+    "opencv-python-headless": "5.0.0.93"
+  },
+  "entries": {
+    "gw-001": {
+      "file": "assets/images/cutout/gw-001.png",
+      "raw": "assets/images/raw/gw-001.webp",
+      "source": "assets/images/products/gw-001.webp",
+      "sourceSha256": "68db3f659ab1880d660de219157ee007e2d7cea0f17b41ad5901f60240a23765",
+      "outputSha256": "a52899c0823f7c72c7d10d9392709e4dda3462b522389ca47ee3426b61d436cf",
+      "width": 551,
+      "height": 830,
+      "sourceCrop": [
+        129,
+        26,
+        680,
+        856
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": false,
+      "anchor": {
+        "x": 0.43636,
+        "y": 0.16164
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.29583,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 0.995175
+      },
+      "solidAlphaBBox": [
+        3,
+        3,
+        549,
+        826
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        551,
+        830
+      ],
+      "bottomAlphaPixels": 11,
+      "bottomMaxAlpha": 53,
+      "transparentPixelFraction": 0.57263,
+      "opaquePixelFraction": 0.4052
+    },
+    "gw-001-champagne": {
+      "file": "assets/images/cutout/gw-001-champagne.png",
+      "raw": "assets/images/raw/gw-001-champagne.png",
+      "source": "assets/images/products/gw-001-champagne.png",
+      "sourceSha256": "ba0f602f6ea6cc809a1b7f61e223e4a60ddde957e2733f9c22b9ffaab1c66b6d",
+      "outputSha256": "83a352ceac91e4d9aeb3f72b776abb54078ec4940ad9edd348971d65875a4769",
+      "width": 856,
+      "height": 1291,
+      "sourceCrop": [
+        206,
+        42,
+        1062,
+        1333
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": false,
+      "anchor": {
+        "x": 0.43567,
+        "y": 0.16124
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.29439,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 0.997674
+      },
+      "solidAlphaBBox": [
+        2,
+        3,
+        853,
+        1288
+      ],
+      "sourceDimensions": [
+        1122,
+        1402
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        856,
+        1291
+      ],
+      "bottomAlphaPixels": 17,
+      "bottomMaxAlpha": 52,
+      "transparentPixelFraction": 0.5759,
+      "opaquePixelFraction": 0.40916
+    },
+    "gw-002": {
+      "file": "assets/images/cutout/gw-002.png",
+      "raw": "assets/images/raw/gw-002.webp",
+      "source": "assets/images/products/gw-002.webp",
+      "sourceSha256": "fcc8762e3f2c685ff5127b6c0b946b39f6865b0c854c606792db5200a18ca168",
+      "outputSha256": "a2cfd4596b15cb1641983cb5329916c03f19e6ee22f6414bf199135f683f707b",
+      "width": 546,
+      "height": 847,
+      "sourceCrop": [
+        123,
+        21,
+        669,
+        868
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": false,
+      "anchor": {
+        "x": 0.44771,
+        "y": 0.16785
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.3022,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 0.99409
+      },
+      "solidAlphaBBox": [
+        17,
+        3,
+        533,
+        842
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        546,
+        847
+      ],
+      "bottomAlphaPixels": 32,
+      "bottomMaxAlpha": 65,
+      "transparentPixelFraction": 0.52814,
+      "opaquePixelFraction": 0.44114
+    },
+    "gw-002-ivory": {
+      "file": "assets/images/cutout/gw-002-ivory.png",
+      "raw": "assets/images/raw/gw-002-ivory.png",
+      "source": "assets/images/products/gw-002-ivory.png",
+      "sourceSha256": "30a58ddd66e943c182c16f9a44a268ba599a1a1fb1cd6bd3a75f31b1b8500dbf",
+      "outputSha256": "dee6776c4ad033e720cc6bce2513f9a44b7a268cce260873f105f8325ae7fff9",
+      "width": 823,
+      "height": 1313,
+      "sourceCrop": [
+        213,
+        34,
+        1036,
+        1347
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 9,
+      "reviewedFloorShadowRemoved": false,
+      "anchor": {
+        "x": 0.44221,
+        "y": 0.17302
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.31349,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 0.996189
+      },
+      "solidAlphaBBox": [
+        5,
+        3,
+        818,
+        1308
+      ],
+      "sourceDimensions": [
+        1122,
+        1402
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        823,
+        1313
+      ],
+      "bottomAlphaPixels": 15,
+      "bottomMaxAlpha": 72,
+      "transparentPixelFraction": 0.51015,
+      "opaquePixelFraction": 0.4642
+    },
+    "gw-003": {
+      "file": "assets/images/cutout/gw-003.png",
+      "raw": "assets/images/raw/gw-003.webp",
+      "source": "assets/images/products/gw-003.webp",
+      "sourceSha256": "7ccac0d3c24b493acf50ac3b3ad448d099f2857d0e34cb33ac000a5cdfef41f5",
+      "outputSha256": "a1885a3d2e0dd03fbabe2b8a820c64e1d27d669a10bd5287d09fabf06cd1e3b7",
+      "width": 518,
+      "height": 840,
+      "sourceCrop": [
+        130,
+        19,
+        648,
+        859
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": false,
+      "anchor": {
+        "x": 0.42456,
+        "y": 0.16567
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.32046,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 0.996424
+      },
+      "solidAlphaBBox": [
+        3,
+        3,
+        516,
+        837
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        518,
+        840
+      ],
+      "bottomAlphaPixels": 20,
+      "bottomMaxAlpha": 49,
+      "transparentPixelFraction": 0.58114,
+      "opaquePixelFraction": 0.39182
+    },
+    "gw-003-navy": {
+      "file": "assets/images/cutout/gw-003-navy.png",
+      "raw": "assets/images/raw/gw-003-navy.png",
+      "source": "assets/images/products/gw-003-navy.png",
+      "sourceSha256": "522d7cd4ad33b938e84684f4d7dd6d3c437dfa2e1085c793a176a6cab7965c8f",
+      "outputSha256": "f30e83df5b57a29106bd9398caa2162ec7fa8456b997258a3f3920edf807ef34",
+      "width": 806,
+      "height": 1307,
+      "sourceCrop": [
+        205,
+        31,
+        1011,
+        1338
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": false,
+      "anchor": {
+        "x": 0.42671,
+        "y": 0.16539
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.32258,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 0.998469
+      },
+      "solidAlphaBBox": [
+        3,
+        3,
+        804,
+        1305
+      ],
+      "sourceDimensions": [
+        1122,
+        1402
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        806,
+        1307
+      ],
+      "bottomAlphaPixels": 51,
+      "bottomMaxAlpha": 100,
+      "transparentPixelFraction": 0.5862,
+      "opaquePixelFraction": 0.40121
+    },
+    "gw-004": {
+      "file": "assets/images/cutout/gw-004.png",
+      "raw": "assets/images/raw/gw-004.webp",
+      "source": "assets/images/products/gw-004.webp",
+      "sourceSha256": "6a7b55ce13b7f3344027f39cddcdf5ad49259b90652ac5ebcbe3d41b5635aeed",
+      "outputSha256": "d989930d87865aa9b36a85e1e1a40969eb4fa35b03ff07c5a4fa50e927e32b65",
+      "width": 536,
+      "height": 830,
+      "sourceCrop": [
+        84,
+        21,
+        620,
+        851
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": false,
+      "anchor": {
+        "x": 0.4757,
+        "y": 0.17129
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.28358,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 0.995175
+      },
+      "solidAlphaBBox": [
+        12,
+        3,
+        533,
+        826
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        536,
+        830
+      ],
+      "bottomAlphaPixels": 15,
+      "bottomMaxAlpha": 63,
+      "transparentPixelFraction": 0.61569,
+      "opaquePixelFraction": 0.34371
+    },
+    "gw-004-rose": {
+      "file": "assets/images/cutout/gw-004-rose.png",
+      "raw": "assets/images/raw/gw-004-rose.png",
+      "source": "assets/images/products/gw-004-rose.png",
+      "sourceSha256": "9bc16110a00a901c0647af18e51887582040603f78684d3be4be13af86423f08",
+      "outputSha256": "c95cd4ce627f9f457e2af6e448c8657b5d37ae9ad6449bd654d7da90133c1fda",
+      "width": 833,
+      "height": 1291,
+      "sourceCrop": [
+        131,
+        34,
+        964,
+        1325
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": false,
+      "anchor": {
+        "x": 0.47957,
+        "y": 0.17054
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.28211,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 0.99845
+      },
+      "solidAlphaBBox": [
+        7,
+        2,
+        829,
+        1289
+      ],
+      "sourceDimensions": [
+        1122,
+        1402
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        833,
+        1291
+      ],
+      "bottomAlphaPixels": 26,
+      "bottomMaxAlpha": 99,
+      "transparentPixelFraction": 0.61938,
+      "opaquePixelFraction": 0.36482
+    },
+    "gw-005": {
+      "file": "assets/images/cutout/gw-005.png",
+      "raw": "assets/images/raw/gw-005.webp",
+      "source": "assets/images/products/gw-005.webp",
+      "sourceSha256": "6a99d8ac444ecb1bc7cfd5d456f7a59d36ea43aed51b46b0dd0014f39772db7a",
+      "outputSha256": "898d535962000f9dab413ea7178e853ddefb3e6a292c071347b4fbe081bec1e5",
+      "width": 530,
+      "height": 823,
+      "sourceCrop": [
+        145,
+        19,
+        675,
+        842
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": false,
+      "anchor": {
+        "x": 0.38469,
+        "y": 0.17518
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.29434,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 0.995134
+      },
+      "solidAlphaBBox": [
+        3,
+        3,
+        527,
+        819
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        530,
+        823
+      ],
+      "bottomAlphaPixels": 2,
+      "bottomMaxAlpha": 35,
+      "transparentPixelFraction": 0.61373,
+      "opaquePixelFraction": 0.36412
+    },
+    "gw-005-black": {
+      "file": "assets/images/cutout/gw-005-black.png",
+      "raw": "assets/images/raw/gw-005-black.png",
+      "source": "assets/images/products/gw-005-black.png",
+      "sourceSha256": "ea1237b5f9e9cee53f192667a44ecc6c51b2126492290812f9eadf14e0c9d00d",
+      "outputSha256": "03959a9158fd9ab4dc4465b49260a044eda4181eb7a5bd664e6cdd72f519dda6",
+      "width": 823,
+      "height": 1284,
+      "sourceCrop": [
+        227,
+        29,
+        1050,
+        1313
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": false,
+      "anchor": {
+        "x": 0.38504,
+        "y": 0.17537
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.29891,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 0.997662
+      },
+      "solidAlphaBBox": [
+        2,
+        2,
+        821,
+        1281
+      ],
+      "sourceDimensions": [
+        1122,
+        1402
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        823,
+        1284
+      ],
+      "bottomAlphaPixels": 14,
+      "bottomMaxAlpha": 82,
+      "transparentPixelFraction": 0.61678,
+      "opaquePixelFraction": 0.37193
+    },
+    "gw-006": {
+      "file": "assets/images/cutout/gw-006.png",
+      "raw": "assets/images/raw/gw-006.webp",
+      "source": "assets/images/products/gw-006.webp",
+      "sourceSha256": "da6838d0773b0f55c61f32688f3a97a8468c6bbf4a974f6d772885a99fdedba5",
+      "outputSha256": "17fcdcfab9080cef96f14ebfe11b2f40f5181da15b0dc9f099bf3faf983f0b81",
+      "width": 509,
+      "height": 849,
+      "sourceCrop": [
+        115,
+        12,
+        624,
+        861
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": false,
+      "anchor": {
+        "x": 0.49409,
+        "y": 0.16156
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.29273,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 0.996462
+      },
+      "solidAlphaBBox": [
+        7,
+        3,
+        506,
+        846
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        509,
+        849
+      ],
+      "bottomAlphaPixels": 23,
+      "bottomMaxAlpha": 44,
+      "transparentPixelFraction": 0.52223,
+      "opaquePixelFraction": 0.45375
+    },
+    "gw-006-mocha": {
+      "file": "assets/images/cutout/gw-006-mocha.png",
+      "raw": "assets/images/raw/gw-006-mocha.png",
+      "source": "assets/images/products/gw-006-mocha.png",
+      "sourceSha256": "6d5c280d11e409aeb374ccb41a8968f04df1170dc6228960becef540e9a69b02",
+      "outputSha256": "2601819e8a5be400c10ce8bb72c03b271860f980ce0147f7798b3ad681058b61",
+      "width": 781,
+      "height": 1322,
+      "sourceCrop": [
+        189,
+        19,
+        970,
+        1341
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": false,
+      "anchor": {
+        "x": 0.48782,
+        "y": 0.162
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.29706,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 0.997729
+      },
+      "solidAlphaBBox": [
+        2,
+        2,
+        778,
+        1319
+      ],
+      "sourceDimensions": [
+        1122,
+        1402
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        781,
+        1322
+      ],
+      "bottomAlphaPixels": 6,
+      "bottomMaxAlpha": 36,
+      "transparentPixelFraction": 0.52361,
+      "opaquePixelFraction": 0.46188
+    },
+    "gw-007": {
+      "file": "assets/images/cutout/gw-007.png",
+      "raw": "assets/images/raw/gw-007.webp",
+      "source": "assets/images/products/gw-007.webp",
+      "sourceSha256": "8656c351103a649c8dfca7542c56307749d5b37721bb7c3596b90904e1538c60",
+      "outputSha256": "85666b1b601baa8b8fc805f5e4938cc947bc88fb0fe83e51442fd1c8689d2e24",
+      "width": 496,
+      "height": 839,
+      "sourceCrop": [
+        94,
+        21,
+        590,
+        860
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": false,
+      "anchor": {
+        "x": 0.50303,
+        "y": 0.16229
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.33266,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 0.997613
+      },
+      "solidAlphaBBox": [
+        8,
+        3,
+        494,
+        837
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        496,
+        839
+      ],
+      "bottomAlphaPixels": 35,
+      "bottomMaxAlpha": 81,
+      "transparentPixelFraction": 0.52522,
+      "opaquePixelFraction": 0.45345
+    },
+    "gw-007-dusty-pink": {
+      "file": "assets/images/cutout/gw-007-dusty-pink.png",
+      "raw": "assets/images/raw/gw-007-dusty-pink.png",
+      "source": "assets/images/products/gw-007-dusty-pink.png",
+      "sourceSha256": "8781bbbb575ad3f8b241cc09682c2109ba1af85bac833b968f6d43127c78f2c6",
+      "outputSha256": "cbfcf01b3db40bd9489ee241aadbbab5215134fa0a91744f33c8be7dcd4611c3",
+      "width": 771,
+      "height": 1306,
+      "sourceCrop": [
+        148,
+        36,
+        919,
+        1342
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": false,
+      "anchor": {
+        "x": 0.50455,
+        "y": 0.16015
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.32944,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 0.997701
+      },
+      "solidAlphaBBox": [
+        12,
+        2,
+        769,
+        1303
+      ],
+      "sourceDimensions": [
+        1122,
+        1402
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        771,
+        1306
+      ],
+      "bottomAlphaPixels": 12,
+      "bottomMaxAlpha": 61,
+      "transparentPixelFraction": 0.52887,
+      "opaquePixelFraction": 0.45732
+    },
+    "gw-008": {
+      "file": "assets/images/cutout/gw-008.png",
+      "raw": "assets/images/raw/gw-008.webp",
+      "source": "assets/images/products/gw-008.webp",
+      "sourceSha256": "83bb595e266eba2458f911217bb63605bd6c951fbb0ea973fc318f158b3e5750",
+      "outputSha256": "f0280c75fa9279176e4d37867e4e14a5745c67afdec1c709c61124b0fd8ea955",
+      "width": 578,
+      "height": 822,
+      "sourceCrop": [
+        95,
+        21,
+        673,
+        843
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": false,
+      "anchor": {
+        "x": 0.42634,
+        "y": 0.162
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.26471,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 0.996346
+      },
+      "solidAlphaBBox": [
+        5,
+        2,
+        576,
+        819
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        578,
+        822
+      ],
+      "bottomAlphaPixels": 1,
+      "bottomMaxAlpha": 35,
+      "transparentPixelFraction": 0.63041,
+      "opaquePixelFraction": 0.35035
+    },
+    "gw-008-burgundy": {
+      "file": "assets/images/cutout/gw-008-burgundy.png",
+      "raw": "assets/images/raw/gw-008-burgundy.png",
+      "source": "assets/images/products/gw-008-burgundy.png",
+      "sourceSha256": "5669df87f6ef63b2e38155304d047e27ffd8281d9957d423dd3aa0be6fd6f57d",
+      "outputSha256": "488a88bea206b8662bdd6a3cf19957dbeb3ffbafbfd082ccbf4d2b8d941253de",
+      "width": 897,
+      "height": 1280,
+      "sourceCrop": [
+        149,
+        33,
+        1046,
+        1313
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": false,
+      "anchor": {
+        "x": 0.4308,
+        "y": 0.16966
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.26421,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 0.997654
+      },
+      "solidAlphaBBox": [
+        7,
+        3,
+        895,
+        1277
+      ],
+      "sourceDimensions": [
+        1122,
+        1402
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        897,
+        1280
+      ],
+      "bottomAlphaPixels": 8,
+      "bottomMaxAlpha": 54,
+      "transparentPixelFraction": 0.63338,
+      "opaquePixelFraction": 0.35181
+    },
+    "jp-001": {
+      "file": "assets/images/cutout/jp-001.png",
+      "raw": "assets/images/raw/jp-001.webp",
+      "source": "assets/images/products/jp-001.webp",
+      "sourceSha256": "536dd3bd2e97f308dc1afdef804afc8e9bb890b195e0a88f67e1ffec820aa876",
+      "outputSha256": "c815c1f1c8138f6b93fa37b8f72bb94dd78ca2a3e0160cc4ffa92049dd3a3723",
+      "width": 297,
+      "height": 851,
+      "sourceCrop": [
+        222,
+        36,
+        519,
+        887
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": false,
+      "anchor": {
+        "x": 0.52872,
+        "y": 0.19294
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.6734,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 0.997647
+      },
+      "solidAlphaBBox": [
+        4,
+        2,
+        293,
+        849
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        297,
+        851
+      ],
+      "bottomAlphaPixels": 16,
+      "bottomMaxAlpha": 67,
+      "transparentPixelFraction": 0.46259,
+      "opaquePixelFraction": 0.49837
+    },
+    "jp-001-charcoal": {
+      "file": "assets/images/cutout/jp-001-charcoal.png",
+      "raw": "assets/images/raw/jp-001-charcoal.png",
+      "source": "assets/images/products/jp-001-charcoal.png",
+      "sourceSha256": "1d1c1f47f95a1a400bb04f87b5360d49d0348567d5b4451a2e9aec83fa2d9d25",
+      "outputSha256": "e72568ce480f604e89ced70dbc2102ef6068186af087bc33d98478b450ec5688",
+      "width": 457,
+      "height": 1324,
+      "sourceCrop": [
+        350,
+        57,
+        807,
+        1381
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": false,
+      "anchor": {
+        "x": 0.52851,
+        "y": 0.19274
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.67177,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 0.999244
+      },
+      "solidAlphaBBox": [
+        1,
+        1,
+        456,
+        1323
+      ],
+      "sourceDimensions": [
+        1122,
+        1402
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        457,
+        1324
+      ],
+      "bottomAlphaPixels": 23,
+      "bottomMaxAlpha": 128,
+      "transparentPixelFraction": 0.46188,
+      "opaquePixelFraction": 0.52376
+    },
+    "jp-002": {
+      "file": "assets/images/cutout/jp-002.png",
+      "raw": "assets/images/raw/jp-002.webp",
+      "source": "assets/images/products/jp-002.webp",
+      "sourceSha256": "da36b7e00c5d6d2d6f92e856349e9c4f98488b9a4a906a458f0792a3d25fcae1",
+      "outputSha256": "d9a799beec1ebc9b93917b28dd7e49397a29718512bb4e3d4a9de7c44561e231",
+      "width": 282,
+      "height": 859,
+      "sourceCrop": [
+        238,
+        35,
+        520,
+        894
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": false,
+      "anchor": {
+        "x": 0.51601,
+        "y": 0.19231
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.69149,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 0.997669
+      },
+      "solidAlphaBBox": [
+        2,
+        3,
+        279,
+        857
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        282,
+        859
+      ],
+      "bottomAlphaPixels": 19,
+      "bottomMaxAlpha": 88,
+      "transparentPixelFraction": 0.41982,
+      "opaquePixelFraction": 0.54415
+    },
+    "jp-002-black": {
+      "file": "assets/images/cutout/jp-002-black.png",
+      "raw": "assets/images/raw/jp-002-black.png",
+      "source": "assets/images/products/jp-002-black.png",
+      "sourceSha256": "bb4510b2d0bd464436c0d0a1c7ede68b4e8f11a06d3600f3ce57efe1df22ad40",
+      "outputSha256": "131459dba65b722049cc5bd86229d4cbd04b066da833272db88af0d303c1718e",
+      "width": 435,
+      "height": 1338,
+      "sourceCrop": [
+        372,
+        55,
+        807,
+        1393
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": false,
+      "anchor": {
+        "x": 0.52074,
+        "y": 0.19147
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.68736,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 0.997756
+      },
+      "solidAlphaBBox": [
+        1,
+        2,
+        433,
+        1335
+      ],
+      "sourceDimensions": [
+        1122,
+        1402
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        435,
+        1338
+      ],
+      "bottomAlphaPixels": 3,
+      "bottomMaxAlpha": 37,
+      "transparentPixelFraction": 0.42433,
+      "opaquePixelFraction": 0.55702
+    },
+    "jp-003": {
+      "file": "assets/images/cutout/jp-003.png",
+      "raw": "assets/images/raw/jp-003.webp",
+      "source": "assets/images/products/jp-003.webp",
+      "sourceSha256": "0f640d7ec75ecaf96f4b4e3167de42a8c427129d3e2dccbe4bbde2d793d2e0f0",
+      "outputSha256": "151e0e8d7138b5604731449207f6c5cf7993dc86ddd01be481b59b5255dcdd1b",
+      "width": 290,
+      "height": 873,
+      "sourceCrop": [
+        217,
+        23,
+        507,
+        896
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": false,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.19381
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.68966,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 0.997706
+      },
+      "solidAlphaBBox": [
+        2,
+        2,
+        287,
+        871
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        290,
+        873
+      ],
+      "bottomAlphaPixels": 18,
+      "bottomMaxAlpha": 89,
+      "transparentPixelFraction": 0.42831,
+      "opaquePixelFraction": 0.53781
+    },
+    "jp-003-slate": {
+      "file": "assets/images/cutout/jp-003-slate.png",
+      "raw": "assets/images/raw/jp-003-slate.png",
+      "source": "assets/images/products/jp-003-slate.png",
+      "sourceSha256": "ab4c30ad42833cfc38ab2b2c02754e433631a2c6fbf1a52b8d5cd6d7ff334dc5",
+      "outputSha256": "f8724deeda79baa0019bde62dc64851c489a1d1b74d53fb43152b0a1489dec72",
+      "width": 448,
+      "height": 1359,
+      "sourceCrop": [
+        340,
+        37,
+        788,
+        1396
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": false,
+      "anchor": {
+        "x": 0.50112,
+        "y": 0.19367
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.69866,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 0.998527
+      },
+      "solidAlphaBBox": [
+        1,
+        1,
+        446,
+        1357
+      ],
+      "sourceDimensions": [
+        1122,
+        1402
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        448,
+        1359
+      ],
+      "bottomAlphaPixels": 23,
+      "bottomMaxAlpha": 86,
+      "transparentPixelFraction": 0.43239,
+      "opaquePixelFraction": 0.54933
+    },
+    "jp-004": {
+      "file": "assets/images/cutout/jp-004.png",
+      "raw": "assets/images/raw/jp-004.webp",
+      "source": "assets/images/products/jp-004.webp",
+      "sourceSha256": "f743ce585fdc3a2766de5993793379706fccf8a30223dd8730654243b4d50064",
+      "outputSha256": "d60247412f993a989aa7738caec12014f63f5c4e73a45a84af11b2ba228a9b12",
+      "width": 298,
+      "height": 868,
+      "sourceCrop": [
+        216,
+        25,
+        514,
+        893
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": false,
+      "anchor": {
+        "x": 0.51515,
+        "y": 0.19262
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.66779,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 0.997693
+      },
+      "solidAlphaBBox": [
+        2,
+        2,
+        295,
+        866
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        298,
+        868
+      ],
+      "bottomAlphaPixels": 17,
+      "bottomMaxAlpha": 86,
+      "transparentPixelFraction": 0.445,
+      "opaquePixelFraction": 0.51892
+    },
+    "jp-005": {
+      "file": "assets/images/cutout/jp-005.png",
+      "raw": "assets/images/raw/jp-005.webp",
+      "source": "assets/images/products/jp-005.webp",
+      "sourceSha256": "76546accc31fa826db107ce2d92b86def4bc3151f94848fb919fd33be16c9751",
+      "outputSha256": "2e3e2ee46e06d4fcb04ceb5cb36ca9f002bae956cc3aaa5aeda79438bd3ad9b8",
+      "width": 268,
+      "height": 847,
+      "sourceCrop": [
+        240,
+        26,
+        508,
+        873
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": false,
+      "anchor": {
+        "x": 0.51311,
+        "y": 0.18913
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.69776,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 0.997636
+      },
+      "solidAlphaBBox": [
+        3,
+        2,
+        265,
+        845
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        268,
+        847
+      ],
+      "bottomAlphaPixels": 13,
+      "bottomMaxAlpha": 54,
+      "transparentPixelFraction": 0.41025,
+      "opaquePixelFraction": 0.54712
+    },
+    "jp-005-ivory": {
+      "file": "assets/images/cutout/jp-005-ivory.png",
+      "raw": "assets/images/raw/jp-005-ivory.png",
+      "source": "assets/images/products/jp-005-ivory.png",
+      "sourceSha256": "75a832dcb1f84fda54a2e6db2af255958a45a949c96550a3f7e734b0fa1baf4c",
+      "outputSha256": "7817716a6e2ad1c804114b57a1b72337963219c50fb208ca553c17102b3542f3",
+      "width": 418,
+      "height": 1313,
+      "sourceCrop": [
+        375,
+        41,
+        793,
+        1354
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": false,
+      "anchor": {
+        "x": 0.51319,
+        "y": 0.19055
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.70574,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 0.998476
+      },
+      "solidAlphaBBox": [
+        3,
+        2,
+        416,
+        1311
+      ],
+      "sourceDimensions": [
+        1122,
+        1402
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        418,
+        1313
+      ],
+      "bottomAlphaPixels": 27,
+      "bottomMaxAlpha": 60,
+      "transparentPixelFraction": 0.41582,
+      "opaquePixelFraction": 0.56088
+    },
+    "jp-006": {
+      "file": "assets/images/cutout/jp-006.png",
+      "raw": "assets/images/raw/jp-006.webp",
+      "source": "assets/images/products/jp-006.webp",
+      "sourceSha256": "4f63e40a5471967a01ae8ceed61022c9175e293ae2b5bdd016a0fe630befd279",
+      "outputSha256": "ca9b800de330d747f40c89b49e687ab5da4208ea4051121b062a3f3fee0bb2e7",
+      "width": 283,
+      "height": 844,
+      "sourceCrop": [
+        226,
+        26,
+        509,
+        870
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": false,
+      "anchor": {
+        "x": 0.51241,
+        "y": 0.18624
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.69965,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 0.997628
+      },
+      "solidAlphaBBox": [
+        3,
+        2,
+        281,
+        842
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        283,
+        844
+      ],
+      "bottomAlphaPixels": 7,
+      "bottomMaxAlpha": 37,
+      "transparentPixelFraction": 0.43995,
+      "opaquePixelFraction": 0.52676
+    },
+    "jp-006-brown": {
+      "file": "assets/images/cutout/jp-006-brown.png",
+      "raw": "assets/images/raw/jp-006-brown.png",
+      "source": "assets/images/products/jp-006-brown.png",
+      "sourceSha256": "d719ef88c7dca76ee0c162f7117a23da70e71d72292ffd16311bfff45beca7c7",
+      "outputSha256": "7873cce52c79a916d170a5c5c80c8d8c55bd99443bb737f675676caa7d15e559",
+      "width": 438,
+      "height": 1312,
+      "sourceCrop": [
+        355,
+        42,
+        793,
+        1354
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": false,
+      "anchor": {
+        "x": 0.51373,
+        "y": 0.18535
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.69863,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 0.998474
+      },
+      "solidAlphaBBox": [
+        2,
+        2,
+        437,
+        1310
+      ],
+      "sourceDimensions": [
+        1122,
+        1402
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        438,
+        1312
+      ],
+      "bottomAlphaPixels": 21,
+      "bottomMaxAlpha": 88,
+      "transparentPixelFraction": 0.44574,
+      "opaquePixelFraction": 0.53747
+    },
+    "jp-007": {
+      "file": "assets/images/cutout/jp-007.png",
+      "raw": "assets/images/raw/jp-007.webp",
+      "source": "assets/images/products/jp-007.webp",
+      "sourceSha256": "530500c87b9568811d891ac4ab851033d71489faaed8375ce4155bf89384a1a9",
+      "outputSha256": "699c1cdc3c1e2a7b1a01e6aac97eec30c25546565b3781a985794bf581f884e5",
+      "width": 269,
+      "height": 845,
+      "sourceCrop": [
+        230,
+        26,
+        499,
+        871
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": false,
+      "anchor": {
+        "x": 0.51119,
+        "y": 0.1872
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.7026,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 0.99763
+      },
+      "solidAlphaBBox": [
+        2,
+        3,
+        266,
+        843
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        269,
+        845
+      ],
+      "bottomAlphaPixels": 20,
+      "bottomMaxAlpha": 100,
+      "transparentPixelFraction": 0.43688,
+      "opaquePixelFraction": 0.53081
+    },
+    "jp-007-cream": {
+      "file": "assets/images/cutout/jp-007-cream.png",
+      "raw": "assets/images/raw/jp-007-cream.png",
+      "source": "assets/images/products/jp-007-cream.png",
+      "sourceSha256": "d114ebeea9ea101ec518a44042eb0a91b7cd23824f1416183020888c22e56154",
+      "outputSha256": "2417b09627b07bf47b595f13bb35752ea33c7b851db0f8518ec3ce3945bf06f9",
+      "width": 420,
+      "height": 1316,
+      "sourceCrop": [
+        359,
+        42,
+        779,
+        1358
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": false,
+      "anchor": {
+        "x": 0.51074,
+        "y": 0.18707
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.70714,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 0.998479
+      },
+      "solidAlphaBBox": [
+        1,
+        1,
+        418,
+        1314
+      ],
+      "sourceDimensions": [
+        1122,
+        1402
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        420,
+        1316
+      ],
+      "bottomAlphaPixels": 21,
+      "bottomMaxAlpha": 79,
+      "transparentPixelFraction": 0.43867,
+      "opaquePixelFraction": 0.54026
+    },
+    "jp-008": {
+      "file": "assets/images/cutout/jp-008.png",
+      "raw": "assets/images/raw/jp-008.webp",
+      "source": "assets/images/products/jp-008.webp",
+      "sourceSha256": "b9e6e96b5fe7abcaf18733fa1e657be60626d6513865697b104da26b856162d7",
+      "outputSha256": "3b80b9eae8e8ddc5e1e1a5570fb3997a20ea700a6cfc4a19e770d6c30c5d0754",
+      "width": 268,
+      "height": 839,
+      "sourceCrop": [
+        229,
+        28,
+        497,
+        867
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": false,
+      "anchor": {
+        "x": 0.51873,
+        "y": 0.18974
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.70896,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 0.988067
+      },
+      "solidAlphaBBox": [
+        3,
+        2,
+        265,
+        829
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        268,
+        839
+      ],
+      "bottomAlphaPixels": 14,
+      "bottomMaxAlpha": 43,
+      "transparentPixelFraction": 0.41432,
+      "opaquePixelFraction": 0.54958
+    },
+    "jp-008-navy": {
+      "file": "assets/images/cutout/jp-008-navy.png",
+      "raw": "assets/images/raw/jp-008-navy.png",
+      "source": "assets/images/products/jp-008-navy.png",
+      "sourceSha256": "5350e9acaa33ba0c5c801f97fde04fb25a28a67e1750b5335dce02ee298dba88",
+      "outputSha256": "a72b191dea8a24509898a682bc772bbfb578335d62c3b43dae82c7a31a9a7fc9",
+      "width": 417,
+      "height": 1287,
+      "sourceCrop": [
+        356,
+        43,
+        773,
+        1330
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": false,
+      "anchor": {
+        "x": 0.52404,
+        "y": 0.19207
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.70743,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 0.997667
+      },
+      "solidAlphaBBox": [
+        2,
+        2,
+        415,
+        1284
+      ],
+      "sourceDimensions": [
+        1122,
+        1402
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        417,
+        1287
+      ],
+      "bottomAlphaPixels": 19,
+      "bottomMaxAlpha": 42,
+      "transparentPixelFraction": 0.4127,
+      "opaquePixelFraction": 0.56637
+    },
+    "sp-001": {
+      "file": "assets/images/cutout/sp-001.png",
+      "raw": "assets/images/raw/sp-001.webp",
+      "source": "assets/images/products/sp-001.webp",
+      "sourceSha256": "2dbd7292a895bdcab76e90a04652b176835f63a51aa48b15eb4f6751f6448ff5",
+      "outputSha256": "bd869f87347ada9009d0bc92661931a24795ef79773082b095d35d8093c96d06",
+      "width": 720,
+      "height": 470,
+      "sourceCrop": [
+        0,
+        249,
+        720,
+        719
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "anchor": {
+        "x": 0.32754,
+        "y": 0.13006
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.58056,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "solidAlphaBBox": [
+        0,
+        3,
+        720,
+        470
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        720,
+        470
+      ],
+      "bottomAlphaPixels": 79,
+      "bottomMaxAlpha": 255,
+      "transparentPixelFraction": 0.33729,
+      "opaquePixelFraction": 0.64289
+    },
+    "sp-001-dark-brown": {
+      "file": "assets/images/cutout/sp-001-dark-brown.png",
+      "raw": "assets/images/raw/sp-001-dark-brown.png",
+      "source": "assets/images/products/sp-001-dark-brown.png",
+      "sourceSha256": "e28475482311a6f375977c936a9ada08119952150d9129738547b82e9b13ff1c",
+      "outputSha256": "2f11f35e5d06148c266318ff58d4ef8c48891d21e36254d188aba470d8539435",
+      "width": 1122,
+      "height": 732,
+      "sourceCrop": [
+        0,
+        389,
+        1122,
+        1121
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "anchor": {
+        "x": 0.32694,
+        "y": 0.12996
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.57932,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "solidAlphaBBox": [
+        0,
+        2,
+        1122,
+        732
+      ],
+      "sourceDimensions": [
+        1122,
+        1402
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        1122,
+        732
+      ],
+      "bottomAlphaPixels": 83,
+      "bottomMaxAlpha": 243,
+      "transparentPixelFraction": 0.34161,
+      "opaquePixelFraction": 0.64883
+    },
+    "sp-002": {
+      "file": "assets/images/cutout/sp-002.png",
+      "raw": "assets/images/raw/sp-002.webp",
+      "source": "assets/images/products/sp-002.webp",
+      "sourceSha256": "56d1372d248e422ea1b1c0f782761cff141e1ba3c4e8aec0813de531c522ccec",
+      "outputSha256": "2a6e8f6660e3ead701248dfafc87ade05adda5e160dfd99d55a4fe80a8282f87",
+      "width": 720,
+      "height": 452,
+      "sourceCrop": [
+        0,
+        260,
+        720,
+        712
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "anchor": {
+        "x": 0.3185,
+        "y": 0.13082
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.57361,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "solidAlphaBBox": [
+        0,
+        3,
+        720,
+        452
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        720,
+        452
+      ],
+      "bottomAlphaPixels": 96,
+      "bottomMaxAlpha": 255,
+      "transparentPixelFraction": 0.33607,
+      "opaquePixelFraction": 0.64551
+    },
+    "sp-003": {
+      "file": "assets/images/cutout/sp-003.png",
+      "raw": "assets/images/raw/sp-003.webp",
+      "source": "assets/images/products/sp-003.webp",
+      "sourceSha256": "39f01658dc0e706eedc532737331d97df694f7ae221526473b4a49583555e961",
+      "outputSha256": "a5c5927fbe14e18aa0c484bd98ea8a12f4cd95d017a7013061e43b9c7e878588",
+      "width": 720,
+      "height": 429,
+      "sourceCrop": [
+        0,
+        296,
+        720,
+        725
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "anchor": {
+        "x": 0.33171,
+        "y": 0.13084
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.59167,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "solidAlphaBBox": [
+        0,
+        1,
+        720,
+        429
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        720,
+        429
+      ],
+      "bottomAlphaPixels": 108,
+      "bottomMaxAlpha": 255,
+      "transparentPixelFraction": 0.33002,
+      "opaquePixelFraction": 0.65144
+    },
+    "sp-003-black": {
+      "file": "assets/images/cutout/sp-003-black.png",
+      "raw": "assets/images/raw/sp-003-black.png",
+      "source": "assets/images/products/sp-003-black.png",
+      "sourceSha256": "8ec0796c92d69284728d2b474859e3e91a97ee268633c70f21f07e8d2bbd7220",
+      "outputSha256": "f5b9f6668166b68f66c985120e02185090df8b801b927c8efc426c45bc272868",
+      "width": 1122,
+      "height": 670,
+      "sourceCrop": [
+        0,
+        460,
+        1122,
+        1130
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "anchor": {
+        "x": 0.3314,
+        "y": 0.13004
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.59002,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "solidAlphaBBox": [
+        0,
+        2,
+        1120,
+        670
+      ],
+      "sourceDimensions": [
+        1122,
+        1402
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        1122,
+        670
+      ],
+      "bottomAlphaPixels": 135,
+      "bottomMaxAlpha": 255,
+      "transparentPixelFraction": 0.33428,
+      "opaquePixelFraction": 0.65563
+    },
+    "sp-004": {
+      "file": "assets/images/cutout/sp-004.png",
+      "raw": "assets/images/raw/sp-004.webp",
+      "source": "assets/images/products/sp-004.webp",
+      "sourceSha256": "d24c09d969f19b9073d7bf300a723acc8f7f4b8ebb0662ad295bf8ed385b7fcb",
+      "outputSha256": "f69c84e9cbdc0373655837347f284cc879a96e69ed5a7499c5f67f3abe567ebf",
+      "width": 720,
+      "height": 442,
+      "sourceCrop": [
+        0,
+        288,
+        720,
+        730
+      ],
+      "model": "u2net",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 1,
+      "anchor": {
+        "x": 0.33032,
+        "y": 0.12925
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.58333,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "solidAlphaBBox": [
+        0,
+        3,
+        720,
+        442
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        720,
+        442
+      ],
+      "bottomAlphaPixels": 103,
+      "bottomMaxAlpha": 255,
+      "transparentPixelFraction": 0.31154,
+      "opaquePixelFraction": 0.66664
+    },
+    "sp-004-black": {
+      "file": "assets/images/cutout/sp-004-black.png",
+      "raw": "assets/images/raw/sp-004-black.png",
+      "source": "assets/images/products/sp-004-black.png",
+      "sourceSha256": "0d3e65a00d9c2e7453fbac7cc1e57fb455d188814df0b38957357bd99338ac0a",
+      "outputSha256": "1d1367557ffebb26e1a798bb2463590dfd2c8b590838ec411b443fbf93e72943",
+      "width": 1122,
+      "height": 689,
+      "sourceCrop": [
+        0,
+        449,
+        1122,
+        1138
+      ],
+      "model": "u2net",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "anchor": {
+        "x": 0.33185,
+        "y": 0.13081
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.57665,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "solidAlphaBBox": [
+        0,
+        2,
+        1122,
+        689
+      ],
+      "sourceDimensions": [
+        1122,
+        1402
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        1122,
+        689
+      ],
+      "bottomAlphaPixels": 95,
+      "bottomMaxAlpha": 255,
+      "transparentPixelFraction": 0.31763,
+      "opaquePixelFraction": 0.66975
+    },
+    "sp-005": {
+      "file": "assets/images/cutout/sp-005.png",
+      "raw": "assets/images/raw/sp-005.webp",
+      "source": "assets/images/products/sp-005.webp",
+      "sourceSha256": "6b5bae263d80b451237d714bea349a1929c3cf95e969a890ce4cbb34e8e8f356",
+      "outputSha256": "8d59db8a244b510336ab4e0b123b26abdb16757c13e79e0d6fbd265dde96f4d7",
+      "width": 720,
+      "height": 441,
+      "sourceCrop": [
+        0,
+        222,
+        720,
+        663
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "anchor": {
+        "x": 0.33171,
+        "y": 0.12955
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.59722,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "solidAlphaBBox": [
+        0,
+        2,
+        720,
+        441
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        720,
+        441
+      ],
+      "bottomAlphaPixels": 94,
+      "bottomMaxAlpha": 255,
+      "transparentPixelFraction": 0.3123,
+      "opaquePixelFraction": 0.67153
+    },
+    "sp-005-sand": {
+      "file": "assets/images/cutout/sp-005-sand.png",
+      "raw": "assets/images/raw/sp-005-sand.png",
+      "source": "assets/images/products/sp-005-sand.png",
+      "sourceSha256": "12f20bbe62c2f1cd90472950a198aef67461f3f679f650259110a7a4295d45c3",
+      "outputSha256": "cf89cae2964f2b9b3e7adcb48c40b52f73ac4aa08f9f8bf9da0b0bd1d6993a35",
+      "width": 1122,
+      "height": 687,
+      "sourceCrop": [
+        0,
+        346,
+        1122,
+        1033
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "anchor": {
+        "x": 0.33318,
+        "y": 0.12974
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.59715,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "solidAlphaBBox": [
+        0,
+        2,
+        1122,
+        687
+      ],
+      "sourceDimensions": [
+        1122,
+        1402
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        1122,
+        687
+      ],
+      "bottomAlphaPixels": 126,
+      "bottomMaxAlpha": 255,
+      "transparentPixelFraction": 0.3151,
+      "opaquePixelFraction": 0.67537
+    },
+    "sp-006": {
+      "file": "assets/images/cutout/sp-006.png",
+      "raw": "assets/images/raw/sp-006.webp",
+      "source": "assets/images/products/sp-006.webp",
+      "sourceSha256": "8b4ef32daee3a7b9922b9eb5b484587643d5b75ba1bec9558baf5f82a2a64e18",
+      "outputSha256": "b6916a3e00f07c0931dffc52182e931185ff54eafeb182da1e3f635ceef90ad2",
+      "width": 716,
+      "height": 499,
+      "sourceCrop": [
+        0,
+        182,
+        716,
+        681
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "anchor": {
+        "x": 0.31538,
+        "y": 0.13052
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.54749,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "solidAlphaBBox": [
+        0,
+        2,
+        714,
+        499
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        716,
+        499
+      ],
+      "bottomAlphaPixels": 67,
+      "bottomMaxAlpha": 227,
+      "transparentPixelFraction": 0.34571,
+      "opaquePixelFraction": 0.63757
+    },
+    "sp-006-white": {
+      "file": "assets/images/cutout/sp-006-white.png",
+      "raw": "assets/images/raw/sp-006-white.png",
+      "source": "assets/images/products/sp-006-white.png",
+      "sourceSha256": "4cf441355c56e6814ff4d5b9009d6c624991aa49bd4db2148c2c51738a5f3086",
+      "outputSha256": "62486ead6edddc27773c5a35c62205b76fe0c6ca0c389a9e70ab0f0d7283b150",
+      "width": 1122,
+      "height": 781,
+      "sourceCrop": [
+        0,
+        282,
+        1122,
+        1063
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "anchor": {
+        "x": 0.31713,
+        "y": 0.13077
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.54902,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "solidAlphaBBox": [
+        0,
+        2,
+        1120,
+        781
+      ],
+      "sourceDimensions": [
+        1122,
+        1402
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        1122,
+        781
+      ],
+      "bottomAlphaPixels": 89,
+      "bottomMaxAlpha": 255,
+      "transparentPixelFraction": 0.34469,
+      "opaquePixelFraction": 0.6393
+    },
+    "sp-007": {
+      "file": "assets/images/cutout/sp-007.png",
+      "raw": "assets/images/raw/sp-007.webp",
+      "source": "assets/images/products/sp-007.webp",
+      "sourceSha256": "b1f71a6c28b151bd894607a4d90605e9fb956516a1baf970fcbcc51ec6880f09",
+      "outputSha256": "0b6da1fd535a378285d8fac70a2415cd93894b315b48460ee182962262545ea3",
+      "width": 720,
+      "height": 446,
+      "sourceCrop": [
+        0,
+        244,
+        720,
+        690
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "anchor": {
+        "x": 0.31154,
+        "y": 0.13034
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.57083,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "solidAlphaBBox": [
+        0,
+        3,
+        720,
+        446
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        720,
+        446
+      ],
+      "bottomAlphaPixels": 98,
+      "bottomMaxAlpha": 255,
+      "transparentPixelFraction": 0.32895,
+      "opaquePixelFraction": 0.65228
+    },
+    "sp-007-tan": {
+      "file": "assets/images/cutout/sp-007-tan.png",
+      "raw": "assets/images/raw/sp-007-tan.png",
+      "source": "assets/images/products/sp-007-tan.png",
+      "sourceSha256": "362926727c8fca5fa647eaa8794bb8c9eb2065b111c71601f482b7f462bbc34e",
+      "outputSha256": "1524f08d8f1d73b330003bbc0c5ad17da760ffd6c5f0bb244261fcf1d54ac371",
+      "width": 1122,
+      "height": 697,
+      "sourceCrop": [
+        0,
+        379,
+        1122,
+        1076
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "anchor": {
+        "x": 0.31267,
+        "y": 0.13075
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.57398,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "solidAlphaBBox": [
+        0,
+        4,
+        1122,
+        697
+      ],
+      "sourceDimensions": [
+        1122,
+        1402
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        1122,
+        697
+      ],
+      "bottomAlphaPixels": 107,
+      "bottomMaxAlpha": 255,
+      "transparentPixelFraction": 0.33228,
+      "opaquePixelFraction": 0.65564
+    },
+    "sp-008": {
+      "file": "assets/images/cutout/sp-008.png",
+      "raw": "assets/images/raw/sp-008.webp",
+      "source": "assets/images/products/sp-008.webp",
+      "sourceSha256": "1429ba9c4d57b9e50acadd3cf2831720496e796e54b876eaf9e7d39863e1fc96",
+      "outputSha256": "54d58558ecae671356c97ba320636931ccdcbcf7b9a7d1c64795f1d0faf831d7",
+      "width": 697,
+      "height": 554,
+      "sourceCrop": [
+        4,
+        148,
+        701,
+        702
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "anchor": {
+        "x": 0.28089,
+        "y": 0.1302
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.47346,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "solidAlphaBBox": [
+        2,
+        2,
+        695,
+        554
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        697,
+        554
+      ],
+      "bottomAlphaPixels": 150,
+      "bottomMaxAlpha": 255,
+      "transparentPixelFraction": 0.41223,
+      "opaquePixelFraction": 0.56784
+    },
+    "sw-001": {
+      "file": "assets/images/cutout/sw-001.png",
+      "raw": "assets/images/raw/sw-001.webp",
+      "source": "assets/images/products/sw-001.webp",
+      "sourceSha256": "80e0d81358a0f76c6e7674a8c85adfacbebe90de9147839edf93ad8ef8a5598e",
+      "outputSha256": "3c6d4c3c5ea9bc8fe432b38b358d96bd757eab2f15b4624f8ed1983f94c1df40",
+      "width": 665,
+      "height": 485,
+      "sourceCrop": [
+        27,
+        232,
+        692,
+        717
+      ],
+      "model": "u2net",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": true,
+      "anchor": {
+        "x": 0.25753,
+        "y": 0.13017
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.40752,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "solidAlphaBBox": [
+        4,
+        3,
+        663,
+        485
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        665,
+        485
+      ],
+      "bottomAlphaPixels": 194,
+      "bottomMaxAlpha": 255,
+      "transparentPixelFraction": 0.44859,
+      "opaquePixelFraction": 0.52305
+    },
+    "sw-001-nude": {
+      "file": "assets/images/cutout/sw-001-nude.png",
+      "raw": "assets/images/raw/sw-001-nude.png",
+      "source": "assets/images/products/sw-001-nude.png",
+      "sourceSha256": "a67cf3e5d133fa53cc28bbf8c6ef4ee5cac58bc5271fe8f8489f579787eda527",
+      "outputSha256": "3b55337f695811bf4efb5721d4da402fc2c079638c2545b4f8df873a468315d9",
+      "width": 1026,
+      "height": 756,
+      "sourceCrop": [
+        47,
+        364,
+        1073,
+        1120
+      ],
+      "model": "u2net",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "reviewedFloorShadowRemoved": true,
+      "anchor": {
+        "x": 0.25805,
+        "y": 0.1298
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.41326,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "solidAlphaBBox": [
+        2,
+        2,
+        1023,
+        756
+      ],
+      "sourceDimensions": [
+        1122,
+        1402
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        1026,
+        756
+      ],
+      "bottomAlphaPixels": 218,
+      "bottomMaxAlpha": 225,
+      "transparentPixelFraction": 0.44994,
+      "opaquePixelFraction": 0.53037
+    },
+    "sw-002": {
+      "file": "assets/images/cutout/sw-002.png",
+      "raw": "assets/images/raw/sw-002.webp",
+      "source": "assets/images/products/sw-002.webp",
+      "sourceSha256": "41c043a881f79e68f2665c3c7086f3bfcbc3f39a59827f33892708c0de9891af",
+      "outputSha256": "799c8c4780904794399d6ff26eb59a5bb5f6721e895c7ed94f53963472d66cd7",
+      "width": 653,
+      "height": 483,
+      "sourceCrop": [
+        27,
+        220,
+        680,
+        703
+      ],
+      "model": "u2net",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "anchor": {
+        "x": 0.24463,
+        "y": 0.139
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.39204,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "solidAlphaBBox": [
+        3,
+        3,
+        651,
+        483
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        653,
+        483
+      ],
+      "bottomAlphaPixels": 196,
+      "bottomMaxAlpha": 255,
+      "transparentPixelFraction": 0.44534,
+      "opaquePixelFraction": 0.52636
+    },
+    "sw-002-black": {
+      "file": "assets/images/cutout/sw-002-black.png",
+      "raw": "assets/images/raw/sw-002-black.png",
+      "source": "assets/images/products/sw-002-black.png",
+      "sourceSha256": "17fca8bdc68903ae889a44f355400e3352fb5c4e1c9abda08a327c96e42f0723",
+      "outputSha256": "8c73d4eb3c29176cb57da153b0fb7cae3a9a9b59a5f6bc7232fc459c21561df0",
+      "width": 1017,
+      "height": 746,
+      "sourceCrop": [
+        44,
+        341,
+        1061,
+        1087
+      ],
+      "model": "u2net",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "anchor": {
+        "x": 0.24557,
+        "y": 0.1396
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.39331,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "solidAlphaBBox": [
+        2,
+        3,
+        1015,
+        746
+      ],
+      "sourceDimensions": [
+        1122,
+        1402
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        1017,
+        746
+      ],
+      "bottomAlphaPixels": 230,
+      "bottomMaxAlpha": 231,
+      "transparentPixelFraction": 0.44787,
+      "opaquePixelFraction": 0.53346
+    },
+    "sw-003": {
+      "file": "assets/images/cutout/sw-003.png",
+      "raw": "assets/images/raw/sw-003.webp",
+      "source": "assets/images/products/sw-003.webp",
+      "sourceSha256": "39a49222da8a6085de064ac9b50502ec75e2d12ff0d284959d930e094f2fa374",
+      "outputSha256": "831a8f2e7ddb7a1524104860e39ab05b75c4ad7b548471753b9726aa76e19f9c",
+      "width": 705,
+      "height": 372,
+      "sourceCrop": [
+        6,
+        350,
+        711,
+        722
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "anchor": {
+        "x": 0.24574,
+        "y": 0.14825
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.42979,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "solidAlphaBBox": [
+        2,
+        4,
+        703,
+        372
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        705,
+        372
+      ],
+      "bottomAlphaPixels": 107,
+      "bottomMaxAlpha": 245,
+      "transparentPixelFraction": 0.37868,
+      "opaquePixelFraction": 0.59046
+    },
+    "sw-003-cream": {
+      "file": "assets/images/cutout/sw-003-cream.png",
+      "raw": "assets/images/raw/sw-003-cream.png",
+      "source": "assets/images/products/sw-003-cream.png",
+      "sourceSha256": "d83edfa3acc971a8cff94c72c844db34e6a947566ab401c3e822382f54206865",
+      "outputSha256": "104ac6e411b62eb8981dad5dc798f19a044e50855b22b9a8ddf2fa1fcbd48784",
+      "width": 1096,
+      "height": 582,
+      "sourceCrop": [
+        10,
+        547,
+        1106,
+        1129
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "anchor": {
+        "x": 0.24429,
+        "y": 0.14802
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.42701,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "solidAlphaBBox": [
+        1,
+        5,
+        1095,
+        582
+      ],
+      "sourceDimensions": [
+        1122,
+        1402
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        1096,
+        582
+      ],
+      "bottomAlphaPixels": 9,
+      "bottomMaxAlpha": 255,
+      "transparentPixelFraction": 0.38674,
+      "opaquePixelFraction": 0.58988
+    },
+    "sw-004": {
+      "file": "assets/images/cutout/sw-004.png",
+      "raw": "assets/images/raw/sw-004.webp",
+      "source": "assets/images/products/sw-004.webp",
+      "sourceSha256": "2e967772ed61d4285f49ee162a1ca5a91ba7b2c2b18b15ce3c6b93356a97b183",
+      "outputSha256": "374f1c4438bfa6538c939610efd099918fcf1124a6dc958f49dfac530d91d248",
+      "width": 689,
+      "height": 400,
+      "sourceCrop": [
+        13,
+        332,
+        702,
+        732
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "anchor": {
+        "x": 0.27907,
+        "y": 0.15038
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.48911,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "solidAlphaBBox": [
+        2,
+        3,
+        686,
+        400
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        689,
+        400
+      ],
+      "bottomAlphaPixels": 129,
+      "bottomMaxAlpha": 247,
+      "transparentPixelFraction": 0.34392,
+      "opaquePixelFraction": 0.63337
+    },
+    "sw-004-black": {
+      "file": "assets/images/cutout/sw-004-black.png",
+      "raw": "assets/images/raw/sw-004-black.png",
+      "source": "assets/images/products/sw-004-black.png",
+      "sourceSha256": "959bf0bb5285e84ebd554641942678fca759483aaa9332c150626f9174b56273",
+      "outputSha256": "f766159957a5a116153041bdc4b513b8d5b90ff69633f39c2613bb44d9eff921",
+      "width": 1072,
+      "height": 624,
+      "sourceCrop": [
+        21,
+        518,
+        1093,
+        1142
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "anchor": {
+        "x": 0.27965,
+        "y": 0.15249
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.49067,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "solidAlphaBBox": [
+        3,
+        3,
+        1068,
+        624
+      ],
+      "sourceDimensions": [
+        1122,
+        1402
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        1072,
+        624
+      ],
+      "bottomAlphaPixels": 183,
+      "bottomMaxAlpha": 227,
+      "transparentPixelFraction": 0.34631,
+      "opaquePixelFraction": 0.63676
+    },
+    "sw-005": {
+      "file": "assets/images/cutout/sw-005.png",
+      "raw": "assets/images/raw/sw-005.webp",
+      "source": "assets/images/products/sw-005.webp",
+      "sourceSha256": "b1fc7f81d05b550175044509fa7b75d235b9adc23e7f1d01cb13ef5d6de16fc4",
+      "outputSha256": "1384dbff5bbf7092570e7ea0e0cf9ae8a299a38b262f6cc820de6c4f9e2973ba",
+      "width": 650,
+      "height": 465,
+      "sourceCrop": [
+        28,
+        209,
+        678,
+        674
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "anchor": {
+        "x": 0.24114,
+        "y": 0.12931
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.46462,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "solidAlphaBBox": [
+        2,
+        2,
+        647,
+        465
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        650,
+        465
+      ],
+      "bottomAlphaPixels": 116,
+      "bottomMaxAlpha": 238,
+      "transparentPixelFraction": 0.5103,
+      "opaquePixelFraction": 0.45338
+    },
+    "sw-005-champagne": {
+      "file": "assets/images/cutout/sw-005-champagne.png",
+      "raw": "assets/images/raw/sw-005-champagne.png",
+      "source": "assets/images/products/sw-005-champagne.png",
+      "sourceSha256": "081b3361642ccba27a9d21cb2a0d9e4a1c376763915852dccf1d8658a7bb0d8a",
+      "outputSha256": "7a6b59c04852dcf8883af88bfa39ca9459239ba45f56ea511c669364230df284",
+      "width": 1010,
+      "height": 724,
+      "sourceCrop": [
+        44,
+        325,
+        1054,
+        1049
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "anchor": {
+        "x": 0.24232,
+        "y": 0.13001
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.46535,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "solidAlphaBBox": [
+        3,
+        3,
+        1007,
+        724
+      ],
+      "sourceDimensions": [
+        1122,
+        1402
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        1010,
+        724
+      ],
+      "bottomAlphaPixels": 170,
+      "bottomMaxAlpha": 255,
+      "transparentPixelFraction": 0.51571,
+      "opaquePixelFraction": 0.4593
+    },
+    "sw-006": {
+      "file": "assets/images/cutout/sw-006.png",
+      "raw": "assets/images/raw/sw-006.webp",
+      "source": "assets/images/products/sw-006.webp",
+      "sourceSha256": "46aaeb8ee918bdda844fe624727b3404dbb9a31f937dfbe4113d006952326982",
+      "outputSha256": "f9164893707a96535548e997606089457bebaeaed78956dd076d84ad8b5363ff",
+      "width": 685,
+      "height": 374,
+      "sourceCrop": [
+        9,
+        302,
+        694,
+        676
+      ],
+      "model": "u2net",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "anchor": {
+        "x": 0.33845,
+        "y": 0.13137
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.57518,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "solidAlphaBBox": [
+        3,
+        4,
+        683,
+        374
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        685,
+        374
+      ],
+      "bottomAlphaPixels": 141,
+      "bottomMaxAlpha": 230,
+      "transparentPixelFraction": 0.3256,
+      "opaquePixelFraction": 0.63373
+    },
+    "sw-006-sage": {
+      "file": "assets/images/cutout/sw-006-sage.png",
+      "raw": "assets/images/raw/sw-006-sage.png",
+      "source": "assets/images/products/sw-006-sage.png",
+      "sourceSha256": "cdabfd4f16818e33414ee94805c8c3347833b4c7fcd9a9df16ea1872fbf64601",
+      "outputSha256": "14ceba48db0c5d785c944fdf6bb48bda3ac6e8a2ce1960e46b8cd3185e95c0f5",
+      "width": 1062,
+      "height": 589,
+      "sourceCrop": [
+        16,
+        466,
+        1078,
+        1055
+      ],
+      "model": "u2net",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "anchor": {
+        "x": 0.33836,
+        "y": 0.13095
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.57721,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "solidAlphaBBox": [
+        2,
+        3,
+        1060,
+        589
+      ],
+      "sourceDimensions": [
+        1122,
+        1402
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        1062,
+        589
+      ],
+      "bottomAlphaPixels": 173,
+      "bottomMaxAlpha": 255,
+      "transparentPixelFraction": 0.33026,
+      "opaquePixelFraction": 0.65348
+    },
+    "sw-007": {
+      "file": "assets/images/cutout/sw-007.png",
+      "raw": "assets/images/raw/sw-007.webp",
+      "source": "assets/images/products/sw-007.webp",
+      "sourceSha256": "29ef9c1902621f7b7fc77fe54920e6ca44c210515fac63dea19fe1ac69085b3c",
+      "outputSha256": "7368ac1db92b86d2f211bc456abbe725b48721a90a6ce39e922a6c2d2998c7d3",
+      "width": 652,
+      "height": 466,
+      "sourceCrop": [
+        19,
+        202,
+        671,
+        668
+      ],
+      "model": "u2net",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "anchor": {
+        "x": 0.24347,
+        "y": 0.14409
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.40184,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "solidAlphaBBox": [
+        3,
+        2,
+        649,
+        466
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        652,
+        466
+      ],
+      "bottomAlphaPixels": 153,
+      "bottomMaxAlpha": 230,
+      "transparentPixelFraction": 0.41142,
+      "opaquePixelFraction": 0.5619
+    },
+    "sw-007-caramel": {
+      "file": "assets/images/cutout/sw-007-caramel.png",
+      "raw": "assets/images/raw/sw-007-caramel.png",
+      "source": "assets/images/products/sw-007-caramel.png",
+      "sourceSha256": "0c0b68853f253b6c8d521a70b77f36cfcd75b08f25e37ef3273748794a781105",
+      "outputSha256": "99cd60d23752dfaafffc256d77d845065337b0513c050b51af75de980383d72b",
+      "width": 1017,
+      "height": 715,
+      "sourceCrop": [
+        27,
+        314,
+        1044,
+        1029
+      ],
+      "model": "u2net",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "reviewedFabricHolesRestored": 0,
+      "anchor": {
+        "x": 0.2436,
+        "y": 0.14706
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.39921,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "solidAlphaBBox": [
+        2,
+        3,
+        1015,
+        715
+      ],
+      "sourceDimensions": [
+        1122,
+        1402
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        1017,
+        715
+      ],
+      "bottomAlphaPixels": 153,
+      "bottomMaxAlpha": 255,
+      "transparentPixelFraction": 0.41553,
+      "opaquePixelFraction": 0.5673
+    },
+    "sw-008": {
+      "file": "assets/images/cutout/sw-008.png",
+      "raw": "assets/images/raw/sw-008.webp",
+      "source": "assets/images/products/sw-008.webp",
+      "sourceSha256": "e63717c5336d3f3ffc5e7526e2ca1035d5efe0a1d74042cf02ef28469823fa7f",
+      "outputSha256": "32b2464858a74e73ae3eda43d8a59f36f4760f6421dd5ca58350e53ea1c003e3",
+      "width": 673,
+      "height": 489,
+      "sourceCrop": [
+        4,
+        203,
+        677,
+        692
+      ],
+      "model": "isnet-general-use",
+      "refinement": "closed-form alpha matting",
+      "subjectType": "photographed-subject",
+      "foregroundFallbackReason": null,
+      "geometryReconstructed": false,
+      "anchor": {
+        "x": 0.33482,
+        "y": 0.13115
+      },
+      "anchorMethod": "upper silhouette shoulder-band estimate",
+      "shoulderWidth": 0.55721,
+      "groundAnchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "solidAlphaBBox": [
+        2,
+        3,
+        671,
+        489
+      ],
+      "sourceDimensions": [
+        720,
+        900
+      ],
+      "alphaBBox": [
+        0,
+        0,
+        673,
+        489
+      ],
+      "bottomAlphaPixels": 120,
+      "bottomMaxAlpha": 246,
+      "transparentPixelFraction": 0.4934,
+      "opaquePixelFraction": 0.44645
+    }
+  }
+}

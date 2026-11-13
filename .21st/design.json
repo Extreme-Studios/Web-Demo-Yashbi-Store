@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "project": {
+    "name": "Web-Demo-Yashbi-Store",
+    "productType": "Three.js WebGL fashion showroom",
+    "stack": [
+      "Three.js 0.187.0",
+      "ES modules",
+      "esbuild",
+      "HTML HUD",
+      "Google Apps Script commerce",
+      "Vercel chat API"
+    ]
+  },
+  "sources": {
+    "tokens": [
+      "src/showroom.css"
+    ],
+    "components": [
+      "src/ui.js",
+      "src/showroom.js"
+    ],
+    "assets": [
+      "assets"
+    ],
+    "instructions": [
+      "AGENTS.md"
+    ]
+  },
+  "design": {
+    "colorMode": "light",
+    "colors": {
+      "canvas": "#F5F3EF",
+      "elevated": "#FAF9F6",
+      "ink": "#181818",
+      "secondary": "#5C5852",
+      "muted": "#969087",
+      "metal": "#2C2C2E",
+      "gold": "#8C7355",
+      "hangtag": "#FDFBF7"
+    },
+    "typography": {
+      "serif": "Cormorant Garamond",
+      "sans": "Plus Jakarta Sans"
+    },
+    "spacing": {},
+    "radius": {},
+    "shadows": {},
+    "motion": {},
+    "density": "unknown"
+  },
+  "components": {
+    "installed": [],
+    "preferredPrimitives": [
+      "Three.js meshes and raycaster",
+      "New native dialogs",
+      "New HUD",
+      "Preserved commerce state and product catalog"
+    ],
+    "patterns": []
+  },
+  "constraints": {
+    "must": [],
+    "avoid": []
+  },
+  "decisions": [
+    "User ordered complete storefront replacement with Three.js WebGL; no legacy layout or hangers",
+    "Preserve30 commercial product records and60cutouts/fallbacks",
+    "Physical scene/floor/lighting/pedestals; alpha planes from preserved photographs",
+    "Desktop shoe gallery10+4; mobile4slots with pagination",
+    "Local renderer fonts and runtime bundled; no CDN dependency",
+    "Local preview commerce and AI/PDF simulated; production untouched"
+  ],
+  "evidence": [
+    {
+      "fact": "project.instructions",
+      "source": "AGENTS.md"
+    }
+  ],
+  "generatedAt": "2026-11-13T05:03:25.243Z"
+}

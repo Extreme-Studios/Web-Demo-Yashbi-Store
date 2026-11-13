@@ -1,0 +1,170 @@
+{
+  "auditedAt": "2026-11-13T05:56:38.783Z",
+  "source": "Google Apps Script GET catalog-images",
+  "remoteProductCount": 32,
+  "localSourcesFound": 32,
+  "downloaded": [],
+  "missingLocal": [],
+  "images": [
+    {
+      "id": "GW-001",
+      "image": "https://drive.google.com/thumbnail?id=1lNbpeWcNG17zZj1VQkD_toOZW6eozy9Y&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=1lNbpeWcNG17zZj1VQkD_toOZW6eozy9Y&sz=w1200"
+    },
+    {
+      "id": "GW-002",
+      "image": "https://drive.google.com/thumbnail?id=1G3v0VAdFWOJ43LGayysyydUpeG-vwWtT&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=1G3v0VAdFWOJ43LGayysyydUpeG-vwWtT&sz=w1200"
+    },
+    {
+      "id": "GW-003",
+      "image": "https://drive.google.com/thumbnail?id=1QGk-lZsEv8wUS7Y8q1fYRbuX2Fa2xGVg&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=1QGk-lZsEv8wUS7Y8q1fYRbuX2Fa2xGVg&sz=w1200"
+    },
+    {
+      "id": "GW-004",
+      "image": "https://drive.google.com/thumbnail?id=1XBZh6RrOZuyBBDXHVB_NlRhvMEIjIvLi&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=1XBZh6RrOZuyBBDXHVB_NlRhvMEIjIvLi&sz=w1200"
+    },
+    {
+      "id": "GW-005",
+      "image": "https://drive.google.com/thumbnail?id=1qNoRo8YA3_GodU9kIh2ykvZehdxrmif5&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=1qNoRo8YA3_GodU9kIh2ykvZehdxrmif5&sz=w1200"
+    },
+    {
+      "id": "GW-006",
+      "image": "https://drive.google.com/thumbnail?id=1LA95eWgbSAJcXUe_stvjSt-XLBDhpdQu&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=1LA95eWgbSAJcXUe_stvjSt-XLBDhpdQu&sz=w1200"
+    },
+    {
+      "id": "GW-007",
+      "image": "https://drive.google.com/thumbnail?id=1IPUG0lB46y9t7oJrGISZFtzl-f5gVfcQ&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=1IPUG0lB46y9t7oJrGISZFtzl-f5gVfcQ&sz=w1200"
+    },
+    {
+      "id": "GW-008",
+      "image": "https://drive.google.com/thumbnail?id=1niejUBjec6UYxUwWEQ_5D65dJbO6SRsD&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=1niejUBjec6UYxUwWEQ_5D65dJbO6SRsD&sz=w1200"
+    },
+    {
+      "id": "SW-001",
+      "image": "https://drive.google.com/thumbnail?id=1P4Q5ohTOOwpOlEkN_0VtQ0D6vcYgF7z4&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=1P4Q5ohTOOwpOlEkN_0VtQ0D6vcYgF7z4&sz=w1200"
+    },
+    {
+      "id": "SW-002",
+      "image": "https://drive.google.com/thumbnail?id=18W6EEDRCUwwszcJwBnqgwUw5q3_NxYFZ&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=18W6EEDRCUwwszcJwBnqgwUw5q3_NxYFZ&sz=w1200"
+    },
+    {
+      "id": "SW-003",
+      "image": "https://drive.google.com/thumbnail?id=1Zo2ZDTlscPJ75Wr7ZatJvTRAh-AzQ9ZW&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=1Zo2ZDTlscPJ75Wr7ZatJvTRAh-AzQ9ZW&sz=w1200"
+    },
+    {
+      "id": "SW-004",
+      "image": "https://drive.google.com/thumbnail?id=1g05HLiN-dlfsdOB3sW3hF0FeGo_p1KvA&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=1g05HLiN-dlfsdOB3sW3hF0FeGo_p1KvA&sz=w1200"
+    },
+    {
+      "id": "SW-005",
+      "image": "https://drive.google.com/thumbnail?id=1Iz0PdVGl7XFVHXZ5ut73Io3xUqvg2vKC&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=1Iz0PdVGl7XFVHXZ5ut73Io3xUqvg2vKC&sz=w1200"
+    },
+    {
+      "id": "SW-006",
+      "image": "https://drive.google.com/thumbnail?id=1SNQIdSiUrNFOkw2dZOJrCO4eJId3VNjM&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=1SNQIdSiUrNFOkw2dZOJrCO4eJId3VNjM&sz=w1200"
+    },
+    {
+      "id": "SW-007",
+      "image": "https://drive.google.com/thumbnail?id=1eaAOFEmGUNIfrFQpqDqo4ZTwW9QykIT9&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=1eaAOFEmGUNIfrFQpqDqo4ZTwW9QykIT9&sz=w1200"
+    },
+    {
+      "id": "SW-008",
+      "image": "https://drive.google.com/thumbnail?id=1B2j0A1hN8DJ8_zSdRXra2Sa3QXu_JcN7&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=1B2j0A1hN8DJ8_zSdRXra2Sa3QXu_JcN7&sz=w1200"
+    },
+    {
+      "id": "JP-001",
+      "image": "https://drive.google.com/thumbnail?id=1OmBkD4w8l1K8LFYxPYOLpBz7hj0o2zuC&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=1OmBkD4w8l1K8LFYxPYOLpBz7hj0o2zuC&sz=w1200"
+    },
+    {
+      "id": "JP-002",
+      "image": "https://drive.google.com/thumbnail?id=1rgQAMZxQLqAWGSLaaXbWG9dvth9SWu-x&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=1rgQAMZxQLqAWGSLaaXbWG9dvth9SWu-x&sz=w1200"
+    },
+    {
+      "id": "JP-003",
+      "image": "https://drive.google.com/thumbnail?id=1cjLTqBc2gcDrjYQSETbT701iRQ30jR_2&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=1cjLTqBc2gcDrjYQSETbT701iRQ30jR_2&sz=w1200"
+    },
+    {
+      "id": "JP-004",
+      "image": "https://drive.google.com/thumbnail?id=10KcGvT3ywE8BS3TjGSBGtSyA7l8R5p6m&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=10KcGvT3ywE8BS3TjGSBGtSyA7l8R5p6m&sz=w1200"
+    },
+    {
+      "id": "JP-005",
+      "image": "https://drive.google.com/thumbnail?id=1DyKpc56UlCCyAsUObDA8n_6_meZVvlTz&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=1DyKpc56UlCCyAsUObDA8n_6_meZVvlTz&sz=w1200"
+    },
+    {
+      "id": "JP-006",
+      "image": "https://drive.google.com/thumbnail?id=14MS54zhbnTGJfjMBtYyzVjJyzE20FC6S&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=14MS54zhbnTGJfjMBtYyzVjJyzE20FC6S&sz=w1200"
+    },
+    {
+      "id": "JP-007",
+      "image": "https://drive.google.com/thumbnail?id=1OqvKARBXpRFifwKsh6hMR2XfwRIJlX77&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=1OqvKARBXpRFifwKsh6hMR2XfwRIJlX77&sz=w1200"
+    },
+    {
+      "id": "JP-008",
+      "image": "https://drive.google.com/thumbnail?id=18eHSF3SyM2rjQqYYb6S-3CaLOS6kU4y8&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=18eHSF3SyM2rjQqYYb6S-3CaLOS6kU4y8&sz=w1200"
+    },
+    {
+      "id": "SP-001",
+      "image": "https://drive.google.com/thumbnail?id=1-ULE5W-rqtOOIguQTvAUV-iNSQ0nQ8pb&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=1-ULE5W-rqtOOIguQTvAUV-iNSQ0nQ8pb&sz=w1200"
+    },
+    {
+      "id": "SP-002",
+      "image": "https://drive.google.com/thumbnail?id=1xYofPIRuXZYyvN_YxwtA0NaYtLT0olka&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=1xYofPIRuXZYyvN_YxwtA0NaYtLT0olka&sz=w1200"
+    },
+    {
+      "id": "SP-003",
+      "image": "https://drive.google.com/thumbnail?id=1EmKM2sRM884FPhNBuXeEd9fHs8FQHb0q&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=1EmKM2sRM884FPhNBuXeEd9fHs8FQHb0q&sz=w1200"
+    },
+    {
+      "id": "SP-004",
+      "image": "https://drive.google.com/thumbnail?id=15BqKOI9ewHy7_SNYNToAtvcmxzpYzUrd&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=15BqKOI9ewHy7_SNYNToAtvcmxzpYzUrd&sz=w1200"
+    },
+    {
+      "id": "SP-005",
+      "image": "https://drive.google.com/thumbnail?id=1CeH4iEDXy9iOIOD7YWyPTnr4fK5SDHUi&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=1CeH4iEDXy9iOIOD7YWyPTnr4fK5SDHUi&sz=w1200"
+    },
+    {
+      "id": "SP-006",
+      "image": "https://drive.google.com/thumbnail?id=1HNIsJ-DnR1ucZsetb-tlqKgO-qFrexzr&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=1HNIsJ-DnR1ucZsetb-tlqKgO-qFrexzr&sz=w1200"
+    },
+    {
+      "id": "SP-007",
+      "image": "https://drive.google.com/thumbnail?id=1o3iFYD1ZXCermPilswnMAhQySmWzSHKY&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=1o3iFYD1ZXCermPilswnMAhQySmWzSHKY&sz=w1200"
+    },
+    {
+      "id": "SP-008",
+      "image": "https://drive.google.com/thumbnail?id=1E785YQZz9Q9nDpjEN0GTqjOSmg85BIYE&sz=w1200",
+      "alt": "https://drive.google.com/thumbnail?id=1E785YQZz9Q9nDpjEN0GTqjOSmg85BIYE&sz=w1200"
+    }
+  ]
+}

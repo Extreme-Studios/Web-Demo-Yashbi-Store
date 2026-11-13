@@ -4,3 +4,6 @@ tests/*.png
 __pycache__/
 
 .vercel
+node_modules/
+.preview/
+dist/

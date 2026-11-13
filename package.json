@@ -1,0 +1,22 @@
+{
+  "name": "web-demo-yashbi-store",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Yashbi Store Three.js showroom with isolated local commerce preview",
+  "scripts": {
+    "build": "node tools/build.mjs",
+    "preview": "node tools/preview.cjs",
+    "test": "node tests/commerce.cjs && node tests/showroom.cjs",
+    "test:layout": "node tests/text-layout.cjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "playwright": "^1.56.0"
+  },
+  "dependencies": {
+    "three": "0.187.0"
+  }
+}
