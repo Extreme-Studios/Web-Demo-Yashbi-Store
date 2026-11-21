@@ -718,6 +718,8 @@ export class Showroom {
     let bottom=Math.min(this.height-95,pagination?.top-12||this.height-95);
     if (this.landscape) {
       right=Math.min(right,(hud?.left||this.width*.58)-18);
+      const greeting=rect('.stylist-greeting:not([hidden])');
+      if (greeting) bottom=Math.min(bottom,greeting.top-12);
     } else {
       bottom=Math.min(bottom,(hud?.top||this.height-250)-14);
     }

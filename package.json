@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node tools/build.mjs",
     "preview": "node tools/preview.cjs",
-    "test": "node tests/order-pricing.cjs && node tests/commerce.cjs && node tests/chat.cjs && node tests/showroom.cjs",
+    "test": "node tests/order-pricing.cjs && node tests/commerce.cjs && node tests/chat.cjs && node tests/showroom.cjs && node tests/stylist-greeting.cjs",
     "test:layout": "node tests/text-layout.cjs"
   },
   "engines": {

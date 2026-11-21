@@ -225,3 +225,91 @@
 .stylist-starters { display:flex; gap:5px; flex-wrap:wrap; margin-top:12px; }
 .stylist-starters button { min-height:44px; padding:5px 8px; border:1px solid var(--line); background:var(--elevated); color:var(--ink); font:inherit; font-size:10px; cursor:pointer; }
 .stylist-starters button:hover { border-color:var(--ink); }
+
+.stylist-greeting {
+  position: fixed;
+  z-index: 8;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px;
+  width: min(250px, calc(100vw - 24px));
+  border: 1px solid var(--line);
+  background: var(--elevated);
+  box-shadow: 0 8px 28px #18181824;
+  pointer-events: auto;
+  transform-origin: bottom right;
+  animation: stylist-greeting-in 180ms ease-out;
+}
+
+.stylist-greeting-open {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  padding: 10px 2px 10px 12px;
+  border: 0;
+  background: transparent;
+  text-align: start;
+  font: 400 11px/1.45 var(--sans);
+  color: var(--secondary);
+}
+
+.stylist-greeting-open strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.stylist-greeting-dismiss {
+  align-self: start;
+  width: 44px;
+  height: 44px;
+  padding: 0 0 10px 6px;
+  border: 0;
+  background: transparent;
+  color: var(--secondary);
+  font-size: 19px;
+}
+
+.stylist-unread {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  display: grid;
+  place-items: center;
+  width: 17px;
+  height: 17px;
+  border: 1px solid var(--elevated);
+  border-radius: 50%;
+  background: #806447;
+  color: white;
+  font: 600 9px/1 var(--sans);
+  pointer-events: none;
+}
+
+.stylist-greeting[hidden],
+.stylist-unread[hidden] {
+  display: none;
+}
+
+@keyframes stylist-greeting-in {
+  from { opacity: 0; transform: translateY(4px) scale(.98); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (min-width: 951px), (min-width: 801px) and (min-height: 551px) {
+  .showroom-ui:has(.stylist-greeting:not([hidden])) .product-hud {
+    max-height: min(calc(100dvh - 240px), calc(100dvh - 2 * var(--greeting-reserved-bottom, 0px)));
+  }
+  .showroom-ui[data-scene=shelf][data-mode=overview]:has(.stylist-greeting:not([hidden])) .product-hud {
+    bottom: max(100px, var(--greeting-reserved-bottom, 0px));
+    max-height: none;
+  }
+}
+
+@media (max-width: 800px) and (orientation: portrait), (max-width: 800px) and (min-height: 551px) {
+  .showroom-ui:has(.stylist-greeting:not([hidden])) .product-hud,
+  .showroom-ui[data-scene=shelf][data-mode=overview]:has(.stylist-greeting:not([hidden])) .product-hud {
+    bottom: max(94px, var(--greeting-reserved-bottom, 0px));
+  }
+  .showroom-ui[data-mode=inspect]:has(.stylist-greeting:not([hidden])) .product-hud {
+    max-height: calc(min(355px, 45dvh) - max(0px, var(--greeting-reserved-bottom, 0px) - 94px));
+  }
+}

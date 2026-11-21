@@ -295,7 +295,10 @@ async function measureCase(page,label){await settle(page);const result=await pag
     page.on('console',message=>{if(message.type()==='error')errors.push(message.text());});
     page.on('response',response=>{if(response.status()>=400)errors.push(`${response.status()} ${response.url()}`);});
     page.on('request',request=>{if(/^https?:/.test(request.url())&&!request.url().startsWith(BASE))external.push(request.url());});
-    await page.goto(BASE,{waitUntil:'networkidle'});await settle(page);await page.mouse.move(0,0);
+    await page.goto(BASE,{waitUntil:'networkidle'});
+    // Compare the same unobstructed camera framing as the existing shoe baseline.
+    await page.locator('#stylistGreetingDismiss').click();
+    await settle(page);await page.mouse.move(0,0);
     check(`${width}x${height} exposes garment detail/full camera API`,await page.evaluate(()=>typeof YASHBI_3D.engine.setGarmentView==='function'));
     // Instrument render-time WebGL state. This catches a fake clip metadata rect
     // that never enables scissoring on the actual renderer draw pass.

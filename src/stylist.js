@@ -1,8 +1,72 @@
+import { createStylistChime } from './stylist-chime.js';
 import { productDescription } from './catalog-copy-en.js';
 const HISTORY_LIMIT = 8;
+const GREETING_SESSION = 'yashbi-stylist-greeting-seen';
 
 export function bindStylist({ $, products, money, openDialog, onStylistFocus, notifyLayout }) {
   const dialog = $('chatDialog');
+  const launcher = $('chatOpen');
+  const greeting = $('stylistGreeting');
+  const greetingOpen = $('stylistGreetingOpen');
+  const badge = $('stylistUnread');
+  const showroom = launcher.closest('.showroom-ui');
+  const chime = createStylistChime();
+  let greetingTimer;
+  let greetingSeen = false;
+  try { greetingSeen = sessionStorage.getItem(GREETING_SESSION) === '1'; } catch { /* Use page memory. */ }
+
+  function markGreetingSeen() {
+    greetingSeen = true;
+    try { sessionStorage.setItem(GREETING_SESSION, '1'); } catch { /* Use page memory. */ }
+  }
+
+  function placeGreeting() {
+    if (greeting.hidden) return;
+    const anchor = launcher.getBoundingClientRect();
+    const height = document.documentElement.clientHeight;
+    const width = document.documentElement.clientWidth;
+    const left = Math.max(12, Math.min(width - greeting.offsetWidth - 12, anchor.right - greeting.offsetWidth));
+    const bottom = height - anchor.top + 9;
+    greeting.style.left = left + 'px';
+    greeting.style.bottom = bottom + 'px';
+    showroom.style.setProperty('--greeting-reserved-bottom', (bottom + greeting.offsetHeight + 9) + 'px');
+    notifyLayout();
+  }
+
+  function startGreeting() {
+    if (greetingSeen || greetingTimer) return;
+    greetingTimer = setTimeout(() => {
+      greetingTimer = undefined;
+      if (greetingSeen) return;
+      if (document.querySelector('dialog[open]') || document.hidden) {
+        startGreeting();
+        return;
+      }
+      markGreetingSeen();
+      greeting.hidden = false;
+      badge.hidden = false;
+      launcher.setAttribute('aria-label', 'Open Yashbi Stylist, 1 unread greeting');
+      placeGreeting();
+    }, 1200);
+  }
+
+  function clearGreeting() {
+    markGreetingSeen();
+    clearTimeout(greetingTimer);
+    greetingTimer = undefined;
+    greeting.hidden = true;
+    badge.hidden = true;
+    launcher.setAttribute('aria-label', 'Open Yashbi Stylist');
+    showroom.style.removeProperty('--greeting-reserved-bottom');
+    notifyLayout();
+  }
+
+  window.addEventListener('resize', placeGreeting);
+  if (typeof ResizeObserver !== 'undefined') {
+    const greetingResize = new ResizeObserver(placeGreeting);
+    greetingResize.observe(launcher);
+    greetingResize.observe(greeting);
+  }
   const messages = $('chatMessages');
   const tray = $('stylistLook');
   const items = $('stylistLookItems');
@@ -25,9 +89,15 @@ export function bindStylist({ $, products, money, openDialog, onStylistFocus, no
     return node;
   }
 
-  function openChat() {
+  function openChat(event) {
+    chime.unlock(event);
+    if (event.currentTarget === greetingOpen) launcher.focus({ preventScroll: true });
     openDialog('chatDialog');
-    if (dialog.open) $('chatInput').focus();
+    if (dialog.open) {
+      // Focus remains on the dialog even if its opener is about to be hidden.
+      $('chatInput').focus();
+      clearGreeting();
+    }
   }
 
   function select(sku) {
@@ -81,7 +151,12 @@ export function bindStylist({ $, products, money, openDialog, onStylistFocus, no
     if (lead && dialog.open) focus(lead.sku, lead.detailView === true, true);
   }
 
-  $('chatOpen').addEventListener('click', openChat);
+  launcher.addEventListener('click', openChat);
+  greetingOpen.addEventListener('click', openChat);
+  $('stylistGreetingDismiss').addEventListener('click', () => {
+    clearGreeting();
+    launcher.focus({ preventScroll: true });
+  });
   $('stylistContinue').addEventListener('click', openChat);
   const input = $('chatInput');
   const starters = $('stylistStarters');
@@ -109,6 +184,7 @@ export function bindStylist({ $, products, money, openDialog, onStylistFocus, no
       replyNode.textContent = data.reply;
       history.push({ role: 'user', content: message }, { role: 'assistant', content: data.reply });
       if (history.length > HISTORY_LIMIT) history.splice(0, history.length - HISTORY_LIMIT);
+      if (!data.simulation) chime.play();
       showLook(data, replyNode);
     } catch (error) {
       replyNode.textContent = error.name === 'TimeoutError' ? 'The stylist timed out. Please try again.' : error.message;
@@ -122,14 +198,16 @@ export function bindStylist({ $, products, money, openDialog, onStylistFocus, no
   }
   $('chatForm').addEventListener('submit', event => {
     event.preventDefault();
+    chime.unlock(event);
     void sendMessage(input.value.trim());
   });
-  for (const chip of chips) chip.addEventListener('click', () => {
+  for (const chip of chips) chip.addEventListener('click', event => {
+    chime.unlock(event);
     const garment = /^(GW|JP)-/.test(activeSku) ? bySku.get(activeSku) : bySku.get('JP-001');
     const message = chip.dataset.stylistPrompt === 'fabric' && garment
       ? 'Zoom in on the fabric detail of ' + garment.name + ' (' + garment.id + ').'
       : chip.textContent.trim();
     void sendMessage(message);
   });
-  return { select };
+  return { select, startGreeting };
 }
