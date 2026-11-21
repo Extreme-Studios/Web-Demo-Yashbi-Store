@@ -40,7 +40,7 @@ function inspectLayout(){
     for(let node=element.parentElement;node;node=node.parentElement){const s=getComputedStyle(node);if(/hidden|clip|auto|scroll/.test(`${s.overflowX} ${s.overflowY}`))clipped=rectIntersection(clipped,node.getBoundingClientRect());}
     return clipped;
   }
-  const selectors=['.showroom-header','.showroom-intro','.shoe-scene-heading','.product-hud','.showroom-footer','.scene-pagination','.chat-launch','#overviewButton','.stylist-greeting'];
+  const selectors=['.showroom-header','.showroom-intro','.shoe-scene-heading','.product-hud','.showroom-footer','.scene-pagination','.chat-launch','#overviewButton'];
   for(const selector of selectors){
     const element=document.querySelector(selector);
     if(!visible(element))continue;
@@ -100,7 +100,7 @@ function inspectLayout(){
       }
     }
   }
-  const groups=['.product-hud','.showroom-header','.shoe-scene-heading','.scene-pagination','.showroom-intro','.stylist-greeting'];
+  const groups=['.product-hud','.showroom-header','.shoe-scene-heading','.scene-pagination','.showroom-intro'];
   const textFragments=[];
   for(const selector of groups){
     const root=document.querySelector(selector);if(!visible(root))continue;
@@ -165,7 +165,7 @@ async function measure(page,label){
     page.on('console',message=>{if(message.type()==='error')runtimeErrors.push({viewport:`${width}x${height}`,message:message.text()});});
     await page.goto(BASE,{waitUntil:'networkidle'});
     await page.waitForFunction(()=>window.YASHBI_3D?.engine?.ready);
-    await page.locator('#stylistGreeting').waitFor({state:'visible'});
+    await page.locator('#browseShowroom').click();
     for(const [category,longId]of [['Gaun Wanita','GW-003'],['Jas Pria','JP-007'],['Sepatu','SW-005']]){
       await page.evaluate(category=>YASHBI_3D.engine.setCategory(category),category);
       await measure(page,`${category}-overview`);

@@ -714,18 +714,16 @@ export class Showroom {
     const rect=selector=>document.querySelector(selector)?.getBoundingClientRect();
     const header=rect('.showroom-header'),hud=rect('.product-hud');
     const pagination=rect('.scene-pagination');
-    const greeting=this.landscape?rect('.stylist-greeting:not([hidden])'):null;
     let left=16,right=this.width-16,top=(header?.bottom||120)+12;
     let bottom=Math.min(this.height-95,pagination?.top-12||this.height-95);
     if (this.landscape) {
       right=Math.min(right,(hud?.left||this.width*.58)-18);
-      if (greeting) bottom=Math.min(bottom,greeting.top-12);
     } else {
       bottom=Math.min(bottom,(hud?.top||this.height-250)-14);
     }
     const title=rect(focus?'#overviewButton':this.shelfCategory?'.shoe-scene-heading':'.showroom-intro');
     if (title?.height) top=Math.max(top,title.bottom+10);
-    bottom=Math.max(top+(greeting?44:80),bottom);
+    bottom=Math.max(top+80,bottom);
     const stageWidth=Math.max(100,right-left),stageHeight=bottom-top;
     const worldHeight=shelf?3.75:(entry.height||3.35)*entry.targetScale+(entry.shoe?.16:.05);
     const worldWidth=shelf?4.65:Math.max((entry.width||2.2)*entry.targetScale,entry.shoe?2.85:1.4);

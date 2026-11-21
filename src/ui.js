@@ -80,14 +80,7 @@ export function createUI({products, money, imageForColor, commerce, onCategory=(
       <div class="scene-pagination"><span id="sceneIndex">01 / 08</span><div><button type="button" id="previousProduct" aria-label="Previous product">←</button><button type="button" id="nextProduct" aria-label="Next product">→</button></div><span class="pagination-hint">DRAG TO EXPLORE · CLICK TO INSPECT</span></div>
       <div class="showroom-footer"><span>YASHBI STORE <i>·</i> INDONESIA / IDR</span><div><button type="button" data-info="size">Size guide</button><button type="button" data-info="shipping">Shipping</button><button type="button" data-info="returns">Exchanges</button><button type="button" data-info="about">About us</button></div></div>
       ${local?'<div class="preview-badge">LOCAL PREVIEW · SIMULATION</div>':''}
-      <button type="button" id="chatOpen" class="chat-launch" aria-label="Open Yashbi Stylist">${icons.chat}<span>Yashbi Stylist</span><span id="stylistUnread" class="stylist-unread" aria-hidden="true" hidden>1</span></button>
-      <div id="stylistGreeting" class="stylist-greeting" hidden>
-        <button id="stylistGreetingOpen" class="stylist-greeting-open" type="button" aria-controls="chatDialog">
-          <span class="stylist-greeting-identity">${stylistAvatar}<strong>${stylistName}</strong></span>
-          <span class="stylist-greeting-copy">Hi there! I'm Alya, your personal stylist. Looking for something special today? Tap here and I'll walk you through the showroom.</span>
-        </button>
-        <button id="stylistGreetingDismiss" class="stylist-greeting-dismiss" type="button" aria-label="Dismiss stylist greeting">×</button>
-      </div>
+      <button type="button" id="chatOpen" class="chat-launch" aria-label="Open Yashbi Stylist">${icons.chat}<span>Yashbi Stylist</span></button>
       <div class="showroom-toast" id="uiToast" role="status" aria-live="polite"></div>
     </div>`;
   const dialog = (id,title,content,klass='') => `<dialog id="${id}" class="atelier-dialog ${klass}" aria-labelledby="${id}Title"><button type="button" class="dialog-close" data-close-dialog aria-label="Close">${icons.close}</button><div class="dialog-heading"><p class="micro-label">YASHBI STORE / PERSONAL SELECTION</p><h2 id="${id}Title">${title}</h2></div>${content}</dialog>`;
@@ -103,11 +96,19 @@ export function createUI({products, money, imageForColor, commerce, onCategory=(
     dialog('helpDialog','Here for your moments.',`<div class="help-list"><button type="button" data-info="size">Size guide <span>↗</span></button><button type="button" data-info="shipping">Shipping <span>↗</span></button><button type="button" data-info="returns">Exchange policy <span>↗</span></button><button type="button" data-info="about">About us <span>↗</span></button><button type="button" id="helpTrack">Track order <span>↗</span></button><button type="button" id="helpHistory">Purchase Record <span>↗</span></button></div>`,'help-dialog'),
     `<dialog id="chatDialog" class="atelier-dialog chat-dialog" aria-labelledby="chatDialogTitle" aria-describedby="chatStatus">
       <header class="chat-header">
-        ${stylistAvatar}
-        <div>
-          <h2 id="chatDialogTitle">${stylistName}</h2>
-          <p id="chatStatus">Personal Showroom Stylist · Online</p>
+        <div class="atelier-welcome-heading">
+          <p>THE YASHBI ATELIER · PERSONAL STYLING</p>
+          <h2 id="atelierWelcomeTitle" tabindex="-1">Welcome to Yashbi.</h2>
         </div>
+        <div class="chat-identity">
+          ${stylistAvatar}
+          <div>
+            <h2 id="chatDialogTitle">${stylistName}</h2>
+            <p id="chatStatus">Personal Showroom Stylist · Online</p>
+            <p class="atelier-welcome-stylist">Alya — Your 3D Showroom Stylist</p>
+          </div>
+        </div>
+        <p id="atelierWelcomeCopy">Tell me the occasion, vibe, or budget—I'll glide the 3D showroom straight to your look.</p>
         <button type="button" class="dialog-close" data-close-dialog aria-label="Close stylist">${icons.close}</button>
       </header>
       <div id="chatMessages" class="chat-messages" role="log" aria-label="Chat with Alya" tabindex="0">
@@ -123,6 +124,7 @@ export function createUI({products, money, imageForColor, commerce, onCategory=(
           <input id="chatInput" aria-label="Message Alya" placeholder="What are you dressing for?" maxlength="800" required autocomplete="off">
           <button type="submit" id="chatSend" aria-label="Send message">↑</button>
         </form>
+        <button type="button" id="browseShowroom" class="browse-showroom" data-close-dialog>Browse Showroom Myself <span aria-hidden="true">→</span></button>
       </div>
     </dialog>`
   ].join('');
@@ -213,5 +215,5 @@ export function createUI({products, money, imageForColor, commerce, onCategory=(
     delete status.dataset.state;
     $('sceneStatus').textContent = '';
   }
-  return {updateProduct,setMode,setCategory,clearWebglError,setLoading(){ $('sceneStatus').textContent='Preparing the showroom…';hud.querySelector('.showroom-status').hidden=false;},setReady(){ stylist.startGreeting(); if (status.dataset.state === 'webgl') return; clearTimeout(statusTimer); $('sceneStatus').textContent='Showroom ready';statusTimer=setTimeout(()=>status.hidden=true,1600);},setError(message, reason){clearTimeout(statusTimer);status.dataset.state=reason||'error';$('sceneStatus').textContent=`${message} The catalog is still available.`;hud.querySelector('.showroom-status').hidden=false;},showCart,showLookbook,showCatalog,toast,showHistory,showPurchase,closeDialogs,getState(){return{product:current,color,size,mode,garmentView,category:activeCategory,lastOrder};}};
+  return {updateProduct,setMode,setCategory,clearWebglError,setLoading(){ $('sceneStatus').textContent='Preparing the showroom…';hud.querySelector('.showroom-status').hidden=false;},startStylistWelcome:stylist.startWelcome,setReady(){ if (status.dataset.state === 'webgl') return; clearTimeout(statusTimer); $('sceneStatus').textContent='Showroom ready';statusTimer=setTimeout(()=>status.hidden=true,1600);},setError(message, reason){clearTimeout(statusTimer);status.dataset.state=reason||'error';$('sceneStatus').textContent=`${message} The catalog is still available.`;hud.querySelector('.showroom-status').hidden=false;},showCart,showLookbook,showCatalog,toast,showHistory,showPurchase,closeDialogs,getState(){return{product:current,color,size,mode,garmentView,category:activeCategory,lastOrder};}};
 }

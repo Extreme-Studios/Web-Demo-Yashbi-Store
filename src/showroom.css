@@ -349,8 +349,8 @@
 .stylist-starters button {
   min-height: 44px;
   padding: 10px 14px;
-  border: 1px solid #a39788;
-  border-radius: 20px;
+  border: 1px solid #d8d3cb;
+  border-radius: 0;
   background: var(--elevated);
   color: #1f1f1f;
   font: inherit;
@@ -359,8 +359,9 @@
 }
 
 .stylist-starters button:hover:not(:disabled) {
-  border-color: var(--gold);
-  background: #f0e7db;
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--elevated);
 }
 
 .chat-form {
@@ -427,115 +428,125 @@
   }
 }
 
-.stylist-greeting {
-  position: fixed;
-  z-index: 8;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 44px;
-  width: min(304px, calc(100vw - 24px));
-  border: 1px solid var(--line);
-  background: var(--elevated);
-  box-shadow: 0 8px 28px #18181824;
-  pointer-events: auto;
-  transform-origin: bottom right;
-  animation: stylist-greeting-in 180ms ease-out;
-}
-
-.stylist-greeting-open {
-  display: grid;
-  gap: 7px;
-  width: 100%;
-  padding: 10px 2px 12px 12px;
-  border: 0;
-  background: transparent;
-  text-align: start;
-  font: 400 13.5px/1.4 var(--sans);
-  color: #1f1f1f;
-}
-
-.stylist-greeting-identity {
+/* The first visit uses the same dialog and composer as the active thread. */
+.chat-identity {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
-.stylist-greeting-identity strong {
-  font-weight: 700;
-}
-
-.stylist-greeting .stylist-avatar {
-  width: 30px;
-  font-size: 20px;
-}
-
-.stylist-greeting-dismiss {
-  align-self: start;
-  width: 44px;
-  height: 44px;
-  padding: 0 0 10px 6px;
-  border: 0;
-  background: transparent;
-  color: var(--secondary);
-  font-size: 19px;
-}
-
-@media (max-height: 550px) and (max-width: 950px) and (orientation: landscape) {
-  .stylist-greeting { width: min(420px, 54vw); }
-
-  .stylist-greeting-open {
-    grid-template-columns: 30px minmax(0, 1fr);
-    column-gap: 8px;
-    row-gap: 3px;
-    padding: 8px 0 9px 11px;
-  }
-
-  .stylist-greeting-identity { display: contents; }
-  .stylist-greeting .stylist-avatar { grid-row: span 2; align-self: start; }
-  .stylist-greeting-copy { grid-column: 2; }
-}
-
-.stylist-unread {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  display: grid;
-  place-items: center;
-  width: 17px;
-  height: 17px;
-  border: 1px solid var(--elevated);
-  border-radius: 50%;
-  background: #806447;
-  color: white;
-  font: 600 9px/1 var(--sans);
-  pointer-events: none;
-}
-
-.stylist-greeting[hidden],
-.stylist-unread[hidden] {
+.chat-dialog:not([data-mode=welcome]) :is(.atelier-welcome-heading, .atelier-welcome-stylist, #atelierWelcomeCopy, .browse-showroom),
+.chat-dialog[data-mode=welcome] :is(#chatDialogTitle, #chatStatus, .chat-messages) {
   display: none;
 }
 
-@keyframes stylist-greeting-in {
-  from { opacity: 0; transform: translateY(4px) scale(.98); }
-  to { opacity: 1; transform: none; }
+.chat-dialog[data-mode=welcome] {
+  width: min(648px, calc(100vw - 24px));
+  height: fit-content;
+  max-height: var(--chat-available);
+  border-color: #d8d3cb;
+  border-top: 2px solid var(--gold);
+  background: var(--elevated);
+  overflow-y: auto;
+  container-type: normal;
 }
 
-@media (min-width: 951px), (min-width: 801px) and (min-height: 551px) {
-  .showroom-ui:has(.stylist-greeting:not([hidden])) .product-hud {
-    max-height: min(calc(100dvh - 240px), calc(100dvh - 2 * var(--greeting-reserved-bottom, 0px)));
-  }
-  .showroom-ui[data-scene=shelf][data-mode=overview]:has(.stylist-greeting:not([hidden])) .product-hud {
-    bottom: max(100px, var(--greeting-reserved-bottom, 0px));
-    max-height: none;
-  }
+.chat-dialog[data-mode=welcome]::backdrop {
+  background: rgba(245, 243, 239, .62);
+  backdrop-filter: blur(2px);
 }
 
-@media (max-width: 800px) and (orientation: portrait), (max-width: 800px) and (min-height: 551px) {
-  .showroom-ui:has(.stylist-greeting:not([hidden])) .product-hud,
-  .showroom-ui[data-scene=shelf][data-mode=overview]:has(.stylist-greeting:not([hidden])) .product-hud {
-    bottom: max(94px, var(--greeting-reserved-bottom, 0px));
-  }
-  .showroom-ui[data-mode=inspect]:has(.stylist-greeting:not([hidden])) .product-hud {
-    max-height: calc(min(355px, 45dvh) - max(0px, var(--greeting-reserved-bottom, 0px) - 94px));
-  }
+.chat-dialog[data-mode=welcome] .chat-header {
+  display: grid;
+  gap: 12px;
+  padding: 24px 30px 18px;
+  border: 0;
+}
+
+.chat-dialog[data-mode=welcome] .dialog-close {
+  top: 8px;
+  right: 8px;
+  transform: none;
+}
+
+.atelier-welcome-heading {
+  padding-right: 40px;
+}
+
+.atelier-welcome-heading > p {
+  margin: 0 0 9px;
+  color: var(--secondary);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .12em;
+}
+
+.atelier-welcome-heading > h2 {
+  font: 500 clamp(43px, 7vw, 64px)/.94 var(--serif);
+  letter-spacing: -.025em;
+}
+
+/* The opening headline receives programmatic focus for reading order. */
+#atelierWelcomeTitle:focus { outline: none; }
+
+.chat-header .atelier-welcome-stylist {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.chat-header #atelierWelcomeCopy {
+  max-width: 50ch;
+  margin: 0;
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.chat-dialog[data-mode=welcome] .chat-dock {
+  position: sticky;
+  bottom: 0;
+  gap: 10px;
+  padding: 14px 30px 12px;
+  background: var(--elevated);
+}
+
+.chat-dialog[data-mode=welcome] .stylist-starters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.browse-showroom {
+  justify-self: center;
+  min-height: 44px;
+  border: 0;
+  background: none;
+  color: var(--secondary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.browse-showroom:hover {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: .2em;
+}
+
+.browse-showroom span {
+  margin-left: 5px;
+}
+
+@media (max-width: 600px) {
+  .chat-dialog[data-mode=welcome] :is(.chat-header, .chat-dock) { padding-inline: 18px; }
+  .chat-dialog[data-mode=welcome] .stylist-starters { grid-template-columns: 1fr; }
+}
+
+@media (max-height: 520px) {
+  .chat-dialog[data-mode=welcome] .chat-header { gap: 8px; padding-block: 12px; }
+  .atelier-welcome-heading > p { margin-bottom: 5px; }
+  .atelier-welcome-heading > h2 { font-size: 43px; }
+  .chat-dialog[data-mode=welcome] .stylist-avatar { width: 32px; }
+  .chat-dialog[data-mode=welcome] .chat-dock { gap: 6px; padding-block: 8px; }
 }

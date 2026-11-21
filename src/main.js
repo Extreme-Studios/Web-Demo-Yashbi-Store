@@ -54,6 +54,8 @@ if(linked) {
   selected=linked;
   engine?.select(linked.id);
   ui.showLookbook(linked.id);
+} else {
+  ui.startStylistWelcome();
 }
 commerce.syncQueue().catch(()=>{});
 window.addEventListener('online',()=>commerce.syncQueue().catch(()=>{}));

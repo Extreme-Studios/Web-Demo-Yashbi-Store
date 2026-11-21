@@ -1,72 +1,27 @@
 import { createStylistChime } from './stylist-chime.js';
 import { productDescription } from './catalog-copy-en.js';
 const HISTORY_LIMIT = 8;
-const GREETING_SESSION = 'yashbi-stylist-greeting-seen';
+const WELCOME_SESSION = 'yashbi-atelier-welcome-seen';
 
 export function bindStylist({ $, products, money, openDialog, onStylistFocus, notifyLayout }) {
   const dialog = $('chatDialog');
   const launcher = $('chatOpen');
-  const greeting = $('stylistGreeting');
-  const greetingOpen = $('stylistGreetingOpen');
-  const badge = $('stylistUnread');
-  const showroom = launcher.closest('.showroom-ui');
   const chime = createStylistChime();
-  let greetingTimer;
-  let greetingSeen = false;
-  try { greetingSeen = sessionStorage.getItem(GREETING_SESSION) === '1'; } catch { /* Use page memory. */ }
+  let welcomeSeen = false;
+  try { welcomeSeen = sessionStorage.getItem(WELCOME_SESSION) === '1'; } catch { /* Use page memory. */ }
 
-  function markGreetingSeen() {
-    greetingSeen = true;
-    try { sessionStorage.setItem(GREETING_SESSION, '1'); } catch { /* Use page memory. */ }
+  function markWelcomeSeen() {
+    welcomeSeen = true;
+    try { sessionStorage.setItem(WELCOME_SESSION, '1'); } catch { /* Use page memory. */ }
   }
 
-  function placeGreeting() {
-    if (greeting.hidden) return;
-    const anchor = launcher.getBoundingClientRect();
-    const height = document.documentElement.clientHeight;
-    const width = document.documentElement.clientWidth;
-    const left = Math.max(12, Math.min(width - greeting.offsetWidth - 12, anchor.right - greeting.offsetWidth));
-    const bottom = height - anchor.top + 9;
-    greeting.style.left = left + 'px';
-    greeting.style.bottom = bottom + 'px';
-    showroom.style.setProperty('--greeting-reserved-bottom', (bottom + greeting.offsetHeight + 9) + 'px');
-    notifyLayout();
+  function setChatMode(mode) {
+    dialog.dataset.mode = mode;
+    const welcome = mode === 'welcome';
+    dialog.setAttribute('aria-labelledby', welcome ? 'atelierWelcomeTitle' : 'chatDialogTitle');
+    dialog.setAttribute('aria-describedby', welcome ? 'atelierWelcomeCopy' : 'chatStatus');
   }
 
-  function startGreeting() {
-    if (greetingSeen || greetingTimer) return;
-    greetingTimer = setTimeout(() => {
-      greetingTimer = undefined;
-      if (greetingSeen) return;
-      if (document.querySelector('dialog[open]') || document.hidden) {
-        startGreeting();
-        return;
-      }
-      markGreetingSeen();
-      greeting.hidden = false;
-      badge.hidden = false;
-      launcher.setAttribute('aria-label', 'Open Yashbi Stylist, 1 unread greeting');
-      placeGreeting();
-    }, 1200);
-  }
-
-  function clearGreeting() {
-    markGreetingSeen();
-    clearTimeout(greetingTimer);
-    greetingTimer = undefined;
-    greeting.hidden = true;
-    badge.hidden = true;
-    launcher.setAttribute('aria-label', 'Open Yashbi Stylist');
-    showroom.style.removeProperty('--greeting-reserved-bottom');
-    notifyLayout();
-  }
-
-  window.addEventListener('resize', placeGreeting);
-  if (typeof ResizeObserver !== 'undefined') {
-    const greetingResize = new ResizeObserver(placeGreeting);
-    greetingResize.observe(launcher);
-    greetingResize.observe(greeting);
-  }
   const messages = $('chatMessages');
   const tray = $('stylistLook');
   const items = $('stylistLookItems');
@@ -103,17 +58,31 @@ export function bindStylist({ $, products, money, openDialog, onStylistFocus, no
   chatViewport?.addEventListener('resize', fitChatViewport);
   chatViewport?.addEventListener('scroll', fitChatViewport);
 
-  function openChat(event) {
-    chime.unlock(event);
-    if (event.currentTarget === greetingOpen) launcher.focus({ preventScroll: true });
+  function startWelcome() {
+    if (welcomeSeen || document.querySelector('dialog[open]')) return;
+    setChatMode('welcome');
     openDialog('chatDialog');
     if (dialog.open) {
-      // Focus remains on the dialog even if its opener is about to be hidden.
       fitChatViewport();
-      $('chatInput').focus({ preventScroll: true });
-      clearGreeting();
+      $('atelierWelcomeTitle').focus({ preventScroll: true });
+      markWelcomeSeen();
     }
   }
+
+  function openChat(event) {
+    chime.unlock(event);
+    setChatMode('chat');
+    openDialog('chatDialog');
+    if (dialog.open) {
+      fitChatViewport();
+      $('chatInput').focus({ preventScroll: true });
+      markWelcomeSeen();
+    }
+  }
+
+  dialog.addEventListener('close', () => {
+    if (document.activeElement === document.body) launcher.focus({ preventScroll: true });
+  });
 
   function select(sku) {
     activeSku = sku;
@@ -167,11 +136,6 @@ export function bindStylist({ $, products, money, openDialog, onStylistFocus, no
   }
 
   launcher.addEventListener('click', openChat);
-  greetingOpen.addEventListener('click', openChat);
-  $('stylistGreetingDismiss').addEventListener('click', () => {
-    clearGreeting();
-    launcher.focus({ preventScroll: true });
-  });
   $('stylistContinue').addEventListener('click', openChat);
   const input = $('chatInput');
   const starters = $('stylistStarters');
@@ -179,6 +143,11 @@ export function bindStylist({ $, products, money, openDialog, onStylistFocus, no
   async function sendMessage(message) {
     if (!message || pending) return;
     pending = true;
+    if (dialog.dataset.mode === 'welcome') {
+      setChatMode('chat');
+      // Keep focus in the dialog before the clicked prompt is disabled.
+      messages.focus({ preventScroll: true });
+    }
     chips.forEach(chip => chip.disabled = true);
     $('chatSend').disabled = true;
     input.value = '';
@@ -224,5 +193,5 @@ export function bindStylist({ $, products, money, openDialog, onStylistFocus, no
       : chip.textContent.trim();
     void sendMessage(message);
   });
-  return { select, startGreeting };
+  return { select, startWelcome };
 }
