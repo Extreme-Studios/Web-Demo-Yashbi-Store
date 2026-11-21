@@ -1,4 +1,4 @@
-import { clientIp, createChatLimiter } from '../server/chat-rate-limit.mjs';
+const { clientIp, createChatLimiter } = require('../server/chat-rate-limit.cjs');
 
 const consumeChatRequest = createChatLimiter();
 
@@ -136,7 +136,7 @@ async function generate(model, apiKey, payload, signal) {
   return { text };
 }
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Method not allowed.' });
@@ -174,3 +174,5 @@ export default async function handler(req, res) {
     return res.status(502).json({ error: 'The stylist could not complete this request. Please try again.' });
   }
 }
+
+module.exports = handler;

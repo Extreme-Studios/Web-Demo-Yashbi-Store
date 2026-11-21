@@ -3,7 +3,7 @@ const { pathToFileURL } = require('node:url');
 
 async function run() {
   const { default: handler } = await import(pathToFileURL(require.resolve('../api/chat.js')).href);
-  const { clientIp, createChatLimiter } = await import('../server/chat-rate-limit.mjs');
+  const { clientIp, createChatLimiter } = require('../server/chat-rate-limit.cjs');
   let time = 0;
   const limit = createChatLimiter({ now: () => time, limit: 2, windowMs: 60000 });
   assert.equal(limit('a'), 0);
