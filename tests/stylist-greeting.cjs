@@ -2,7 +2,8 @@ const { chromium } = require('playwright');
 const assert = require('node:assert/strict');
 
 const BASE = 'http://127.0.0.1:4173';
-const GREETING = 'Hi! Welcome to Yashbi Store. Need help finding an outfit? Tell me the occasion or budget.';
+const GREETING = "Hi there! I'm Alya, your personal stylist. Looking for something special today? Tap here and I'll walk you through the showroom.";
+const OPENING = "Welcome to Yashbi Store! I'm Alya. Tell me what event you're dressing for—or just your vibe and rough budget—and I'll bring the best pieces right in front of you in 3D.";
 const REPLY = 'Try a sand suit and brown loafers.';
 const SESSION_KEY = 'yashbi-stylist-greeting-seen';
 
@@ -28,6 +29,54 @@ async function assertAnchored(page) {
   const hud = await page.locator('.product-hud').boundingBox();
   assert.ok(greeting.x >= hud.x + hud.width || greeting.x + greeting.width <= hud.x ||
     greeting.y >= hud.y + hud.height || greeting.y + greeting.height <= hud.y);
+}
+
+async function assertChatLayout(page) {
+  const result = await page.locator('#chatDialog').evaluate(dialog => {
+    const thread = dialog.querySelector('#chatMessages');
+    const header = dialog.querySelector('.chat-header');
+    const dock = dialog.querySelector('.chat-dock');
+    const input = dialog.querySelector('#chatInput');
+    const send = dialog.querySelector('#chatSend');
+    const visible = window.visualViewport;
+    const viewportTop = visible?.offsetTop ?? 0;
+    const viewportBottom = viewportTop + (visible?.height ?? innerHeight);
+    const viewportRight = (visible?.offsetLeft ?? 0) + (visible?.width ?? innerWidth);
+    const room = dialog.getBoundingClientRect();
+    const inside = element => {
+      const box = element.getBoundingClientRect();
+      return box.top >= Math.max(room.top, viewportTop) && box.bottom <= Math.min(room.bottom, viewportBottom) &&
+        box.left >= room.left && box.right <= Math.min(room.right, viewportRight) &&
+        document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2) === element;
+    };
+    const getPosition = element => element.getBoundingClientRect().top;
+    const frame = [getPosition(header), getPosition(dock), getPosition(input), getPosition(send)];
+    const initial = { dialogScroll: dialog.scrollTop, visible: inside(input) && inside(send) };
+    thread.scrollTop = 0;
+    thread.scrollTop = thread.scrollHeight;
+    const canScroll = thread.scrollTop > 0;
+    return {
+      ...initial,
+      canScroll,
+      frameStaysPut: frame.every((top, index) => top === getPosition([header, dock, input, send][index])),
+      dialogCanScroll: dialog.scrollHeight > dialog.clientHeight,
+      visibleAfterScroll: inside(input) && inside(send),
+      height: room.height,
+      threadHeight: thread.clientHeight,
+    };
+  });
+  const viewport = page.viewportSize();
+  const label = `${viewport.width}×${viewport.height}`;
+  assert.equal(result.visible, true, `${label} composer fully visible on open`);
+  assert.equal(result.visibleAfterScroll, true, `${label} composer fully visible after scrolling`);
+  assert.equal(result.dialogScroll, 0, `${label} dialog starts at rest`);
+  assert.equal(result.dialogCanScroll, false, `${label} dialog fits its own content`);
+  assert.equal(result.frameStaysPut, true, `${label} header and dock stay fixed`);
+  assert.ok(result.threadHeight > 0, `${label} thread has space`);
+  if (viewport.width > 600) {
+    assert.ok(result.height <= Math.min(0.82 * viewport.height, 620) + 1, `${label} desktop max height`);
+  }
+  return result;
 }
 
 async function run() {
@@ -65,8 +114,8 @@ async function run() {
       };
     });
     await load(desktop);
-    assert.equal(await desktop.locator('#stylistGreeting strong').innerText(), 'Yashbi Stylist \u00b7 Online');
-    assert.equal(await desktop.locator('#stylistGreetingOpen span').innerText(), GREETING);
+    assert.equal(await desktop.locator('#stylistGreeting strong').innerText(), 'Alya — Yashbi Stylist');
+    assert.equal(await desktop.locator('#stylistGreetingOpen .stylist-greeting-copy').innerText(), GREETING);
     assert.equal(await desktop.locator('#stylistUnread').innerText(), '1');
     assert.equal(await desktop.locator('#stylistUnread').isVisible(), true);
     assert.equal(await desktop.evaluate(() => window.audioProof.contexts), 0);
@@ -75,6 +124,17 @@ async function run() {
 
     await desktop.locator('#stylistGreetingOpen').click();
     await desktop.locator('#chatDialog[open]').waitFor();
+    assert.equal(await desktop.locator('#chatDialogTitle').innerText(), 'Alya — Yashbi Stylist');
+    assert.equal(await desktop.locator('#chatStatus').innerText(), 'Personal Showroom Stylist · Online');
+    assert.equal(await desktop.locator('#chatMessages .assistant').first().innerText(), OPENING);
+    assert.equal(await desktop.locator('#chatDialog .stylist-avatar').innerText(), 'A');
+    assert.deepEqual(await desktop.locator('#stylistStarters button').allTextContents(), [
+      'Style a wedding look with a sand suit',
+      'Find an evening dress under Rp 2M',
+      'Show me the fabric close-up',
+    ]);
+    await assertChatLayout(desktop);
+
     assert.equal(await desktop.locator('#stylistGreeting').isVisible(), false);
     assert.equal(await desktop.locator('#stylistUnread').isVisible(), false);
     assert.equal(await desktop.locator('#chatInput').evaluate(node => document.activeElement === node), true);
@@ -85,6 +145,7 @@ async function run() {
     await desktop.locator('#stylistStarters button').first().click();
     await desktop.locator('#chatMessages').getByText(REPLY, { exact: true }).waitFor();
     await desktop.waitForFunction(() => window.audioProof.notes.length === 2);
+    await assertChatLayout(desktop);
     const { contexts, notes } = await desktop.evaluate(() => window.audioProof);
     assert.equal(contexts, 1);
     assert.deepEqual(notes.map(note => Math.round(note.frequency)), [659, 880]);
@@ -115,13 +176,44 @@ async function run() {
     await load(mobile, true);
     await mobile.route('**/api/chat', route => route.fulfill({ json: { reply: REPLY, recommendedSkus: [], actions: [] } }));
     await mobile.locator('#chatOpen').tap();
+    await assertChatLayout(mobile);
     await mobile.locator('#chatInput').fill('A summer wedding');
     await mobile.locator('#chatSend').tap();
     await mobile.locator('#chatMessages').getByText(REPLY, { exact: true }).waitFor();
     assert.equal(await mobile.evaluate(() => window.audioAttemptedWhileSuspended), undefined);
 
+    await mobile.close();
+
+    for (const viewport of [{ width: 1366, height: 768 }, { width: 844, height: 390 }]) {
+      const page = await browser.newPage({ viewport, reducedMotion: 'reduce' });
+      watch(page);
+      await page.goto(BASE, { waitUntil: 'networkidle' });
+      await page.locator('#chatOpen').click();
+      await assertChatLayout(page);
+
+      const longReply = Array.from({ length: 28 }, (_, index) => `Look ${index + 1}. A softly tailored suit goes well with brown loafers.`).join('\n');
+      await page.route('**/api/chat', route => route.fulfill({
+        json: { reply: longReply, recommendedSkus: [], actions: [], simulation: true },
+      }));
+      await page.locator('#chatInput').fill('How would you style a sand suit?');
+      await page.locator('#chatInput').press('Enter');
+      await page.locator('#chatMessages .assistant').filter({ hasText: 'Look 28.' }).waitFor();
+      const afterReply = await assertChatLayout(page);
+      assert.equal(afterReply.canScroll, true, 'A long thread scrolls independently of the header and composer');
+      if (viewport.height === 390) {
+        // Model the visual viewport shrinking and panning when a soft keyboard opens.
+        await page.evaluate(() => {
+          const visible = window.visualViewport;
+          Object.defineProperties(visible, { height: { value: 174 }, offsetTop: { value: 20 } });
+          visible.dispatchEvent(new Event('resize'));
+        });
+        await assertChatLayout(page);
+      }
+      await page.close();
+    }
+
     assert.deepEqual(errors, []);
-    console.log('PASS stylist greeting, session deduplication, desktop opening, touch dismissal, two-note audio, and suspended audio.');
+    console.log('PASS stylist greeting, session deduplication, fixed composer, desktop and mobile layout, touch dismissal, two-note audio, and suspended audio.');
   } finally {
     await browser.close();
   }

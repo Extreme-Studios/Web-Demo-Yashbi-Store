@@ -57,6 +57,7 @@ async function run() {
     assert.match(calls[1].url, /gemini-2\.5-flash:generateContent$/);
     assert.equal(calls[0].headers['x-goog-api-key'], calls[1].headers['x-goog-api-key']);
     const sent = calls[1].body;
+    assert.match(sent.systemInstruction.parts[0].text, /You are Alya, the personal showroom stylist/);
     assert.equal(sent.generationConfig.responseMimeType, 'application/json');
     assert.deepEqual(sent.generationConfig.responseJsonSchema.required, ['reply', 'recommendedSkus', 'actions']);
     assert.deepEqual(sent.contents.slice(-3).map(turn => [turn.role, turn.parts[0].text]), [

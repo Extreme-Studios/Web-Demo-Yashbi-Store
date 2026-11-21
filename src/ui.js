@@ -29,6 +29,9 @@ const icons = {
   chat:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11a9 9 0 0 1-9 9H4l-2 2V11a9 9 0 1 1 19 0Z"/><path d="M7 10h10M7 14h6"/></svg>'
 };
 
+const stylistAvatar = '<span class="stylist-avatar" aria-hidden="true">A</span>';
+const stylistName = 'Alya — Yashbi Stylist';
+
 export function createUI({products, money, imageForColor, commerce, onCategory=()=>{}, onSelect=()=>{}, onInspect=()=>{}, onColor=()=>{}, onOverview=()=>{}, onStep=()=>{}, onGarmentView=()=>{}, onStylistFocus=()=>false}) {
   const hud = document.getElementById('hudRoot');
   const overlay = document.getElementById('overlayRoot');
@@ -80,8 +83,8 @@ export function createUI({products, money, imageForColor, commerce, onCategory=(
       <button type="button" id="chatOpen" class="chat-launch" aria-label="Open Yashbi Stylist">${icons.chat}<span>Yashbi Stylist</span><span id="stylistUnread" class="stylist-unread" aria-hidden="true" hidden>1</span></button>
       <div id="stylistGreeting" class="stylist-greeting" hidden>
         <button id="stylistGreetingOpen" class="stylist-greeting-open" type="button" aria-controls="chatDialog">
-          <strong>Yashbi Stylist · Online</strong>
-          <span>Hi! Welcome to Yashbi Store. Need help finding an outfit? Tell me the occasion or budget.</span>
+          <span class="stylist-greeting-identity">${stylistAvatar}<strong>${stylistName}</strong></span>
+          <span class="stylist-greeting-copy">Hi there! I'm Alya, your personal stylist. Looking for something special today? Tap here and I'll walk you through the showroom.</span>
         </button>
         <button id="stylistGreetingDismiss" class="stylist-greeting-dismiss" type="button" aria-label="Dismiss stylist greeting">×</button>
       </div>
@@ -98,7 +101,30 @@ export function createUI({products, money, imageForColor, commerce, onCategory=(
     dialog('infoDialog','With a little care.',`<div id="infoContent" class="info-content"></div>`,'info-dialog'),
     dialog('catalogDialog','The complete edit.',`<p class="dialog-subtitle">30 produk. Tiga koleksi untuk menemukan gayamu.</p><div class="catalog-controls"><input id="catalogSearch" type="search" aria-label="Search products" placeholder="Nama, warna, atau gaya…"><select id="catalogCategory" aria-label="Kategori katalog">${categories.map(c=>`<option value="${c}">${categoryLabel(c)}</option>`).join('')}</select><select id="catalogSort" aria-label="Sort products"><option value="featured">Featured</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option><option value="newest">New arrivals</option></select></div><p id="catalogCount" class="micro-label"></p><div id="catalogItems" class="catalog-index"></div>`,'catalog-dialog'),
     dialog('helpDialog','Here for your moments.',`<div class="help-list"><button type="button" data-info="size">Size guide <span>↗</span></button><button type="button" data-info="shipping">Shipping <span>↗</span></button><button type="button" data-info="returns">Exchange policy <span>↗</span></button><button type="button" data-info="about">About us <span>↗</span></button><button type="button" id="helpTrack">Track order <span>↗</span></button><button type="button" id="helpHistory">Purchase Record <span>↗</span></button></div>`,'help-dialog'),
-    dialog('chatDialog','Yashbi Stylist',`<p class="dialog-subtitle">${local?'Local preview simulation':'Your 3D fashion stylist'}</p><div id="chatMessages" class="chat-messages" role="log" aria-live="polite"><div class="chat-message assistant">Tell me the occasion, your budget in IDR, and any size or color preferences. I can show you a complete look in the showroom.</div></div><div id="stylistStarters" class="stylist-starters" role="group" aria-label="Try a styling prompt"><button type="button" data-stylist-prompt="wedding">Build a wedding look around a sand suit</button><button type="button" data-stylist-prompt="evening">Show an evening dress under Rp 2M</button><button type="button" data-stylist-prompt="fabric">Zoom in on the fabric detail</button></div><form id="chatForm" class="chat-form"><input id="chatInput" aria-label="Message Yashbi Stylist" placeholder="Find a wedding outfit under Rp2,000,000…" maxlength="800" required autocomplete="off"><button type="submit" id="chatSend" aria-label="Send message">↑</button></form>`,'chat-dialog')
+    `<dialog id="chatDialog" class="atelier-dialog chat-dialog" aria-labelledby="chatDialogTitle" aria-describedby="chatStatus">
+      <header class="chat-header">
+        ${stylistAvatar}
+        <div>
+          <h2 id="chatDialogTitle">${stylistName}</h2>
+          <p id="chatStatus">Personal Showroom Stylist · Online</p>
+        </div>
+        <button type="button" class="dialog-close" data-close-dialog aria-label="Close stylist">${icons.close}</button>
+      </header>
+      <div id="chatMessages" class="chat-messages" role="log" aria-label="Chat with Alya" tabindex="0">
+        <div class="chat-message assistant">Welcome to Yashbi Store! I'm Alya. Tell me what event you're dressing for—or just your vibe and rough budget—and I'll bring the best pieces right in front of you in 3D.</div>
+      </div>
+      <div class="chat-dock">
+        <div id="stylistStarters" class="stylist-starters" role="group" aria-label="Try a styling prompt">
+          <button type="button" data-stylist-prompt="wedding">Style a wedding look with a sand suit</button>
+          <button type="button" data-stylist-prompt="evening">Find an evening dress under Rp 2M</button>
+          <button type="button" data-stylist-prompt="fabric">Show me the fabric close-up</button>
+        </div>
+        <form id="chatForm" class="chat-form">
+          <input id="chatInput" aria-label="Message Alya" placeholder="What are you dressing for?" maxlength="800" required autocomplete="off">
+          <button type="submit" id="chatSend" aria-label="Send message">↑</button>
+        </form>
+      </div>
+    </dialog>`
   ].join('');
   const $ = id => document.getElementById(id);
   function toast(message) {

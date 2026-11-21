@@ -89,13 +89,28 @@ export function bindStylist({ $, products, money, openDialog, onStylistFocus, no
     return node;
   }
 
+  const chatViewport = window.visualViewport;
+
+  function fitChatViewport() {
+    if (!dialog.open || !chatViewport) return;
+    const { offsetTop, height } = chatViewport;
+    const coveredBottom = Math.max(0, document.documentElement.clientHeight - height - offsetTop);
+    dialog.style.setProperty('--chat-viewport-top', offsetTop + 'px');
+    dialog.style.setProperty('--chat-viewport-bottom', coveredBottom + 'px');
+    dialog.style.setProperty('--chat-viewport-height', height + 'px');
+  }
+
+  chatViewport?.addEventListener('resize', fitChatViewport);
+  chatViewport?.addEventListener('scroll', fitChatViewport);
+
   function openChat(event) {
     chime.unlock(event);
     if (event.currentTarget === greetingOpen) launcher.focus({ preventScroll: true });
     openDialog('chatDialog');
     if (dialog.open) {
       // Focus remains on the dialog even if its opener is about to be hidden.
-      $('chatInput').focus();
+      fitChatViewport();
+      $('chatInput').focus({ preventScroll: true });
       clearGreeting();
     }
   }
@@ -168,7 +183,7 @@ export function bindStylist({ $, products, money, openDialog, onStylistFocus, no
     $('chatSend').disabled = true;
     input.value = '';
     addMessage('user', message);
-    const replyNode = addMessage('assistant', 'The stylist is putting your look together…');
+    const replyNode = addMessage('assistant', 'I’m putting a look together for you…');
     try {
       const response = await fetch('/api/chat', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
