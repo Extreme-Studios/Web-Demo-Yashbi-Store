@@ -66,14 +66,35 @@ async function checkout(p,total,label){
  await p.locator('[data-hud-color=Nude]').click();await p.locator('[data-hud-size="38"]').click();await p.locator('#hudAdd').click();await p.locator('#overviewButton').click();
  await p.locator('#cartOpen').click();await p.locator('[data-quantity][data-delta="1"]').first().click();check('drawer quantity and IDR subtotal',await p.locator('#cartSubtotal').innerText().then(v=>v.replace(/[^\d]/g,'')==='2267000'));await close(p);
  const order=await checkout(p,2285000,'desktop');await p.locator('#historyOpen').click();check('new purchase record lists saved order',(await p.locator('#historyLines').innerText()).includes(order));await close(p);
- await p.locator('#trackOpen').click();await p.locator('#trackingForm [name=orderId]').fill(order);await p.locator('#trackingForm [name=phone]').fill('081111111111');await p.locator('#trackingSubmit').click();await p.waitForFunction(()=>document.querySelector('#trackingResult').textContent.includes('tidak ditemukan'));check('wrong WA cannot retrieve order',true);await p.locator('#trackingForm [name=phone]').fill('+6281234567890');await p.locator('#trackingSubmit').click();await p.waitForFunction(()=>document.querySelector('#trackingResult').textContent.includes('Simulasi'));check('matching WA retrieves order',true);await close(p);
+ await p.locator('#trackOpen').click();await p.locator('#trackingForm [name=orderId]').fill(order);await p.locator('#trackingForm [name=phone]').fill('081111111111');await p.locator('#trackingSubmit').click();await p.waitForFunction(()=>document.querySelector('#trackingResult').textContent.includes('Order not found'));check('wrong WA cannot retrieve order',true);await p.locator('#trackingForm [name=phone]').fill('+6281234567890');await p.locator('#trackingSubmit').click();await p.waitForFunction(()=>document.querySelector('#trackingResult').textContent.includes('Simulasi'));check('matching WA retrieves order',true);await close(p);
  await p.locator('#catalogOpen').click();await p.locator('#catalogCategory').selectOption('all');check('new lookbook index contains all30 products',await p.locator('[data-catalog-product]').count()===30);await p.locator('#catalogSearch').fill('Serena');check('lookbook search works',await p.locator('[data-catalog-product]').count()===1);await p.locator('[data-catalog-product="GW-001"]').click();await p.locator('#lookbookDialog[open]').waitFor();check('full lookbook uses transparent product image',(await p.locator('#lookbookImage').getAttribute('src')).includes('/cutout/'));await close(p);
- await p.locator('#chatOpen').click();await p.locator('#chatInput').fill('Cari jas pria');await p.locator('#chatSend').click();await p.waitForFunction(()=>document.querySelector('#chatMessages').textContent.includes('Respons simulasi'));check('Sahabat Yashbi works from new HUD',true);await close(p);
+ check('global CTA exposes the stylist',await p.locator('#chatOpen').innerText()==='Yashbi Stylist');
+ await p.locator('#chatOpen').click();check('three one-tap starters are visible',await p.locator('#stylistStarters button:visible').count()===3);await p.locator('[data-stylist-prompt=wedding]').click();await p.waitForFunction(()=>{const e=YASHBI_3D.engine;return e.mode==='focus'&&e.selectedProduct.id==='JP-001'&&e.garmentView==='full';});await settled(p);
+ check('stylist leads with a full-suit camera focus and dismisses the dialog',await p.locator('#chatDialog').evaluate(el=>!el.open));
+ await p.locator('#stylistLook [data-sku=SP-001]').click();await settled(p);check('look piece button crosses collections into the shoe camera', (await debug(p)).selectedId==='SP-001');
+ await p.locator('#stylistContinue').click();check('chat transcript survives camera navigation', (await p.locator('#chatMessages').innerText()).includes('wedding'));
+ const follow=p.waitForRequest(r=>r.url().endsWith('/api/chat')&&r.method()==='POST');await p.locator('#chatInput').fill('Show me the fabric detail.');await p.locator('#chatSend').click();const body=(await follow).postDataJSON();
+ check('follow-up carries previous user and assistant turns',body.history.length===2&&body.history[0].content.includes('wedding')&&body.history[1].role==='assistant');
+ await p.waitForFunction(()=>{const e=YASHBI_3D.engine;return e.mode==='focus'&&e.selectedProduct.id==='JP-001'&&e.garmentView==='detail';});await settled(p);
+ check('stylist remembered menswear for the follow-up and moved into garment detail',await p.locator('#stylistLook [data-sku=JP-001]').getAttribute('aria-current')==='true');
+ check('stylist does not change the cart',await p.locator('#cartCount').innerText()==='0');
+ check('English is the default storefront language',await p.locator('html').getAttribute('lang')==='en');
+ await p.locator('#stylistContinue').click();await p.locator('[data-stylist-prompt=evening]').click();
+ await p.waitForFunction(()=>YASHBI_3D.engine.mode==='focus'&&YASHBI_3D.engine.selectedProduct.id.startsWith('GW-'));
+ const eveningSku=(await debug(p)).selectedId;
+ await p.locator('#stylistContinue').click();await p.locator('[data-stylist-prompt=fabric]').click();
+ await p.waitForFunction(id=>YASHBI_3D.engine.mode==='focus'&&YASHBI_3D.engine.garmentView==='detail'&&YASHBI_3D.engine.selectedProduct.id===id,eveningSku);
+ check('evening and fabric starters drive the camera in one tap',true);
+ await p.locator('#stylistContinue').click();await p.route('**/api/chat',route=>route.fulfill({status:429,headers:{'Retry-After':'17'},contentType:'application/json',body:'{}'}));
+ await p.locator('[data-stylist-prompt=wedding]').click();await p.getByText('The stylist is busy. Try again in 17 seconds.').waitFor();
+ await p.unroute('**/api/chat');const expected429=errors.findIndex(value=>value.startsWith('429 '));if(expected429>=0)errors.splice(expected429,1);
+ const expectedConsoleError=errors.findIndex(value=>value.includes('429 (Too Many Requests)'));if(expectedConsoleError>=0)errors.splice(expectedConsoleError,1);
+ await close(p);
  check('desktop no horizontal overflow',await p.evaluate(()=>document.documentElement.scrollWidth===innerWidth));
  const mc=await context({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:3,acceptDownloads:true});const m=await mc.newPage();watch(m);await m.goto(BASE,{waitUntil:'networkidle'});await settled(m);await m.screenshot({path:path.join(OUT,'3d-showroom-mobile.png')});check('mobile WebGL renderer and viewport fit',(await debug(m)).webgl&&await m.evaluate(()=>document.documentElement.scrollWidth===390));
  check('high-DPR phones cap raster cost and use1024 real shadows',await m.evaluate(()=>{const e=window.YASHBI_3D.engine;return e.renderer.getPixelRatio()===1.5&&e.keyLight.shadow.mapSize.x===1024;}));await mobileFit(m,'390x844 gown overview');
  const cdp=await mc.newCDPSession(m);await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:260,y:360}]});for(const x of [230,200,160,120])await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x,y:360}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});check('native touch swipe selects next product',(await debug(m)).selectedId==='GW-002');
- await m.locator('[data-category="Gaun Wanita"]').tap();await settled(m);check('first HUD tap after native swipe changes category',(await debug(m)).category==='Gaun Wanita'&&(await debug(m)).selectedId==='GW-001');await m.locator('#hudInspect').tap();await settled(m);await m.locator('[data-hud-size=M]').tap();await m.locator('#hudAdd').tap();check('mobile add confirmation remains available inline',(await m.locator('#hudFeedback').innerText()).includes('ditambahkan'));check('mobile confirmation never obscures cart action',await m.evaluate(()=>{const t=document.querySelector('#uiToast'),a=document.querySelector('#hudAdd');if(Number(getComputedStyle(t).opacity)<.05)return true;const x=t.getBoundingClientRect(),y=a.getBoundingClientRect();return x.right<=y.left||x.left>=y.right||x.bottom<=y.top||x.top>=y.bottom;}));await m.screenshot({path:path.join(OUT,'3d-clothing-mobile-focus.png')});await checkout(m,917000,'mobile');
+ await m.locator('[data-category="Gaun Wanita"]').tap();await settled(m);check('first HUD tap after native swipe changes category',(await debug(m)).category==='Gaun Wanita'&&(await debug(m)).selectedId==='GW-001');await m.locator('#hudInspect').tap();await settled(m);await m.locator('[data-hud-size=M]').tap();await m.locator('#hudAdd').tap();check('mobile add confirmation remains available inline',(await m.locator('#hudFeedback').innerText()).includes('added'));check('mobile confirmation never obscures cart action',await m.evaluate(()=>{const t=document.querySelector('#uiToast'),a=document.querySelector('#hudAdd');if(Number(getComputedStyle(t).opacity)<.05)return true;const x=t.getBoundingClientRect(),y=a.getBoundingClientRect();return x.right<=y.left||x.left>=y.right||x.bottom<=y.top||x.top>=y.bottom;}));await m.screenshot({path:path.join(OUT,'3d-clothing-mobile-focus.png')});await checkout(m,917000,'mobile');
  await m.locator('#helpOpen').tap();check('mobile tracking remains reachable',await m.locator('#helpTrack').isVisible());await m.locator('#helpTrack').tap();check('mobile tracking modal opens',await m.locator('#trackDialog').evaluate(el=>el.open));await close(m);
  await m.locator('[data-primary-collection="Sepatu"]').tap();await m.locator('[data-shoe-filter="Sepatu Pria"]').tap();await settled(m);check('mobile shoe pagination preserves7 products',(await debug(m)).filteredCount===7&&(await debug(m)).pageCount===2);await m.screenshot({path:path.join(OUT,'3d-shoes-mobile.png')});
  for(const [width,height] of [[360,800],[412,915],[844,390]]){
@@ -87,6 +108,21 @@ async function checkout(p,total,label){
   }
   check(`${width}x${height} has no horizontal overflow`,await page.evaluate(()=>document.documentElement.scrollWidth===innerWidth));await compact.close();
  }
+ const framesBeforeLoss=await p.evaluate(()=>{
+  const e=YASHBI_3D.engine;
+  window.testContextLoss=e.renderer.getContext().getExtension('WEBGL_lose_context');
+  if(!window.testContextLoss) throw Error('WEBGL_lose_context unavailable');
+  window.testContextLoss.loseContext();
+  return e.renderedFrames;
+ });
+ await p.waitForFunction(()=>YASHBI_3D.engine.contextLost&&document.querySelector('.showroom-status').dataset.state==='webgl');
+ check('actual WebGL context loss raises a visible recovery notice',await p.locator('.showroom-status').isVisible());
+ await p.evaluate(()=>window.testContextLoss.restoreContext());
+ await p.waitForFunction(frames=>{
+  const e=YASHBI_3D.engine;
+  return !e.contextLost&&e.renderedFrames>frames&&document.querySelector('.showroom-status').hidden;
+ },framesBeforeLoss);
+ check('actual WebGL context restoration resumes rendering and clears the notice',!(await p.locator('#sceneStatus').textContent()));
  const broken=await p.evaluate(async()=>{document.querySelectorAll('img[loading=lazy]').forEach(x=>x.loading='eager');await Promise.all([...document.images].filter(x=>x.getAttribute('src')).map(x=>x.decode().catch(()=>{})));return [...document.images].filter(x=>x.getAttribute('src')&&!x.naturalWidth).map(x=>x.src);});check('zero broken HTML image elements',broken.length===0);
  check('zero console page or resource errors',errors.length===0);check('zero external or production requests',external.length===0);
  const manifest=JSON.parse(fs.readFileSync(path.join(ROOT,'assets/images/cutout/manifest.json'),'utf8'));check('all31 clothing photos preserve complete photographed people',Object.values(manifest.entries).filter(item=>/^assets\/images\/cutout\/(gw|jp)-/.test(item.file)).length===31&&Object.values(manifest.entries).filter(item=>/^assets\/images\/cutout\/(gw|jp)-/.test(item.file)).every(item=>item.subjectType==='photographed-subject'));

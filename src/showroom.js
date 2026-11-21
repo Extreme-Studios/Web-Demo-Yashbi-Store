@@ -8,13 +8,13 @@ const asId = value => typeof value === 'object' ? value?.id : value;
 
 /** A real WebGL installation. Commerce and the accessible HTML controls live outside it. */
 export class Showroom {
-  constructor({canvas, products = [], imageForColor, imageSources, onSelect = noop, onInspect = noop, onReady = noop, onError = noop}) {
+  constructor({canvas, products = [], imageForColor, imageSources, onSelect = noop, onInspect = noop, onReady = noop, onError = noop, onContextRecovered = noop}) {
     if (!canvas) throw new Error('Showroom requires a canvas.');
     this.canvas = canvas;
     this.products = products;
     this.imageForColor = imageForColor || ((product, color) => product.colorImages?.[color] || product.image);
     this.imageSources = imageSources;
-    this.callbacks = {onSelect, onInspect, onReady, onError};
+    this.callbacks = {onSelect, onInspect, onReady, onError, onContextRecovered};
     this.disposed = false;
     this.category = 'Gaun Wanita';
     this.mode = 'runway';
@@ -109,10 +109,13 @@ export class Showroom {
     this._listen(this.canvas, 'webglcontextlost', event => {
       event.preventDefault();
       this.contextLost = true;
-      this.callbacks.onError(new Error('WebGL context lost. Reload the preview to restore the showroom.'));
+      this.contextRecoveryPending = false;
+      this.callbacks.onError(new Error('WebGL was interrupted. The showroom will resume when graphics recover.'), 'webgl');
     });
     this._listen(this.canvas, 'webglcontextrestored', () => {
       this.contextLost = false;
+      this.contextRecoveryPending = true;
+      this.activeUntil = performance.now() + 1600;
       this.materials.forEach(material => material.needsUpdate = true);
       this.textureCache.forEach(promise => promise.then(asset => {if (asset?.texture) asset.texture.needsUpdate = true;}));
     });
@@ -349,7 +352,7 @@ export class Showroom {
     // swallowing the next HUD tap after a horizontal camera swipe.
     this.canvas.style.touchAction = 'none';
     this.canvas.setAttribute('tabindex','0');
-    this.canvas.setAttribute('aria-label','Showroom tiga dimensi Yashbi. Gunakan panah kiri dan kanan untuk memilih produk.');
+    this.canvas.setAttribute('aria-label','Yashbi 3D showroom. Use the left and right arrow keys to select products.');
     this._listen(this.canvas,'pointerdown',event => {
       if (this._blocked() || !event.isPrimary || event.button > 0) return;
       this.drag = {id:event.pointerId,x:event.clientX,y:event.clientY,lastX:event.clientX,dx:0,dy:0,garmentCenter:this.garmentCenter,start:performance.now()};
@@ -507,10 +510,10 @@ export class Showroom {
     this._layout();this._emitSelection(this.mode==='focus');return true;
   }
 
-  inspect(id = this.selectedProduct?.id) {
+  inspect(id = this.selectedProduct?.id, view = 'detail') {
     if (this.disposed || !id) return false;
     if (asId(id)!==this.selectedProduct?.id && !this.select(id)) return false;
-    this.garmentView='detail';this.garmentCenter=.4;
+    this.garmentView=view==='full'&&!isShoe(this.selectedProduct)?'full':'detail';this.garmentCenter=.4;
     this.mode='focus';this._layout();this._emitSelection(true);return true;
   }
 
@@ -795,6 +798,10 @@ export class Showroom {
     this.focusLight.intensity=THREE.MathUtils.lerp(this.focusLight.intensity,this.mode==='focus'?15:7,response);
     this._updateInspectionPlanes();
     this.renderer.render(this.scene,this.camera);this.renderedFrames++;
+    if (this.contextRecoveryPending) {
+      this.contextRecoveryPending = false;
+      this.callbacks.onContextRecovered();
+    }
     if (matchMedia('(hover:hover)').matches&&this._isPointerInside&&!this.drag&&this.renderedFrames%5===0&&!this._blocked())this._updateHover();
   }
 

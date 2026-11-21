@@ -20,6 +20,10 @@ const ui = createUI({
   onInspect(id) {engine?.inspect(typeof id==='string'?id:selected.id);},
   onColor(color) {engine?.setColor(selected.id,color);},
   onOverview() {engine?.overview();},
+  onStylistFocus(sku, detailView) {
+    if (!engine || engine.contextLost) return false;
+    return engine.inspect(sku, detailView ? 'detail' : 'full');
+  },
   onGarmentView(view) {engine?.setGarmentView(view);}
 });
 
@@ -35,10 +39,11 @@ try {
     onSelect:selection,
     onInspect:selection,
     onReady() {ui.setReady();},
-    onError(error) {ui.setError(error.message || 'Showroom 3D belum dapat dibuka.');}
+    onContextRecovered() {ui.clearWebglError();},
+    onError(error, reason) {ui.setError(error.message || 'The 3D showroom could not open.', reason);}
   });
 } catch(error) {
-  ui.setError(error.message || 'Perangkat ini belum mendukung WebGL.');
+  ui.setError(error.message || 'WebGL is unavailable on this device.');
 }
 
 // Public coordination surface for accessible HUD actions, deep links and QA.

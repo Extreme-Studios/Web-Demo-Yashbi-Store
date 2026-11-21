@@ -97,7 +97,11 @@ export function createCommerce(catalog) {
     });
     if (!response.ok) throw new Error('Server tidak dapat menerima data.');
     const result = await response.json();
-    if (!result.ok) throw new Error(result.error || 'Permintaan ditolak server.');
+    if (!result.ok) {
+      throw Object.assign(new Error(result.error || 'The request was rejected.'), {
+        code: result.code, details: result.details, retryable: result.retryable,
+      });
+    }
     return result;
   }
   async function syncVisitor(status = 'Online / Tanya', orderId = '') {
@@ -174,6 +178,10 @@ export function createCommerce(catalog) {
         if (!result.order?.id) throw new Error('Server belum mengembalikan nomor pesanan.');
         Object.assign(order, result.order, { syncState: 'Tersinkron' });
       } catch (failure) {
+        if (failure.retryable === false) {
+          saveOrders(orders.filter(item => item.clientOrderId !== order.clientOrderId));
+          throw failure;
+        }
         order.syncError = failure.message;
         order.status = 'Menunggu sinkronisasi';
         order.syncState = 'Antrean perangkat ini';
@@ -229,7 +237,19 @@ export function createCommerce(catalog) {
         const next = queue.filter(value => value !== item);
         save(STORE_KEYS.queue, next); queue = next;
         emit();
-      } catch { /* Preserve failed or unstored payloads for an idempotent retry. */ }
+      } catch (failure) {
+        if (failure.retryable !== false) continue;
+        const order = orders.find(value => value.clientOrderId === item.payload.clientOrderId);
+        try {
+          if (order) saveOrders(orders.map(value => value === order ? {
+            ...value, proof: undefined, status: 'Order rejected', syncState: 'Rejected', syncError: failure.message,
+          } : value));
+          const next = queue.filter(value => value !== item);
+          save(STORE_KEYS.queue, next);
+          queue = next;
+          emit();
+        } catch { /* Preserve the queue if the outcome could not be saved. */ }
+      }
     }
     return queue;
   }

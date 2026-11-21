@@ -177,3 +177,51 @@
   .showroom-ui[data-mode=overview] .hud-actions,.showroom-ui[data-mode=overview] .product-hud>#hudDetails,.showroom-ui[data-scene=shelf][data-mode=overview] .hud-actions,.showroom-ui[data-scene=shelf][data-mode=overview] #hudDetails{grid-row:3;margin-top:12px}.showroom-ui[data-scene=shelf][data-mode=overview] #hudDetails{display:flex}.showroom-ui[data-scene=shelf][data-mode=overview] .hud-actions{grid-column:1}.showroom-ui[data-scene=shelf][data-mode=overview] #hudInspect{min-height:44px;font-size:7px}
   .scene-pagination button{width:44px;height:44px}.chat-launch{left:calc(3vw + 192px);right:auto;bottom:25px;min-height:44px}.showroom-footer>div{display:none}.dialog-close{width:44px;height:44px}
 }
+
+.stylist-look {
+  grid-column: 1 / -1;
+  margin: 12px 0;
+  padding: 9px;
+  border: 1px solid var(--line);
+  background: var(--elevated);
+}
+.stylist-look-title { margin: 0 0 5px; font-size: 10px; font-weight: 600; }
+.stylist-items { display: flex; flex-wrap: wrap; gap: 5px; }
+.stylist-items button, .stylist-continue {
+  min-height: 44px;
+  max-width: 100%;
+  padding: 7px 9px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  font-size: 10px;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.stylist-items button[aria-current=true] {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--elevated);
+}
+.stylist-continue {
+  border: 0;
+  padding: 4px 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.stylist-notes { margin-top: 3px; font-size: 10px; line-height: 1.6; }
+.stylist-notes summary { padding: 8px 0; cursor: pointer; }
+.stylist-notes p { margin: 0 0 4px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.showroom-ui[data-mode=overview] .stylist-look { display: none; }
+.chat-messages > .stylist-items { flex: none; }
+
+@media (max-width:800px), (max-height:550px) and (max-width:950px) {
+  .stylist-look { grid-row: 3; margin: 8px 0 0; }
+  .showroom-ui[data-mode=inspect] .product-hud:has(.stylist-look:not([hidden])) .hud-options { grid-row: 4; }
+  .showroom-ui[data-mode=inspect] .product-hud:has(.stylist-look:not([hidden])) .selection-feedback { grid-row: 5; }
+  .showroom-ui[data-mode=inspect] .product-hud:has(.stylist-look:not([hidden])) :is(.hud-actions, #hudDetails) { grid-row: 6; }
+}
+
+.stylist-starters { display:flex; gap:5px; flex-wrap:wrap; margin-top:12px; }
+.stylist-starters button { min-height:44px; padding:5px 8px; border:1px solid var(--line); background:var(--elevated); color:var(--ink); font:inherit; font-size:10px; cursor:pointer; }
+.stylist-starters button:hover { border-color:var(--ink); }

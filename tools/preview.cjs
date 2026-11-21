@@ -170,14 +170,34 @@ function createOrder(payload, origin) {
 
 function chatReply(payload) {
   const message = text(payload.message, 801);
-  if (!message || message.length > 800) throw Object.assign(new Error("Pesan harus diisi dan maksimal 800 karakter."), { status: 400 });
+  if (!message || message.length > 800) throw Object.assign(new Error('Enter a message of up to 800 characters.'), { status: 400 });
   const catalog = Array.isArray(payload.catalog) ? payload.catalog.slice(0, 50) : [];
-  const query = message.toLowerCase();
-  if (/pesanan|resi|pembayaran|transfer|bayar|order/.test(query)) return "[Local Preview · Respons simulasi] Pesanan pada preview ini hanya simulasi lokal. Gunakan Cek Pesanan dengan nomor PREVIEW dan WhatsApp yang sama. Jangan melakukan pembayaran; tidak ada pesanan atau email yang dikirim ke toko.";
-  const category = /sepatu/.test(query) ? (/pria/.test(query) ? "sepatu pria" : /wanita/.test(query) ? "sepatu wanita" : "sepatu") : /gaun/.test(query) ? "gaun wanita" : /jas/.test(query) ? "jas pria" : "";
-  const tokens = query.split(/[^a-z0-9]+/).filter(token => token.length >= 3);
-  const selected = catalog.filter(product => !category || String(product.category).toLowerCase().includes(category)).map(product => ({ product, score: tokens.reduce((score, token) => score + (`${product.name} ${product.category} ${(product.colors || []).join(" ")} ${(product.sizes || []).join(" ")}`.toLowerCase().includes(token) ? 1 : 0), 0) })).sort((a, b) => b.score - a.score).slice(0, 3).map(({ product }) => `${text(product.name, 100)} (${text(product.id, 32)}) - ${rupiah(product.price)}`);
-  return selected.length ? `[Local Preview · Respons simulasi] Dari katalog di halaman ini, coba ${selected.join("; ")}. Buka produk untuk memilih warna dan ukuran. Respons ini contoh lokal; layanan AI live belum diuji.` : "[Local Preview · Respons simulasi] Coba jelaskan gaun, jas, atau sepatu yang kamu cari. Katalog yang cocok belum ditemukan. Layanan AI live belum diuji.";
+  const history = Array.isArray(payload.history) ? payload.history.slice(-8) : [];
+  const prior = history.filter(turn => turn?.role === 'user').map(turn => text(turn.content, 800));
+  const query = [message, ...prior.reverse()].join(' ').toLowerCase();
+  const simulate = reply => ({ reply: '[Local preview simulation] ' + reply, recommendedSkus: [], actions: [] });
+  if (/\b(pesanan|resi|pembayaran|transfer|bayar|order|payment|tracking)\b/.test(query)) {
+    return simulate('Use Track order with the preview order number and matching WhatsApp number.');
+  }
+  const menswear = !/\b(gaun|dress|gown)\b/i.test(message) && /\b(jas|pria|men|menswear|suit|blazer)\b/.test(query);
+  const wanted = menswear ? 'JP-' : 'GW-';
+  const footwear = menswear ? 'SP-' : 'SW-';
+  const explicitSku = message.match(/\b(?:GW|JP)-\d{3}\b/i)?.[0]?.toUpperCase();
+  const requestedGarment = catalog.find(product => product.id === explicitSku);
+  const shoesFirst = /\b(shoes|sepatu|heels|sneakers)\b/i.test(message);
+  const tokens = message.toLowerCase().match(/[a-z]{3,}/g) || [];
+  const pick = prefix => catalog.filter(product => typeof product?.id === 'string' && product.id.startsWith(prefix))
+    .map(product => ({ product, score: tokens.filter(token => String(product.name).toLowerCase().includes(token)).length }))
+    .sort((a,b) => b.score-a.score)[0]?.product;
+  const choices = (shoesFirst ? [pick(footwear), pick(wanted)] : [requestedGarment || pick(wanted), pick(requestedGarment?.id.startsWith('JP-') ? 'SP-' : requestedGarment ? 'SW-' : footwear)]).filter(Boolean);
+  if (!choices.length) return simulate('Tell me what kind of outfit you are looking for.');
+  const recommendedSkus = choices.map(product => product.id);
+  const detailView = /\b(detail|fabric|close[- ]?up|bahan)\b/i.test(message) && !shoesFirst;
+  return {
+    reply: '[Local preview simulation] Try ' + choices.map(product => text(product.name,100) + ' (' + rupiah(product.price) + ')').join(' with ') + '. Select either item to inspect it.',
+    recommendedSkus,
+    actions: recommendedSkus.map((sku,index) => ({ type: 'focusProduct', sku, detailView: index === 0 && detailView })),
+  };
 }
 
 const server = http.createServer(async (req, res) => {
@@ -204,7 +224,7 @@ const server = http.createServer(async (req, res) => {
     }
     if (url.pathname === "/api/chat") {
       if (req.method !== "POST") return json(res, 405, { error: "Method tidak didukung." });
-      return json(res, 200, { reply: chatReply(await readBody(req)), simulation: true });
+      return json(res, 200, { ...chatReply(await readBody(req)), simulation: true });
     }
     const invoiceMatch = url.pathname.match(/^\/__preview\/invoice\/(PREVIEW-[A-Z0-9-]+)\.pdf$/);
     if (invoiceMatch) {

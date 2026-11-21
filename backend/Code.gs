@@ -20,7 +20,7 @@ function doGet(e) {
     if (action === "products") return json_({ ok: true, products: getProducts_() });
     if (action === "catalog-images") return json_({ ok: true, images: getCatalogImages_() });
     if (action === "admin-dashboard") return json_(adminDashboard_(e.parameter.token));
-    return json_({ ok: true, service: "Yashbi Store API", time: new Date().toISOString() });
+    return json_({ ok: true, service: "Yashbi Store API", orderPricing: "server-catalog-v1", time: new Date().toISOString() });
   } catch (error) {
     return json_({ ok: false, error: error.message });
   }
@@ -32,7 +32,14 @@ function doPost(e) {
       return json_(receiveBiteshipWebhook_(JSON.parse((e.postData && e.postData.contents) || "{}"), e));
     }
     const payload = JSON.parse((e && e.postData && e.postData.contents) || "{}");
-    if (payload.action === "createOrder" || payload.action === "syncOrder") return json_(createOrder_(payload));
+    if (payload.action === "createOrder" || payload.action === "syncOrder") {
+      try {
+        return json_(createOrder_(payload));
+      } catch (error) {
+        if (error.orderValidation) return json_({ ok: false, error: error.message, code: error.code, details: error.details, retryable: false });
+        throw error;
+      }
+    }
     if (payload.action === "upsertVisitor") return json_(upsertVisitor_(payload));
     if (payload.action === "adminLogin") return json_(adminLogin_(payload));
     if (payload.action === "updateOrder") return json_(updateOrder_(payload));
@@ -124,8 +131,73 @@ function clearDemoOrderDataForOwner_(payload) {
   return clearDemoOrderData();
 }
 
+const SHIPPING_OPTIONS = {
+  'j&t regular': { label: 'J&T Regular', fee: 18000 },
+  'jne regular': { label: 'JNE Regular', fee: 20000 },
+  'sicepat reg': { label: 'SiCepat REG', fee: 17000 },
+  'ambil di toko': { label: 'Ambil di toko', fee: 0 },
+  'store pickup': { label: 'Ambil di toko', fee: 0 }
+};
+
+function orderValidationError_(code, message, details) {
+  return Object.assign(new Error(message), { orderValidation: true, code, details });
+}
+
+function priceOrder_(payload, products, bootstrap) {
+  if (!payload.customer || !Array.isArray(payload.items) || !payload.items.length || payload.items.length > 100) {
+    throw orderValidationError_('INVALID_ORDER', 'An order needs a recipient and between 1 and 100 line items.');
+  }
+  const courier = String(payload.customer.courier || '').split(/\s*[-–—]\s*(?=Rp|Gratis|Free)/i)[0].trim().toLowerCase();
+  const option = Object.hasOwn(SHIPPING_OPTIONS, courier) ? SHIPPING_OPTIONS[courier] : null;
+  if (!option) throw orderValidationError_('INVALID_SHIPPING', 'Choose an available shipping option.');
+
+  const idFor = value => String(value || '').trim().toUpperCase();
+  const bySku = new Map(products.map(product => [idFor(product.id), product]));
+  const defaults = new Map(bootstrap.map(([id, name, price, colors, sizes, stock]) => [id, { id, name, price, colors, sizes, stock }]));
+  const quantities = new Map();
+  let subtotal = 0;
+  const items = payload.items.map((item, index) => {
+    const sku = idFor(item && item.productId);
+    const position = { line: index + 1, sku: sku.slice(0, 32) };
+    const row = bySku.get(sku);
+    if (!row) throw orderValidationError_('INVALID_SKU', 'An item is no longer offered.', position);
+    // Import-created placeholders have no price or variants. Known active SKUs
+    // can use the reviewed server snapshot until their Sheet record is configured.
+    const isPlaceholder = row.price === 0 && !row.colors.length && !row.sizes.length;
+    const product = isPlaceholder ? defaults.get(sku) : row;
+    if (!product || !String(product.name || '').trim() || !Number.isSafeInteger(product.price) || product.price <= 0 ||
+        !product.colors.length || !product.sizes.length || !Number.isSafeInteger(row.stock) || row.stock < 0) {
+      throw orderValidationError_('UNCONFIGURED_SKU', 'An item is not configured for checkout. Contact store staff.', position);
+    }
+    const stock = row.stock;
+    const qty = item.qty;
+    if (!Number.isSafeInteger(qty) || qty <= 0 || qty > 100) {
+      throw orderValidationError_('INVALID_QUANTITY', 'Quantity must be a whole number from 1 to 100.', position);
+    }
+    const matching = (variants, value) => typeof value === 'string' &&
+      variants.find(variant => String(variant).trim().toLowerCase() === value.trim().toLowerCase());
+    const color = matching(product.colors, item.color);
+    const size = matching(product.sizes, item.size);
+    if (!color || !size) throw orderValidationError_('INVALID_VARIANT', 'Choose an available color and size for this item.', position);
+    const count = (quantities.get(sku) || 0) + qty;
+    if (count > stock || count > 100) {
+      throw orderValidationError_('INSUFFICIENT_STOCK', 'The combined quantity exceeds stock or the per-item order limit.', position);
+    }
+    quantities.set(sku, count);
+    const lineTotal = qty * product.price;
+    subtotal += lineTotal;
+    if (!Number.isSafeInteger(subtotal + option.fee)) {
+      throw orderValidationError_('INVALID_TOTAL', 'The order total is outside the supported range.', position);
+    }
+    return { productId: sku, name: product.name, color, size: String(size), qty, price: product.price, lineTotal };
+  });
+  return { items, subtotal, shipping: option.fee, total: subtotal + option.fee, courier: option.label };
+}
+
 function createOrder_(payload) {
-  if (!payload.customer || !payload.items || !payload.items.length) throw new Error("Data pesanan tidak lengkap.");
+  if (!payload.customer || !Array.isArray(payload.items) || !payload.items.length) {
+    throw orderValidationError_("INVALID_ORDER", "An order needs a recipient and at least one item.");
+  }
   const lock = LockService.getScriptLock();
   lock.waitLock(15000);
   try {
@@ -133,29 +205,46 @@ function createOrder_(payload) {
     const orderSheet = spreadsheet.getSheetByName(CONFIG.sheets.orders);
     const itemSheet = spreadsheet.getSheetByName(CONFIG.sheets.orderItems);
     if (!orderSheet || !itemSheet) throw new Error("Jalankan setupYashbiStore terlebih dahulu.");
-    ensureOrderPaymentHeaders_(orderSheet);
     const clientOrderId = safe_(payload.clientOrderId || "");
     const existing = clientOrderId && orderSheet.getLastRow() > 1
       ? orderSheet.getRange(2, 1, orderSheet.getLastRow() - 1, HEADERS.Pesanan.length).getValues()
           .find(row => String(row[17] || "") === clientOrderId)
       : null;
-    if (existing) return { ok: true, order: { id: existing[0], status: existing[12], createdAt: new Date(existing[1]).toISOString(), duplicate: true } };
+    if (existing) {
+      if (normalizePhone_(existing[3]) !== normalizePhone_(payload.customer.phone)) {
+        throw orderValidationError_("ORDER_ID_CONFLICT", "This order reference is already in use.");
+      }
+      const invoiceViewUrl = String(existing[20] || "");
+      const recordedItems = itemSheet.getLastRow() > 1
+        ? itemSheet.getRange(2, 1, itemSheet.getLastRow() - 1, HEADERS["Detail Pesanan"].length).getValues()
+          .filter(row => String(row[0]) === String(existing[0]))
+          .map(row => ({ productId: String(row[1]), name: row[2], color: row[3], size: String(row[4]), qty: row[5], price: row[6], lineTotal: row[7] }))
+        : [];
+      return { ok: true, order: { id: existing[0], status: existing[12], createdAt: new Date(existing[1]).toISOString(),
+        subtotal: existing[9], shipping: existing[10], total: existing[11], items: recordedItems,
+        invoiceUrl: invoiceViewUrl ? driveDownloadUrl_(invoiceViewUrl) : "", invoiceViewUrl, duplicate: true } };
+    }
+    const customer = payload.customer;
+    if (![customer.name, customer.address, customer.city, customer.postal].every(value => typeof value === "string" && value.trim()) || !normalizePhone_(customer.phone)) {
+      throw orderValidationError_("INVALID_RECIPIENT", "Complete the recipient and shipping details.");
+    }
+    if (typeof payload.proof !== "string" || payload.proof.length > 7000000 || !/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(payload.proof)) {
+      throw orderValidationError_("INVALID_PROOF", "Upload a valid payment proof image.");
+    }
+    const { items, subtotal, shipping, total, courier } = priceOrder_(payload, getProducts_(spreadsheet), ORDER_CATALOG_BOOTSTRAP);
+    ensureOrderPaymentHeaders_(orderSheet);
     const orderId = nextOrderId_(orderSheet);
     const now = new Date();
     const proofUrl = saveProof_(payload.proof, orderId);
-    const customer = payload.customer;
-    const subtotal = number_(payload.subtotal);
-    const shipping = number_(payload.shipping);
-    const total = subtotal + shipping;
     const status = "Menunggu Verifikasi Pembayaran";
     orderSheet.appendRow([
       orderId, now, safe_(customer.name), normalizePhone_(customer.phone), safe_(customer.email),
-      safe_(customer.address), safe_(customer.city), safe_(customer.postal), safe_(customer.courier),
+      safe_(customer.address), safe_(customer.city), safe_(customer.postal), safe_(courier),
       subtotal, shipping, total, status, proofUrl, "", "", now, clientOrderId, orderSource_(payload.source), paymentMethod_(payload.paymentMethod || customer.paymentMethod)
     ]);
-    const rows = payload.items.map(item => [
+    const rows = items.map(item => [
       orderId, safe_(item.productId), safe_(item.name), safe_(item.color), safe_(item.size),
-      number_(item.qty), number_(item.price), number_(item.qty) * number_(item.price)
+      item.qty, item.price, item.lineTotal
     ]);
     itemSheet.getRange(itemSheet.getLastRow() + 1, 1, rows.length, HEADERS["Detail Pesanan"].length).setValues(rows);
     let invoice = null;
@@ -166,7 +255,7 @@ function createOrder_(payload) {
     } catch (invoiceError) {
       console.warn("Invoice belum dapat dibuat untuk " + orderId + ": " + invoiceError.message);
     }
-    return { ok: true, order: { id: orderId, status: status, createdAt: now.toISOString(), invoiceUrl: invoice ? invoice.downloadUrl : "", invoiceViewUrl: invoice ? invoice.viewUrl : "" } };
+    return { ok: true, order: { id: orderId, status: status, createdAt: now.toISOString(), items, subtotal, shipping, total, invoiceUrl: invoice ? invoice.downloadUrl : "", invoiceViewUrl: invoice ? invoice.viewUrl : "" } };
   } finally {
     lock.releaseLock();
   }
@@ -686,8 +775,8 @@ function authorizeInvoiceEmail() {
   return MailApp.getRemainingDailyQuota();
 }
 
-function getProducts_() {
-  const sheet = SpreadsheetApp.openById(CONFIG.spreadsheetId).getSheetByName(CONFIG.sheets.products);
+function getProducts_(spreadsheet) {
+  const sheet = (spreadsheet || SpreadsheetApp.openById(CONFIG.spreadsheetId)).getSheetByName(CONFIG.sheets.products);
   if (!sheet || sheet.getLastRow() < 2) return [];
   return sheet.getRange(2, 1, sheet.getLastRow() - 1, HEADERS.Produk.length).getValues()
     .filter(row => row[0] && String(row[12]).toLowerCase() !== "false")
